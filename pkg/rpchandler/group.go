@@ -68,7 +68,7 @@ func (g *Group) GetMethodNames() []string {
 	var names []string
 	prefix := g.prefix + "."
 
-	for methodName := range g.registry.methods {
+	for methodName := range g.registry.contexts {
 		if strings.HasPrefix(methodName, prefix) {
 			names = append(names, methodName)
 		}
@@ -99,17 +99,12 @@ func (g *Group) GetPrefix() string {
 	return g.prefix
 }
 
-// RegisterToServer 이 그룹의 메서드들만 JSON-RPC 서버에 등록합니다
-func (g *Group) RegisterToServer(server interface{}) error {
-	return g.registry.RegisterMethodsWithPrefix(server, g.prefix)
-}
-
 // GetMethodCount 이 그룹에 속한 메서드 수를 반환합니다
 func (g *Group) GetMethodCount() int {
 	count := 0
 	prefix := g.prefix + "."
 
-	for methodName := range g.registry.methods {
+	for methodName := range g.registry.contexts {
 		if strings.HasPrefix(methodName, prefix) {
 			count++
 		}
@@ -127,9 +122,10 @@ func (g *Group) GetHandlerCount() int {
 func (g *Group) Clear() {
 	// 등록된 메서드들 제거
 	prefix := g.prefix + "."
-	for methodName := range g.registry.methods {
+
+	for methodName := range g.registry.contexts {
 		if strings.HasPrefix(methodName, prefix) {
-			delete(g.registry.methods, methodName)
+			delete(g.registry.contexts, methodName)
 		}
 	}
 

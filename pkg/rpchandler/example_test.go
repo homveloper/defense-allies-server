@@ -36,7 +36,7 @@ func (g *GameHandler) GetState(ctx context.Context, params GetStateParams) (map[
 	if params.GameID == "" {
 		return nil, fmt.Errorf("game_id is required")
 	}
-	
+
 	return map[string]interface{}{
 		"game_id": params.GameID,
 		"status":  "active",
@@ -74,32 +74,32 @@ func (p *PlayerHandler) GetProfile(ctx context.Context, params GetProfileParams)
 func TestRPCContext(t *testing.T) {
 	// Registry 생성
 	registry := NewRegistry()
-	
+
 	// 핸들러 등록
 	err := registry.RegisterHandler("game", &GameHandler{})
 	if err != nil {
 		t.Fatalf("Failed to register GameHandler: %v", err)
 	}
-	
+
 	err = registry.RegisterHandler("player", &PlayerHandler{})
 	if err != nil {
 		t.Fatalf("Failed to register PlayerHandler: %v", err)
 	}
-	
+
 	// 등록된 메서드 확인
 	methods := registry.GetMethodNames()
 	expectedMethods := []string{
 		"game.GetStatus",
-		"game.Ping", 
+		"game.Ping",
 		"game.GetState",
 		"game.ProcessRawData",
 		"player.GetProfile",
 	}
-	
+
 	if len(methods) != len(expectedMethods) {
 		t.Errorf("Expected %d methods, got %d", len(expectedMethods), len(methods))
 	}
-	
+
 	// RPCContext 확인
 	for _, methodName := range expectedMethods {
 		ctx, exists := registry.GetRPCContext(methodName)
@@ -107,11 +107,11 @@ func TestRPCContext(t *testing.T) {
 			t.Errorf("RPCContext not found for method: %s", methodName)
 			continue
 		}
-		
+
 		if !ctx.IsValid() {
 			t.Errorf("Invalid RPCContext for method: %s", methodName)
 		}
-		
+
 		t.Logf("Method: %s, Signature: %s", methodName, ctx.GetMethodSignature())
 	}
 }
@@ -121,9 +121,9 @@ func TestMethodCalls(t *testing.T) {
 	registry := NewRegistry()
 	registry.RegisterHandler("game", &GameHandler{})
 	registry.RegisterHandler("player", &PlayerHandler{})
-	
+
 	ctx := context.Background()
-	
+
 	// 파라미터 없는 메서드 테스트
 	result, err := registry.CallMethod(ctx, "game.GetStatus", nil)
 	if err != nil {
@@ -131,7 +131,7 @@ func TestMethodCalls(t *testing.T) {
 	} else {
 		t.Logf("game.GetStatus result: %+v", result)
 	}
-	
+
 	// 에러만 반환하는 메서드 테스트
 	result, err = registry.CallMethod(ctx, "game.Ping", nil)
 	if err != nil {
@@ -139,7 +139,7 @@ func TestMethodCalls(t *testing.T) {
 	} else {
 		t.Logf("game.Ping result: %+v", result)
 	}
-	
+
 	// 구조체 파라미터 메서드 테스트
 	params := json.RawMessage(`{"game_id": "12345"}`)
 	result, err = registry.CallMethod(ctx, "game.GetState", params)
@@ -148,7 +148,7 @@ func TestMethodCalls(t *testing.T) {
 	} else {
 		t.Logf("game.GetState result: %+v", result)
 	}
-	
+
 	// Raw JSON 파라미터 메서드 테스트
 	rawParams := json.RawMessage(`{"action": "test", "data": [1,2,3]}`)
 	result, err = registry.CallMethod(ctx, "game.ProcessRawData", rawParams)
@@ -157,7 +157,7 @@ func TestMethodCalls(t *testing.T) {
 	} else {
 		t.Logf("game.ProcessRawData result: %+v", result)
 	}
-	
+
 	// 플레이어 프로필 조회 테스트
 	playerParams := json.RawMessage(`{"player_id": "user123"}`)
 	result, err = registry.CallMethod(ctx, "player.GetProfile", playerParams)
@@ -172,7 +172,7 @@ func TestMethodCalls(t *testing.T) {
 func TestMethodInfo(t *testing.T) {
 	registry := NewRegistry()
 	registry.RegisterHandler("game", &GameHandler{})
-	
+
 	// 메서드 정보 조회
 	info, err := registry.GetMethodInfo("game.GetState")
 	if err != nil {
@@ -180,13 +180,13 @@ func TestMethodInfo(t *testing.T) {
 	} else {
 		t.Logf("Method info: %+v", info)
 	}
-	
+
 	// 모든 메서드 정보 조회
 	allInfo := registry.GetAllMethodInfo()
 	for methodName, info := range allInfo {
 		t.Logf("Method %s info: %+v", methodName, info)
 	}
-	
+
 	// 메서드 시그니처 조회
 	signatures := registry.GetMethodSignatures()
 	for methodName, signature := range signatures {

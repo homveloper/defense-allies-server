@@ -85,46 +85,6 @@ func CreateQuickGroup(registry *Registry, prefix string, handlers map[string]Han
 	return group, nil
 }
 
-// MethodInfo 메서드 정보 구조체 (디버깅/모니터링 용도)
-type MethodInfo struct {
-	Name        string `json:"name"`
-	Path        string `json:"path"`
-	HasContext  bool   `json:"has_context"`
-	NeedsParams bool   `json:"needs_params"`
-	HasReturn   bool   `json:"has_return"`
-	HasError    bool   `json:"has_error"`
-}
-
-// GetLegacyMethodInfo 레거시 메서드 정보를 반환합니다 (MethodWrapper 기반)
-func (r *Registry) GetLegacyMethodInfo(methodName string) (*MethodInfo, error) {
-	wrapper, exists := r.methods[methodName]
-	if !exists {
-		return nil, fmt.Errorf("method not found: %s", methodName)
-	}
-
-	return &MethodInfo{
-		Name:        wrapper.method.Name,
-		Path:        wrapper.methodPath,
-		HasContext:  wrapper.hasContext,
-		NeedsParams: wrapper.needsParams,
-		HasReturn:   wrapper.returnInfo.hasReturn,
-		HasError:    wrapper.returnInfo.hasError,
-	}, nil
-}
-
-// GetAllLegacyMethodInfo 모든 레거시 메서드 정보를 반환합니다
-func (r *Registry) GetAllLegacyMethodInfo() map[string]*MethodInfo {
-	info := make(map[string]*MethodInfo)
-
-	for methodName := range r.methods {
-		if methodInfo, err := r.GetLegacyMethodInfo(methodName); err == nil {
-			info[methodName] = methodInfo
-		}
-	}
-
-	return info
-}
-
 // Stats 레지스트리 통계 정보
 type Stats struct {
 	MethodCount int    `json:"method_count"`

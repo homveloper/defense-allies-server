@@ -14,15 +14,13 @@ import (
 
 // Registry RPC 메서드 등록 및 관리
 type Registry struct {
-	methods  map[string]*MethodWrapper
-	contexts map[string]*RPCContext // RPCContext 추가
+	contexts map[string]*RPCContext // RPCContext만 사용
 	groups   map[string]*Group
 }
 
 // NewRegistry 새로운 Registry를 생성합니다
 func NewRegistry() *Registry {
 	return &Registry{
-		methods:  make(map[string]*MethodWrapper),
 		contexts: make(map[string]*RPCContext),
 		groups:   make(map[string]*Group),
 	}
@@ -62,11 +60,7 @@ func (r *Registry) scanAndRegisterMethods(prefix string, handler Handler, opts *
 
 		methodPath := prefix + "." + method.Name
 
-		// 기존 MethodWrapper 생성
-		methodWrapper := analyzeMethod(handlerValue, method, methodPath)
-		r.methods[methodPath] = methodWrapper
-
-		// 새로운 RPCContext 생성
+		// RPCContext 생성
 		rpcContext := NewRPCContext(prefix, handlerValue, method)
 		r.contexts[methodPath] = rpcContext
 	}
@@ -76,18 +70,12 @@ func (r *Registry) scanAndRegisterMethods(prefix string, handler Handler, opts *
 
 // CallMethod 메서드를 호출합니다
 func (r *Registry) CallMethod(ctx context.Context, methodName string, params json.RawMessage) (interface{}, error) {
-	// RPCContext 우선 사용
-	if rpcContext, exists := r.contexts[methodName]; exists {
-		return rpcContext.Call(ctx, params)
-	}
-
-	// 기존 MethodWrapper 폴백
-	methodWrapper, exists := r.methods[methodName]
+	rpcContext, exists := r.contexts[methodName]
 	if !exists {
 		return nil, fmt.Errorf("method not found: %s", methodName)
 	}
 
-	return methodWrapper.Call(ctx, params)
+	return rpcContext.Call(ctx, params)
 }
 
 // GetHandlerFunc 메서드에 대한 HandlerFunc를 반환합니다
@@ -115,8 +103,8 @@ func (r *Registry) Group(prefix string) *Group {
 
 // GetMethodNames 등록된 모든 메서드 이름을 반환합니다
 func (r *Registry) GetMethodNames() []string {
-	names := make([]string, 0, len(r.methods))
-	for name := range r.methods {
+	names := make([]string, 0, len(r.contexts))
+	for name := range r.contexts {
 		names = append(names, name)
 	}
 	sort.Strings(names)
@@ -126,7 +114,7 @@ func (r *Registry) GetMethodNames() []string {
 // GetMethodNamesWithPrefix 특정 프리픽스로 시작하는 메서드 이름을 반환합니다
 func (r *Registry) GetMethodNamesWithPrefix(prefix string) []string {
 	var names []string
-	for name := range r.methods {
+	for name := range r.contexts {
 		if strings.HasPrefix(name, prefix) {
 			names = append(names, name)
 		}
@@ -137,57 +125,13 @@ func (r *Registry) GetMethodNamesWithPrefix(prefix string) []string {
 
 // HasMethod 메서드가 등록되어 있는지 확인합니다
 func (r *Registry) HasMethod(methodName string) bool {
-	_, exists := r.methods[methodName]
+	_, exists := r.contexts[methodName]
 	return exists
-}
-
-// RegisterAllMethods 모든 메서드를 JSON-RPC 서버에 등록합니다
-// 이 메서드는 실제 JSON-RPC 서버 구현에 따라 달라질 수 있습니다
-func (r *Registry) RegisterAllMethods(server interface{}) error {
-	// 이 부분은 실제 JSON-RPC 서버 라이브러리에 따라 구현이 달라집니다
-	// 예시로 일반적인 패턴을 보여줍니다
-
-	type RPCServer interface {
-		RegisterFunc(name string, fn interface{}) error
-	}
-
-	if rpcServer, ok := server.(RPCServer); ok {
-		for methodName := range r.methods {
-			handlerFunc := r.GetHandlerFunc(methodName)
-			if err := rpcServer.RegisterFunc(methodName, handlerFunc); err != nil {
-				return fmt.Errorf("failed to register method %s: %w", methodName, err)
-			}
-		}
-		return nil
-	}
-
-	return fmt.Errorf("unsupported server type")
-}
-
-// RegisterMethodsWithPrefix 특정 프리픽스의 메서드만 JSON-RPC 서버에 등록합니다
-func (r *Registry) RegisterMethodsWithPrefix(server interface{}, prefix string) error {
-	type RPCServer interface {
-		RegisterFunc(name string, fn interface{}) error
-	}
-
-	if rpcServer, ok := server.(RPCServer); ok {
-		for methodName := range r.methods {
-			if strings.HasPrefix(methodName, prefix) {
-				handlerFunc := r.GetHandlerFunc(methodName)
-				if err := rpcServer.RegisterFunc(methodName, handlerFunc); err != nil {
-					return fmt.Errorf("failed to register method %s: %w", methodName, err)
-				}
-			}
-		}
-		return nil
-	}
-
-	return fmt.Errorf("unsupported server type")
 }
 
 // GetMethodCount 등록된 메서드 수를 반환합니다
 func (r *Registry) GetMethodCount() int {
-	return len(r.methods)
+	return len(r.contexts)
 }
 
 // GetGroupCount 등록된 그룹 수를 반환합니다
@@ -197,7 +141,6 @@ func (r *Registry) GetGroupCount() int {
 
 // Clear 모든 등록된 메서드와 그룹을 제거합니다
 func (r *Registry) Clear() {
-	r.methods = make(map[string]*MethodWrapper)
 	r.contexts = make(map[string]*RPCContext)
 	r.groups = make(map[string]*Group)
 }
@@ -242,12 +185,6 @@ func (r *Registry) GetAllMethodInfo() map[string]map[string]interface{} {
 		info[name] = ctx.GetInfo()
 	}
 	return info
-}
-
-// isPublicMethod 메서드가 public인지 확인합니다
-func isPublicMethod(method reflect.Method) bool {
-	// 메서드 이름이 대문자로 시작하는지 확인
-	return method.Name[0] >= 'A' && method.Name[0] <= 'Z'
 }
 
 // ServeHTTP http.Handler 인터페이스 구현 - Registry를 HTTP 핸들러로 사용
