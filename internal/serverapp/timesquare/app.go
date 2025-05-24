@@ -69,7 +69,7 @@ func (t *TimeSquareApp) onStart(ctx context.Context) error {
 // onStop 종료 시 호출되는 훅
 func (t *TimeSquareApp) onStop(ctx context.Context) error {
 	log.Printf("[TimeSquare] Shutting down - Clearing the square... 🌃")
-	
+
 	// 진행 중인 게임 세션 정리
 	if t.gameService != nil {
 		// TODO: 게임 세션 정리 로직
@@ -161,7 +161,7 @@ func (t *TimeSquareApp) handleMatchLeave(w http.ResponseWriter, r *http.Request)
 func (t *TimeSquareApp) handleGameRoutes(w http.ResponseWriter, r *http.Request) {
 	// URL 파싱하여 게임 ID 추출
 	// TODO: 게임 라우팅 로직 구현
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"message": "Game route - Coming soon! 🎮"}`))

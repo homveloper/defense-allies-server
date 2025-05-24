@@ -28,8 +28,8 @@ func NewRegistry() *Registry {
 	}
 }
 
-// RegisterHandler 핸들러를 등록합니다
-func (r *Registry) RegisterHandler(name string, handler Handler) error {
+// RegisterHandler 핸들러를 등록합니다 (옵션 패턴 지원)
+func (r *Registry) RegisterHandler(name string, handler Handler, options ...RegisterOption) error {
 	if name == "" {
 		return fmt.Errorf("handler name cannot be empty")
 	}
@@ -38,11 +38,15 @@ func (r *Registry) RegisterHandler(name string, handler Handler) error {
 		return fmt.Errorf("handler cannot be nil")
 	}
 
-	return r.scanAndRegisterMethods(name, handler)
+	// 옵션 적용
+	opts := newRegisterOptions()
+	opts.applyOptions(options)
+
+	return r.scanAndRegisterMethods(name, handler, opts)
 }
 
 // scanAndRegisterMethods 핸들러의 메서드를 스캔하여 등록합니다
-func (r *Registry) scanAndRegisterMethods(prefix string, handler Handler) error {
+func (r *Registry) scanAndRegisterMethods(prefix string, handler Handler, opts *RegisterOptions) error {
 	handlerValue := reflect.ValueOf(handler)
 	handlerType := reflect.TypeOf(handler)
 
@@ -51,8 +55,8 @@ func (r *Registry) scanAndRegisterMethods(prefix string, handler Handler) error 
 	for i := 0; i < handlerType.NumMethod(); i++ {
 		method := handlerType.Method(i)
 
-		// public 메서드만 등록
-		if !isPublicMethod(method) {
+		// 제외할 메서드인지 확인
+		if opts.shouldIgnoreMethod(method.Name) {
 			continue
 		}
 
@@ -238,6 +242,12 @@ func (r *Registry) GetAllMethodInfo() map[string]map[string]interface{} {
 		info[name] = ctx.GetInfo()
 	}
 	return info
+}
+
+// isPublicMethod 메서드가 public인지 확인합니다
+func isPublicMethod(method reflect.Method) bool {
+	// 메서드 이름이 대문자로 시작하는지 확인
+	return method.Name[0] >= 'A' && method.Name[0] <= 'Z'
 }
 
 // ServeHTTP http.Handler 인터페이스 구현 - Registry를 HTTP 핸들러로 사용

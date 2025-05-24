@@ -149,9 +149,3 @@ func analyzeReturnTypes(methodType reflect.Type, numOut int) returnTypeInfo {
 
 	return info
 }
-
-// isPublicMethod 메서드가 public인지 확인합니다
-func isPublicMethod(method reflect.Method) bool {
-	// 메서드 이름이 대문자로 시작하는지 확인
-	return method.Name[0] >= 'A' && method.Name[0] <= 'Z'
-}

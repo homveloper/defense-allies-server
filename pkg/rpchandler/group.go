@@ -14,7 +14,7 @@ type Group struct {
 }
 
 // RegisterHandler 그룹에 핸들러를 등록합니다
-func (g *Group) RegisterHandler(name string, handler Handler) error {
+func (g *Group) RegisterHandler(name string, handler Handler, options ...RegisterOption) error {
 	if name == "" {
 		return fmt.Errorf("handler name cannot be empty")
 	}
@@ -29,8 +29,12 @@ func (g *Group) RegisterHandler(name string, handler Handler) error {
 	// 전체 경로 생성
 	fullPath := g.prefix + "." + name
 
+	// 옵션 적용
+	opts := newRegisterOptions()
+	opts.applyOptions(options)
+
 	// Registry에 메서드 등록
-	return g.registry.scanAndRegisterMethods(fullPath, handler)
+	return g.registry.scanAndRegisterMethods(fullPath, handler, opts)
 }
 
 // Group 하위 그룹을 생성합니다
