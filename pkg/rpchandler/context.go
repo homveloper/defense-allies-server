@@ -166,39 +166,53 @@ func (ctx *RPCContext) buildCache() {
 
 // DecodeParams JSON-RPC 파라미터를 디코딩합니다
 func (ctx *RPCContext) DecodeParams(params json.RawMessage) ([]reflect.Value, error) {
-	args := []reflect.Value{ctx.Handler} // receiver 추가
+	// context가 아닌 실제 파라미터들만 필터링
+	inTypes := make([]reflect.Type, 0, len(ctx.InputArgs))
+	for _, arg := range ctx.InputArgs {
+		if !arg.IsContext {
+			inTypes = append(inTypes, arg.Type)
+		}
+	}
 
-	for _, argInfo := range ctx.InputArgs {
-		if argInfo.IsContext {
-			// context는 나중에 호출 시점에 추가
-			continue
+	return DecodeJSONArrayToTypes(string(params), inTypes)
+}
+
+// DecodeJSONArrayToTypes decodes JSON array to specified types
+// Usage:
+//
+//	args, err := DecodeJSONArrayToTypes(`[`hello", 42, true]`, []reflect.Type{
+//	    reflect.TypeOf(""),     // string
+//	    reflect.TypeOf(0),      // int
+//	    reflect.TypeOf(false),  // bool
+//	})
+func DecodeJSONArrayToTypes(jsonArray string, paramTypes []reflect.Type) ([]reflect.Value, error) {
+	// Parse JSON array to raw messages
+	var rawArgs []json.RawMessage
+	if err := json.Unmarshal([]byte(jsonArray), &rawArgs); err != nil {
+		return nil, fmt.Errorf("failed to parse JSON array: %w", err)
+	}
+
+	// Validate parameter count
+	if len(rawArgs) != len(paramTypes) {
+		return nil, fmt.Errorf("expected %d parameters, got %d", len(paramTypes), len(rawArgs))
+	}
+
+	// Prepare arguments
+	args := make([]reflect.Value, len(paramTypes))
+
+	// Convert each JSON parameter to proper type
+	for i, paramType := range paramTypes {
+		// Create new instance of parameter type
+		paramPtr := reflect.New(paramType)
+		paramValue := paramPtr.Interface()
+
+		// Unmarshal JSON into the parameter
+		if err := json.Unmarshal(rawArgs[i], paramValue); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal parameter %d (%s): %w", i, paramType.String(), err)
 		}
 
-		if argInfo.IsRawJSON {
-			// json.RawMessage는 그대로 전달
-			args = append(args, reflect.ValueOf(params))
-		} else if argInfo.IsStruct {
-			// 구조체는 언마샬링
-			var paramValue reflect.Value
-			if argInfo.IsPointer {
-				paramValue = reflect.New(argInfo.Type.Elem())
-			} else {
-				paramValue = reflect.New(argInfo.Type)
-			}
-
-			if err := json.Unmarshal(params, paramValue.Interface()); err != nil {
-				return nil, fmt.Errorf("failed to unmarshal params for %s: %w", argInfo.Name, err)
-			}
-
-			if !argInfo.IsPointer {
-				paramValue = paramValue.Elem()
-			}
-
-			args = append(args, paramValue)
-		} else {
-			// 기타 타입들은 기본값으로 처리
-			args = append(args, reflect.Zero(argInfo.Type))
-		}
+		// Get the actual value (not pointer)
+		args[i] = paramPtr.Elem()
 	}
 
 	return args, nil
@@ -238,6 +252,9 @@ func (ctx *RPCContext) Call(callCtx context.Context, params json.RawMessage) (in
 
 		args = finalArgs
 	}
+
+	// receiver 추가
+	args = append([]reflect.Value{ctx.Handler}, args...)
 
 	// 메서드 호출
 	results := ctx.Method.Func.Call(args)
