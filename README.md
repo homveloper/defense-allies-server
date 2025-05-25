@@ -97,72 +97,149 @@ graph TB
 
 ```
 defense-allies-server/
-├── cmd/
-│   └── server/
-│       └── main.go                 # 애플리케이션 엔트리포인트
-├── internal/
-│   ├── domain/                     # 도메인 레이어
-│   │   ├── match/                  # 매치 관리 로직
-│   │   │   ├── service.go
-│   │   │   ├── models.go
-│   │   │   └── repository.go
-│   │   ├── player/                 # 플레이어 관리
-│   │   │   ├── service.go
-│   │   │   ├── models.go
-│   │   │   └── repository.go
-│   │   ├── tower/                  # 타워 시스템
-│   │   ├── enemy/                  # 적 관리
-│   │   ├── wave/                   # 웨이브 시스템
-│   │   └── session/                # 게임 세션
-│   ├── handlers/                   # HTTP 핸들러
-│   │   ├── match_handler.go
-│   │   ├── player_handler.go
-│   │   ├── game_handler.go
-│   │   └── websocket_handler.go
-│   ├── services/                   # 비즈니스 서비스
-│   │   ├── match_service.go
-│   │   ├── player_service.go
-│   │   ├── game_service.go
-│   │   └── realtime_service.go
-│   ├── repository/                 # 데이터 접근 레이어
-│   │   ├── redis/                  # Redis 구현체
-│   │   │   ├── client.go
-│   │   │   ├── match_repo.go
-│   │   │   ├── player_repo.go
-│   │   │   └── session_repo.go
-│   │   └── interfaces.go           # Repository 인터페이스
-│   ├── models/                     # 데이터 모델
-│   │   ├── match.go
-│   │   ├── player.go
-│   │   ├── tower.go
-│   │   └── game_state.go
-│   └── middleware/                 # HTTP 미들웨어
-│       ├── auth.go
-│       ├── cors.go
-│       └── logging.go
-├── pkg/                           # 공통 패키지
-│   ├── redis/                     # Redis 유틸리티
-│   ├── websocket/                 # WebSocket 유틸리티
-│   ├── utils/                     # 공통 유틸리티
-│   └── monitoring/                # 모니터링 유틸리티
-├── configs/                       # 설정 파일
-│   ├── config.go
-│   ├── local.yaml
-│   ├── staging.yaml
-│   └── production.yaml
-├── deployments/                   # 배포 관련
-│   ├── docker/
-│   │   ├── Dockerfile
-│   │   └── docker-compose.yml
-│   └── k8s/
-├── docs/                         # 문서
-│   ├── api/                      # API 문서
-│   ├── redis-schema/             # Redis 스키마 문서
-│   └── game-design/              # 게임 디자인 문서
-└── tests/                        # 테스트
-    ├── unit/
-    ├── integration/
-    └── load/
+├── server/                        # 백엔드 서버
+│   ├── cmd/
+│   │   └── server/
+│   │       └── main.go            # 애플리케이션 엔트리포인트
+│   ├── internal/
+│   │   ├── domain/                # 도메인 레이어
+│   │   │   ├── match/             # 매치 관리 로직
+│   │   │   │   ├── service.go
+│   │   │   │   ├── models.go
+│   │   │   │   └── repository.go
+│   │   │   ├── player/            # 플레이어 관리
+│   │   │   │   ├── service.go
+│   │   │   │   ├── models.go
+│   │   │   │   └── repository.go
+│   │   │   ├── tower/             # 타워 시스템
+│   │   │   ├── enemy/             # 적 관리
+│   │   │   ├── wave/              # 웨이브 시스템
+│   │   │   └── session/           # 게임 세션
+│   │   ├── handlers/              # HTTP 핸들러
+│   │   │   ├── match_handler.go
+│   │   │   ├── player_handler.go
+│   │   │   ├── game_handler.go
+│   │   │   └── websocket_handler.go
+│   │   ├── services/              # 비즈니스 서비스
+│   │   │   ├── match_service.go
+│   │   │   ├── player_service.go
+│   │   │   ├── game_service.go
+│   │   │   └── realtime_service.go
+│   │   ├── repository/            # 데이터 접근 레이어
+│   │   │   ├── redis/             # Redis 구현체
+│   │   │   │   ├── client.go
+│   │   │   │   ├── match_repo.go
+│   │   │   │   ├── player_repo.go
+│   │   │   │   └── session_repo.go
+│   │   │   └── interfaces.go      # Repository 인터페이스
+│   │   ├── models/                # 데이터 모델
+│   │   │   ├── match.go
+│   │   │   ├── player.go
+│   │   │   ├── tower.go
+│   │   │   └── game_state.go
+│   │   └── middleware/            # HTTP 미들웨어
+│   │       ├── auth.go
+│   │       ├── cors.go
+│   │       └── logging.go
+│   ├── pkg/                       # 공통 패키지
+│   │   ├── redis/                 # Redis 유틸리티
+│   │   ├── websocket/             # WebSocket 유틸리티
+│   │   ├── utils/                 # 공통 유틸리티
+│   │   └── monitoring/            # 모니터링 유틸리티
+│   ├── configs/                   # 설정 파일
+│   │   ├── config.go
+│   │   ├── local.yaml
+│   │   ├── staging.yaml
+│   │   └── production.yaml
+│   ├── deployments/               # 배포 관련
+│   │   ├── docker/
+│   │   │   ├── Dockerfile
+│   │   │   └── docker-compose.yml
+│   │   └── k8s/
+│   └── tests/                     # 테스트
+│       ├── unit/
+│       ├── integration/
+│       └── load/
+├── client/                        # 웹 클라이언트 (React)
+│   ├── public/                    # 정적 파일
+│   │   ├── index.html
+│   │   ├── favicon.ico
+│   │   └── manifest.json
+│   ├── src/                       # React 소스 코드
+│   │   ├── components/            # 재사용 가능한 컴포넌트
+│   │   │   ├── common/            # 공통 컴포넌트
+│   │   │   ├── game/              # 게임 관련 컴포넌트
+│   │   │   │   ├── GameBoard.tsx
+│   │   │   │   ├── Tower.tsx
+│   │   │   │   ├── Enemy.tsx
+│   │   │   │   └── GameUI.tsx
+│   │   │   ├── lobby/             # 로비 컴포넌트
+│   │   │   │   ├── PlayerList.tsx
+│   │   │   │   ├── MatchMaking.tsx
+│   │   │   │   └── RoomSettings.tsx
+│   │   │   └── auth/              # 인증 컴포넌트
+│   │   │       ├── Login.tsx
+│   │   │       └── Register.tsx
+│   │   ├── pages/                 # 페이지 컴포넌트
+│   │   │   ├── HomePage.tsx
+│   │   │   ├── GamePage.tsx
+│   │   │   ├── LobbyPage.tsx
+│   │   │   └── ProfilePage.tsx
+│   │   ├── hooks/                 # 커스텀 훅
+│   │   │   ├── useWebSocket.ts
+│   │   │   ├── useGameState.ts
+│   │   │   └── useAuth.ts
+│   │   ├── services/              # API 서비스
+│   │   │   ├── api.ts             # API 클라이언트
+│   │   │   ├── authService.ts     # 인증 서비스
+│   │   │   ├── gameService.ts     # 게임 서비스
+│   │   │   └── websocketService.ts # WebSocket 서비스
+│   │   ├── store/                 # 상태 관리 (Redux/Zustand)
+│   │   │   ├── slices/            # Redux 슬라이스
+│   │   │   │   ├── authSlice.ts
+│   │   │   │   ├── gameSlice.ts
+│   │   │   │   └── lobbySlice.ts
+│   │   │   └── index.ts
+│   │   ├── types/                 # TypeScript 타입 정의
+│   │   │   ├── game.ts
+│   │   │   ├── player.ts
+│   │   │   └── api.ts
+│   │   ├── utils/                 # 유틸리티 함수
+│   │   │   ├── constants.ts
+│   │   │   ├── helpers.ts
+│   │   │   └── validators.ts
+│   │   ├── styles/                # 스타일 파일
+│   │   │   ├── globals.css
+│   │   │   ├── components/
+│   │   │   └── pages/
+│   │   ├── App.tsx                # 메인 앱 컴포넌트
+│   │   ├── index.tsx              # 엔트리 포인트
+│   │   └── setupTests.ts          # 테스트 설정
+│   ├── package.json               # 의존성 관리
+│   ├── package-lock.json
+│   ├── tsconfig.json              # TypeScript 설정
+│   ├── tailwind.config.js         # Tailwind CSS 설정
+│   ├── vite.config.ts             # Vite 설정
+│   └── .env.example               # 환경 변수 예시
+└── doc/                          # 프로젝트 문서
+    ├── api/                      # API 문서
+    │   ├── openapi.yaml          # OpenAPI 스펙
+    │   └── postman/              # Postman 컬렉션
+    ├── architecture/             # 아키텍처 문서
+    │   ├── system-design.md      # 시스템 설계
+    │   ├── database-schema.md    # 데이터베이스 스키마
+    │   └── deployment.md         # 배포 가이드
+    ├── game-design/              # 게임 디자인 문서
+    │   ├── game-mechanics.md     # 게임 메커니즘
+    │   ├── tower-system.md       # 타워 시스템
+    │   └── multiplayer.md        # 멀티플레이어 설계
+    ├── development/              # 개발 가이드
+    │   ├── setup.md              # 개발 환경 설정
+    │   ├── coding-standards.md   # 코딩 표준
+    │   └── testing.md            # 테스트 가이드
+    └── assets/                   # 문서용 이미지/다이어그램
+        ├── diagrams/             # 아키텍처 다이어그램
+        └── screenshots/          # 스크린샷
 ```
 
 ## 🏗️ 서버 아키텍처 구성
@@ -271,7 +348,8 @@ go mod download
 redis-server --appendonly yes --save 60 1000
 
 # 개발 서버 실행
-go run main.go
+cd server
+go run cmd/server/main.go
 ```
 
 ### Docker로 실행
@@ -331,11 +409,14 @@ GET  /health/detailed                # 상세 헬스체크
 GET  /metrics                        # 시스템 메트릭
 ```
 
-자세한 API 문서는 [docs/api/](docs/api/) 폴더를 참조하세요.
+자세한 API 문서는 [doc/api/](doc/api/) 폴더를 참조하세요.
 
 ## 🧪 테스트
 
 ```bash
+# 서버 디렉토리로 이동
+cd server
+
 # 단위 테스트
 go test ./...
 
@@ -411,7 +492,7 @@ curl http://localhost:8080/health/detailed
 
 - **개발팀**: dev@defense-allies.com
 - **이슈 트래킹**: [GitHub Issues](https://github.com/homveloper/defense-allies-server/issues)
-- **문서**: [프로젝트 Wiki](https://github.com/homveloper/defense-allies-server/wiki)
+- **문서**: [프로젝트 문서](doc/)
 
 ---
 
