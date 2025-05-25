@@ -8,7 +8,7 @@
 ## 🎮 게임 개요
 
 - **장르**: 협력 멀티플레이어 타워 디펜스
-- **플랫폼**: PC (언리얼 엔진 클라이언트)
+- **플랫폼**: 웹 브라우저 (React 클라이언트)
 - **매치 시스템**: 실시간 매칭 및 게임 세션 관리
 - **핵심 특징**: 팀워크 기반 방어 전략, 실시간 협력 플레이
 
@@ -19,7 +19,7 @@
 ```mermaid
 graph TB
     subgraph "Client Layer"
-        UE[Unreal Engine Client]
+        REACT[React Web Client]
     end
 
     subgraph "API Gateway"
@@ -47,7 +47,7 @@ graph TB
         PERSIST[Redis Persistence<br/>RDB + AOF]
     end
 
-    UE --> LB
+    REACT --> LB
     LB --> API
     LB --> WS
     API --> HANDLER
@@ -65,13 +65,25 @@ graph TB
 
 ## 🛠️ 기술 스택
 
+### 프론트엔드
+- **프레임워크**: Next.js 14+ with React 18+ & TypeScript
+- **렌더링**: SSR (페이지) + CSR (게임 플레이)
+- **빌드 도구**: Turbopack (Next.js 내장)
+- **상태 관리**: Zustand + TanStack Query
+- **스타일링**: Tailwind CSS + CSS Modules
+- **실시간 통신**: REST API + JSON RPC + Server-Sent Events
+- **게임 렌더링**: React Three Fiber (R3F) + Three.js
+- **라우팅**: Next.js App Router
+- **폼 관리**: React Hook Form + Zod
+- **테스팅**: Jest + React Testing Library + Playwright
+
 ### 백엔드
 - **언어**: Go 1.21+
 - **웹 프레임워크**: net/http (표준 라이브러리) + Gorilla Mux
 - **아키텍처**: Clean Architecture + Domain-Driven Design
 - **데이터베이스**: Redis (Primary Storage + Cache + Pub/Sub)
 - **데이터 지속성**: Redis RDB + AOF (Append Only File)
-- **실시간 통신**: WebSocket + Server-Sent Events
+- **실시간 통신**: REST API + JSON RPC + Server-Sent Events
 - **메시징**: Redis Pub/Sub
 
 ### Redis 활용 전략
@@ -160,67 +172,83 @@ defense-allies-server/
 │       ├── unit/
 │       ├── integration/
 │       └── load/
-├── client/                        # 웹 클라이언트 (React)
+├── client/                        # 웹 클라이언트 (Next.js + React)
+│   ├── app/                       # Next.js App Router
+│   │   ├── (auth)/                # 인증 관련 페이지 그룹
+│   │   │   ├── login/
+│   │   │   └── register/
+│   │   ├── (game)/                # 게임 관련 페이지 그룹
+│   │   │   ├── lobby/
+│   │   │   ├── play/
+│   │   │   └── spectate/
+│   │   ├── api/                   # API Routes
+│   │   │   ├── auth/
+│   │   │   └── proxy/
+│   │   ├── globals.css
+│   │   ├── layout.tsx             # 루트 레이아웃
+│   │   ├── page.tsx               # 홈페이지
+│   │   └── loading.tsx
+│   ├── components/                # 재사용 가능한 컴포넌트
+│   │   ├── ui/                    # 기본 UI 컴포넌트
+│   │   │   ├── Button.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   └── Input.tsx
+│   │   ├── game/                  # 게임 관련 컴포넌트
+│   │   │   ├── GameBoard/
+│   │   │   ├── Tower/
+│   │   │   ├── Enemy/
+│   │   │   └── GameUI/
+│   │   ├── lobby/                 # 로비 컴포넌트
+│   │   │   ├── PlayerList/
+│   │   │   ├── MatchMaking/
+│   │   │   └── RoomSettings/
+│   │   └── layout/                # 레이아웃 컴포넌트
+│   │       ├── Header/
+│   │       ├── Sidebar/
+│   │       └── Footer/
+│   ├── hooks/                     # 커스텀 훅
+│   │   ├── useSSE.ts              # Server-Sent Events 훅
+│   │   ├── useJsonRPC.ts          # JSON RPC 통신 훅
+│   │   ├── useGameState.ts        # 게임 상태 훅
+│   │   ├── useAuth.ts             # 인증 훅
+│   │   └── useLocalStorage.ts
+│   ├── lib/                       # 유틸리티 라이브러리
+│   │   ├── api.ts                 # REST API 클라이언트
+│   │   ├── jsonrpc.ts             # JSON RPC 클라이언트
+│   │   ├── sse.ts                 # Server-Sent Events 클라이언트
+│   │   ├── auth.ts                # 인증 유틸리티
+│   │   ├── game-engine.ts         # 게임 엔진 로직
+│   │   └── utils.ts
+│   ├── stores/                    # Zustand 스토어
+│   │   ├── authStore.ts           # 인증 상태
+│   │   ├── gameStore.ts           # 게임 상태
+│   │   ├── lobbyStore.ts          # 로비 상태
+│   │   └── uiStore.ts
+│   ├── types/                     # TypeScript 타입 정의
+│   │   ├── api.ts                 # REST API 타입
+│   │   ├── jsonrpc.ts             # JSON RPC 타입
+│   │   ├── sse.ts                 # SSE 이벤트 타입
+│   │   ├── game.ts
+│   │   └── player.ts
+│   ├── styles/                    # 글로벌 스타일
+│   │   ├── globals.css
+│   │   └── components.css
 │   ├── public/                    # 정적 파일
-│   │   ├── index.html
-│   │   ├── favicon.ico
-│   │   └── manifest.json
-│   ├── src/                       # React 소스 코드
-│   │   ├── components/            # 재사용 가능한 컴포넌트
-│   │   │   ├── common/            # 공통 컴포넌트
-│   │   │   ├── game/              # 게임 관련 컴포넌트
-│   │   │   │   ├── GameBoard.tsx
-│   │   │   │   ├── Tower.tsx
-│   │   │   │   ├── Enemy.tsx
-│   │   │   │   └── GameUI.tsx
-│   │   │   ├── lobby/             # 로비 컴포넌트
-│   │   │   │   ├── PlayerList.tsx
-│   │   │   │   ├── MatchMaking.tsx
-│   │   │   │   └── RoomSettings.tsx
-│   │   │   └── auth/              # 인증 컴포넌트
-│   │   │       ├── Login.tsx
-│   │   │       └── Register.tsx
-│   │   ├── pages/                 # 페이지 컴포넌트
-│   │   │   ├── HomePage.tsx
-│   │   │   ├── GamePage.tsx
-│   │   │   ├── LobbyPage.tsx
-│   │   │   └── ProfilePage.tsx
-│   │   ├── hooks/                 # 커스텀 훅
-│   │   │   ├── useWebSocket.ts
-│   │   │   ├── useGameState.ts
-│   │   │   └── useAuth.ts
-│   │   ├── services/              # API 서비스
-│   │   │   ├── api.ts             # API 클라이언트
-│   │   │   ├── authService.ts     # 인증 서비스
-│   │   │   ├── gameService.ts     # 게임 서비스
-│   │   │   └── websocketService.ts # WebSocket 서비스
-│   │   ├── store/                 # 상태 관리 (Redux/Zustand)
-│   │   │   ├── slices/            # Redux 슬라이스
-│   │   │   │   ├── authSlice.ts
-│   │   │   │   ├── gameSlice.ts
-│   │   │   │   └── lobbySlice.ts
-│   │   │   └── index.ts
-│   │   ├── types/                 # TypeScript 타입 정의
-│   │   │   ├── game.ts
-│   │   │   ├── player.ts
-│   │   │   └── api.ts
-│   │   ├── utils/                 # 유틸리티 함수
-│   │   │   ├── constants.ts
-│   │   │   ├── helpers.ts
-│   │   │   └── validators.ts
-│   │   ├── styles/                # 스타일 파일
-│   │   │   ├── globals.css
-│   │   │   ├── components/
-│   │   │   └── pages/
-│   │   ├── App.tsx                # 메인 앱 컴포넌트
-│   │   ├── index.tsx              # 엔트리 포인트
-│   │   └── setupTests.ts          # 테스트 설정
-│   ├── package.json               # 의존성 관리
-│   ├── package-lock.json
-│   ├── tsconfig.json              # TypeScript 설정
+│   │   ├── images/
+│   │   ├── sounds/
+│   │   └── icons/
+│   ├── __tests__/                 # 테스트 파일
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── lib/
+│   │   └── e2e/
+│   ├── .storybook/                # Storybook 설정
+│   ├── next.config.js             # Next.js 설정
 │   ├── tailwind.config.js         # Tailwind CSS 설정
-│   ├── vite.config.ts             # Vite 설정
-│   └── .env.example               # 환경 변수 예시
+│   ├── tsconfig.json              # TypeScript 설정
+│   ├── jest.config.js             # Jest 설정
+│   ├── playwright.config.ts       # Playwright 설정
+│   └── package.json
 └── doc/                          # 프로젝트 문서
     ├── api/                      # API 문서
     │   ├── openapi.yaml          # OpenAPI 스펙
@@ -236,10 +264,14 @@ defense-allies-server/
     ├── development/              # 개발 가이드
     │   ├── setup.md              # 개발 환경 설정
     │   ├── coding-standards.md   # 코딩 표준
-    │   └── testing.md            # 테스트 가이드
+    │   ├── testing.md            # 테스트 가이드
+    │   ├── client-app.md         # 클라이언트 앱 설계
+    │   ├── ui-ux-design.md       # UI/UX 설계 가이드
+    │   └── client-todo.md        # 클라이언트 개발 TODO
     └── assets/                   # 문서용 이미지/다이어그램
         ├── diagrams/             # 아키텍처 다이어그램
-        └── screenshots/          # 스크린샷
+        ├── screenshots/          # 스크린샷
+        └── ui-mockups/           # UI 목업 파일
 ```
 
 ## 🏗️ 서버 아키텍처 구성
@@ -331,8 +363,13 @@ sequenceDiagram
 
 ### 필수 요구사항
 
+**백엔드**
 - Go 1.21 이상
 - Redis 7.0+ (RDB + AOF 지속성 설정 권장)
+
+**프론트엔드**
+- Node.js 18+
+- npm, yarn, 또는 pnpm
 
 ### 설치 및 실행
 
@@ -347,9 +384,16 @@ go mod download
 # Redis 서버 시작 (로컬 개발용)
 redis-server --appendonly yes --save 60 1000
 
-# 개발 서버 실행
+# 백엔드 서버 실행
 cd server
 go run cmd/server/main.go
+
+# 새 터미널에서 프론트엔드 실행 (Next.js)
+cd client
+npm install
+npm run dev
+# 또는 더 빠른 개발 서버 (Turbopack)
+npm run dev -- --turbo
 ```
 
 ### Docker로 실행
@@ -413,6 +457,7 @@ GET  /metrics                        # 시스템 메트릭
 
 ## 🧪 테스트
 
+### 백엔드 테스트
 ```bash
 # 서버 디렉토리로 이동
 cd server
@@ -429,6 +474,27 @@ go test -tags=load ./tests/load/...
 # 커버리지 확인
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
+```
+
+### 프론트엔드 테스트
+```bash
+# 클라이언트 디렉토리로 이동
+cd client
+
+# 단위 테스트 (Jest + React Testing Library)
+npm run test
+
+# 테스트 워치 모드
+npm run test:watch
+
+# 테스트 커버리지
+npm run test:coverage
+
+# E2E 테스트 (Playwright)
+npm run test:e2e
+
+# Storybook 실행 (컴포넌트 문서화)
+npm run storybook
 ```
 
 ## 📊 모니터링

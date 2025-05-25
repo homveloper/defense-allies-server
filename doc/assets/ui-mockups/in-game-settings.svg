@@ -1,0 +1,52 @@
+<svg viewBox="0 0 375 812" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 (어두운 오버레이) -->
+  <rect width="375" height="812" fill="rgba(0,0,0,0.7)"/>
+
+  <!-- 설정 모달 -->
+  <rect x="24" y="200" width="327" height="400" rx="16" fill="#FFFFFF"/>
+
+  <!-- 모달 헤더 -->
+  <rect x="24" y="200" width="327" height="60" rx="16" fill="#F8FAFC"/>
+  <rect x="24" y="244" width="327" height="1" fill="#E2E8F0"/>
+
+  <text x="48" y="235" font-size="18" font-weight="600" fill="#0F172A">게임 설정</text>
+
+  <!-- 닫기 버튼 -->
+  <rect x="315" y="215" width="24" height="24" rx="12" fill="#F1F5F9"/>
+  <text x="327" y="230" text-anchor="middle" font-size="14" fill="#64748B">×</text>
+
+  <!-- 설정 항목들 -->
+  <!-- 사운드 설정 -->
+  <text x="48" y="285" font-size="16" font-weight="500" fill="#0F172A">사운드</text>
+
+  <text x="48" y="310" font-size="14" fill="#64748B">효과음</text>
+  <rect x="280" y="295" width="50" height="24" rx="12" fill="#2563EB"/>
+  <circle cx="320" cy="307" r="8" fill="#FFFFFF"/>
+
+  <text x="48" y="340" font-size="14" fill="#64748B">배경음악</text>
+  <rect x="280" y="325" width="50" height="24" rx="12" fill="#E2E8F0"/>
+  <circle cx="290" cy="337" r="8" fill="#FFFFFF"/>
+
+  <!-- 게임 설정 -->
+  <line x1="48" y1="365" x2="327" y2="365" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="48" y="390" font-size="16" font-weight="500" fill="#0F172A">게임</text>
+
+  <text x="48" y="415" font-size="14" fill="#64748B">화면 진동</text>
+  <rect x="280" y="400" width="50" height="24" rx="12" fill="#2563EB"/>
+  <circle cx="320" cy="412" r="8" fill="#FFFFFF"/>
+
+  <!-- 게임 정보 (읽기 전용) -->
+  <text x="48" y="445" font-size="14" fill="#94A3B8">게임 속도: 1x</text>
+  <text x="48" y="465" font-size="12" fill="#94A3B8">매치 시작 시 결정됨</text>
+
+  <!-- 액션 버튼들 -->
+  <line x1="48" y1="485" x2="327" y2="485" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- 게임 나가기 -->
+  <rect x="48" y="500" width="279" height="40" rx="8" fill="#FEF2F2" stroke="#FECACA"/>
+  <text x="187.5" y="525" text-anchor="middle" font-size="14" font-weight="500" fill="#DC2626">게임 나가기</text>
+
+  <!-- 게임 계속하기 -->
+  <rect x="48" y="550" width="279" height="40" rx="8" fill="#2563EB"/>
+  <text x="187.5" y="575" text-anchor="middle" font-size="14" font-weight="500" fill="#FFFFFF">게임 계속하기</text>
+</svg>

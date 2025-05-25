@@ -1,0 +1,41 @@
+<svg viewBox="0 0 375 812" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="375" height="812" fill="#1F2937"/>
+
+  <!-- 상단 게임 정보 바 -->
+  <rect x="0" y="44" width="375" height="50" fill="rgba(0,0,0,0.3)"/>
+  <text x="24" y="69" font-size="14" font-weight="500" fill="#FFFFFF">웨이브 3/10</text>
+  <text x="24" y="85" font-size="12" fill="#D1D5DB">체력: 100/100</text>
+
+  <text x="280" y="69" text-anchor="end" font-size="14" font-weight="500" fill="#F59E0B">골드: 250</text>
+  <text x="280" y="85" text-anchor="end" font-size="12" fill="#D1D5DB">점수: 1,250</text>
+
+  <!-- 설정 버튼 -->
+  <rect x="315" y="59" width="32" height="32" rx="16" fill="rgba(255,255,255,0.1)"/>
+  <text x="331" y="80" text-anchor="middle" font-size="14" fill="#FFFFFF">⚙</text>
+
+  <!-- 게임 영역 (최대화) -->
+  <rect x="0" y="94" width="375" height="718" fill="#374151"/>
+  <text x="187.5" y="460" text-anchor="middle" font-size="16" fill="#9CA3AF">게임 화면 영역</text>
+  <text x="187.5" y="480" text-anchor="middle" font-size="12" fill="#6B7280">(React Three Fiber)</text>
+  <text x="187.5" y="500" text-anchor="middle" font-size="10" fill="#6B7280">타워 선택 UI 포함</text>
+
+  <!-- 게임 영역 내 UI 요소 예시 (오버레이) -->
+  <!-- 타워 선택 패널 (게임 화면 우측 하단) -->
+  <rect x="285" y="720" width="80" height="80" rx="8" fill="rgba(0,0,0,0.7)" stroke="rgba(255,255,255,0.1)"/>
+  <text x="325" y="740" text-anchor="middle" font-size="10" fill="#FFFFFF">타워</text>
+  <text x="325" y="752" text-anchor="middle" font-size="10" fill="#FFFFFF">선택</text>
+
+  <!-- 미니 타워 아이콘들 -->
+  <rect x="295" y="760" width="12" height="12" rx="2" fill="#2563EB"/>
+  <rect x="310" y="760" width="12" height="12" rx="2" fill="#10B981"/>
+  <rect x="325" y="760" width="12" height="12" rx="2" fill="#F59E0B"/>
+  <rect x="340" y="760" width="12" height="12" rx="2" fill="#8B5CF6"/>
+
+  <!-- 선택된 타워 정보 (게임 화면 좌측 하단) -->
+  <rect x="10" y="720" width="120" height="80" rx="8" fill="rgba(0,0,0,0.7)" stroke="rgba(255,255,255,0.1)"/>
+  <text x="20" y="740" font-size="10" fill="#FFFFFF">선택된 타워</text>
+  <text x="20" y="755" font-size="9" fill="#D1D5DB">기본 타워</text>
+  <text x="20" y="770" font-size="9" fill="#D1D5DB">레벨: 2</text>
+  <text x="20" y="785" font-size="9" fill="#F59E0B">업그레이드: 50G</text>
+</svg>
