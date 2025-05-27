@@ -279,6 +279,30 @@ graph TD
 
 ![게임 결과 화면](assets/ui-mockups/game-result.svg)
 
+### 6. 프로필 화면 (Profile Screen)
+
+![프로필 화면](assets/ui-mockups/profile-screen.svg)
+
+사용자 프로필, 통계, 업적 및 계정 연동 옵션을 제공합니다.
+
+### 7. 설정 화면 (Settings Screen)
+
+![설정 화면](assets/ui-mockups/settings-screen.svg)
+
+계정 관리, 알림 설정, 게임 관련 환경설정, 도움말 및 앱 정보 등을 제공합니다.
+
+### 8. 친구 목록 화면 (Friend List Screen)
+
+![친구 목록 화면](assets/ui-mockups/friend-list-screen.svg)
+
+사용자의 친구 목록을 표시하고, 친구 추가 및 관리 기능을 제공합니다.
+
+### 9. 매치메이킹 화면 (Matchmaking Screen)
+
+![매치메이킹 화면](assets/ui-mockups/matchmaking-screen.svg)
+
+게임 로비에서 매칭 시작 후 상대방을 찾는 동안 표시되는 화면입니다.
+
 ## 🧩 컴포넌트 라이브러리
 
 ### 버튼 컴포넌트
@@ -316,6 +340,12 @@ graph TD
     D --> L[Error]
     D --> M[Info]
 ```
+
+### 비주얼 컴포넌트 쇼케이스 (Visual Component Showcase)
+
+![컴포넌트 쇼케이스](assets/ui-mockups/component-showcase.svg)
+
+주요 UI 컴포넌트(버튼, 카드, 입력 필드 등)의 다양한 시각적 예시입니다.
 
 ## 📱 반응형 설계
 
