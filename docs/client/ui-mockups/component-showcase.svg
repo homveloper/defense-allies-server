@@ -1,0 +1,127 @@
+<svg width="375" height="1200" viewBox="0 0 375 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Increased height to 1200 to accommodate all components, implying scrolling -->
+  <defs>
+    <style>
+      .h1 { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 24px; font-weight: bold; fill: #0F172A; }
+      .h2 { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 20px; font-weight: bold; fill: #0F172A; margin-bottom: 12px; }
+      .body-regular { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #0F172A; }
+      .text-secondary { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #64748B; }
+      .button-text { font-family: 'Inter', 'Pretendard', sans-serif; font-weight: 500; fill: #FFFFFF; text-anchor: middle; dominant-baseline: middle;}
+      .input-text { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #0F172A; }
+      .placeholder-text { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #94A3B8; }
+    </style>
+    <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5"/>
+      </feComponentTransfer>
+      <feMerge> 
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="375" height="1200" fill="#F8FAFC"/>
+
+  <!-- Status Bar -->
+  <rect width="375" height="44" fill="#E2E8F0" />
+  <text x="187.5" y="28" text-anchor="middle" font-family="Inter, Pretendard, sans-serif" font-size="12px" fill="#0F172A">9:41</text>
+  <rect x="330" y="15" width="20" height="12" rx="2" stroke="#0F172A" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="332" y="17" width="16" height="8" fill="#0F172A"/>
+  <rect x="305" y="15" width="18" height="12" rx="2" fill="none" stroke="#0F172A" stroke-width="1"/>
+  <line x1="308" y1="24" x2="310" y2="18" stroke="#0F172A" stroke-width="1"/>
+  <line x1="311" y1="24" x2="313" y2="20" stroke="#0F172A" stroke-width="1"/>
+  <line x1="314" y1="24" x2="316" y2="22" stroke="#0F172A" stroke-width="1"/>
+
+  <!-- Header Area -->
+  <g transform="translate(0, 44)">
+    <text x="20" y="40" class="h1">UI Components</text>
+  </g>
+
+  <!-- Main Content Area -->
+  <g transform="translate(20, 120)">
+
+    <!-- Buttons Section -->
+    <text y="0" class="h2">Buttons</text>
+    <g transform="translate(0, 30)">
+      <!-- Primary Buttons -->
+      <rect y="0" width="335" height="48" rx="8" fill="#4F46E5"/> <!-- Indigo-600 -->
+      <text x="167.5" y="24" class="button-text" style="font-size:16px;">Primary Large (Full Width)</text>
+      
+      <rect y="60" width="160" height="40" rx="8" fill="#4F46E5"/>
+      <text x="80" y="80" class="button-text" style="font-size:14px;">Primary Medium</text>
+      
+      <rect x="175" y="60" width="120" height="32" rx="8" fill="#4F46E5"/>
+      <text x="235" y="76" class="button-text" style="font-size:12px;">Primary Small</text>
+
+      <!-- Secondary Button -->
+      <rect y="115" width="130" height="40" rx="8" fill="#E2E8F0"/> <!-- Slate-200 -->
+      <text x="65" y="135" class="button-text" style="fill:#0F172A; font-size:14px;">Secondary</text> <!-- Slate-900 text -->
+
+      <!-- Danger Button -->
+      <rect x="145" y="115" width="120" height="40" rx="8" fill="#EF4444"/> <!-- Red-500 -->
+      <text x="205" y="135" class="button-text" style="font-size:14px;">Danger Action</text>
+
+      <!-- Ghost Button -->
+      <rect y="170" width="130" height="40" rx="8" fill="transparent" stroke="#64748B" stroke-width="1"/> <!-- Slate-500 border -->
+      <text x="65" y="190" class="button-text" style="fill:#0F172A; font-size:14px;">Ghost Button</text>
+    </g>
+
+    <!-- Cards Section -->
+    <text y="240" class="h2">Cards</text>
+    <g transform="translate(0, 270)">
+      <!-- Default Card -->
+      <rect y="0" width="335" height="100" rx="8" fill="#FFFFFF" stroke="#E2E8F0" filter="url(#card-shadow)"/>
+      <text x="15" y="20" class="body-regular" style="font-weight:bold;">Default Card</text>
+      <text x="15" y="45" class="body-regular" fill="#334155"  width="305" >This is some placeholder text for the default card. It can contain various types of content.</text>
+      
+      <!-- Interactive Card -->
+      <rect y="120" width="335" height="100" rx="8" fill="#FFFFFF" stroke="#CBD5E1" filter="url(#card-shadow)" /> <!-- Slightly darker border Slate-300 -->
+      <text x="15" y="140" class="body-regular" style="font-weight:bold;">Interactive Card</text>
+      <text x="15" y="165" class="body-regular" fill="#334155">This card could have hover or active states. (Visualized with darker border)</text>
+      <text x="15" y="190" class="text-secondary" style="font-size:12px;">Note: Hover/active state implied.</text>
+
+      <!-- Status Cards -->
+      <rect y="240" width="335" height="60" rx="8" fill="#ECFDF5" stroke="#A7F3D0" filter="url(#card-shadow)"/> <!-- Green-50 bg, Green-200 border -->
+      <circle cx="30" cy="270" r="8" fill="#22C55E"/> <!-- Green-500 -->
+      <text x="50" y="275" class="body-regular" fill="#065F46" style="font-weight:500;">Success Message</text> <!-- Green-800 text -->
+
+      <rect y="315" width="335" height="60" rx="8" fill="#FEF2F2" stroke="#FECACA" filter="url(#card-shadow)"/> <!-- Red-50 bg, Red-200 border -->
+      <circle cx="30" cy="345" r="8" fill="#EF4444"/> <!-- Red-500 -->
+      <text x="50" y="350" class="body-regular" fill="#991B1B" style="font-weight:500;">Error Message</text> <!-- Red-800 text -->
+      
+      <rect y="390" width="335" height="60" rx="8" fill="#EFF6FF" stroke="#BFDBFE" filter="url(#card-shadow)"/> <!-- Blue-50 bg, Blue-200 border -->
+      <circle cx="30" cy="420" r="8" fill="#3B82F6"/> <!-- Blue-500 -->
+      <text x="50" y="425" class="body-regular" fill="#1E40AF" style="font-weight:500;">Info Message</text> <!-- Blue-800 text -->
+    </g>
+
+    <!-- Input Fields Section -->
+    <text y="490" class="h2">Input Fields</text>
+    <g transform="translate(0, 520)">
+      <!-- Text Input -->
+      <rect y="0" width="335" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/> <!-- Slate-300 border -->
+      <text x="12" y="25" class="placeholder-text">Enter text...</text>
+
+      <!-- Search Input -->
+      <rect y="55" width="335" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <path d="M16.5 17.5C18.9853 17.5 21 15.4853 21 13C21 10.5147 18.9853 8.5 16.5 8.5C14.0147 8.5 12 10.5147 12 13C12 15.4853 14.0147 17.5 16.5 17.5Z M19.5 19.5L22.5 22.5" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(5, 63)"/>
+      <text x="38" y="80" class="placeholder-text">Search...</text>
+
+      <!-- Select Input -->
+      <rect y="110" width="335" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <text x="12" y="135" class="input-text">Select option...</text>
+      <path d="M8 10L12 14L16 10" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(300, 122)"/>
+
+      <!-- Disabled Text Input -->
+      <rect y="165" width="335" height="40" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/> <!-- Slate-100 bg, Slate-200 border -->
+      <text x="12" y="190" class="placeholder-text">Disabled input</text>
+    </g>
+    
+    <!-- Spacer for bottom -->
+    <rect y="650" width="335" height="40" fill="transparent"/>
+
+  </g>
+</svg>

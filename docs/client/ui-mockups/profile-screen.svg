@@ -1,0 +1,79 @@
+<svg width="375" height="812" viewBox="0 0 375 812" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .h1 { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 24px; font-weight: bold; fill: #0F172A; }
+      .body-large { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 16px; fill: #0F172A; }
+      .text-secondary { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #64748B; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="375" height="812" fill="#F8FAFC"/>
+
+  <!-- Status Bar -->
+  <rect width="375" height="44" fill="#E2E8F0" />
+  <text x="187.5" y="28" text-anchor="middle" font-family="Inter, Pretendard, sans-serif" font-size="12px" fill="#0F172A">9:41</text>
+  <!-- Mockup status bar icons (wifi, battery) -->
+  <rect x="330" y="15" width="20" height="12" rx="2" stroke="#0F172A" stroke-width="1" fill="#FFFFFF"/>
+  <rect x="332" y="17" width="16" height="8" fill="#0F172A"/>
+  <rect x="305" y="15" width="18" height="12" rx="2" fill="none" stroke="#0F172A" stroke-width="1"/>
+  <line x1="308" y1="24" x2="310" y2="18" stroke="#0F172A" stroke-width="1"/>
+  <line x1="311" y1="24" x2="313" y2="20" stroke="#0F172A" stroke-width="1"/>
+  <line x1="314" y1="24" x2="316" y2="22" stroke="#0F172A" stroke-width="1"/>
+
+
+  <!-- Main Content Area -->
+  <g transform="translate(0, 44)">
+    <!-- Title -->
+    <text x="20" y="40" class="h1">프로필</text>
+
+    <!-- User Information Area -->
+    <rect x="20" y="80" width="335" height="80" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <!-- User Icon Placeholder -->
+    <circle cx="60" cy="120" r="24" fill="#D1D5DB"/>
+    <text x="100" y="120" class="body-large" dominant-baseline="middle">GUEST_12345</text>
+    <text x="100" y="140" class="text-secondary" dominant-baseline="middle">View and edit profile</text>
+
+
+    <!-- Navigation Links -->
+    <g transform="translate(20, 180)">
+      <!-- Statistics Card -->
+      <rect y="0" width="335" height="60" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <path d="M32 20 H18 V34 H32 V20ZM20 32H22V22H20V32ZM24 32H26V26H24V32ZM28 32H30V24H28V32Z" fill="#0F172A"/>
+      <text x="50" y="35" class="body-large">통계</text>
+      <text x="310" y="35" fill="#64748B" font-size="20" text-anchor="middle">&gt;</text>
+
+      <!-- Achievements Card -->
+      <rect y="70" width="335" height="60" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <path d="M25 18 L22 24 L18 22 L21 28 L16 28 L19 34 L25 30 L31 34 L29 28 L34 28 L29 22 L28 24 L25 18Z" fill="#0F172A" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/>
+      <text x="50" y="105" class="body-large">업적</text>
+      <text x="310" y="105" fill="#64748B" font-size="20" text-anchor="middle">&gt;</text>
+
+      <!-- Link Account Card -->
+      <rect y="140" width="335" height="60" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <path d="M22 28 C20.343 28 19 29.343 19 31 C19 32.657 20.343 34 22 34 C23.657 34 25 32.657 25 31 C25 29.343 23.657 28 22 28 Z M28 22 C26.343 22 25 23.343 25 25 C25 26.657 26.343 28 28 28 C29.657 28 31 26.657 31 25 C31 23.343 29.657 22 28 22 Z M24 25.5 C24 25.224 24.224 25 24.5 25 L27.5 25 C27.776 25 28 25.224 28 25.5 C28 25.776 27.776 26 27.5 26 L24.5 26 C24.224 26 24 25.776 24 25.5 Z M26 29.5 C26 29.224 26.224 29 26.5 29 L29.5 29 C29.776 29 30 29.224 30 29.5 C30 29.776 29.776 30 29.5 30 L26.5 30 C26.224 30 26 29.776 26 29.5 Z" fill="#0F172A"/>
+      <text x="50" y="175" class="body-large">계정 연동</text>
+      <text x="310" y="175" fill="#64748B" font-size="20" text-anchor="middle">&gt;</text>
+    </g>
+  </g>
+
+  <!-- Bottom Navigation Bar -->
+  <rect y="734" width="375" height="44" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <g transform="translate(0, 734)">
+    <!-- Tab 1 (e.g., Home) -->
+    <rect x="0" y="0" width="93.75" height="44" fill="transparent"/>
+    <text x="46.875" y="30" text-anchor="middle" class="text-secondary">홈</text>
+    <!-- Tab 2 (e.g., Search) -->
+    <rect x="93.75" y="0" width="93.75" height="44" fill="transparent"/>
+    <text x="140.625" y="30" text-anchor="middle" class="text-secondary">검색</text>
+    <!-- Tab 3 (e.g., Notifications) -->
+    <rect x="187.5" y="0" width="93.75" height="44" fill="transparent"/>
+    <text x="234.375" y="30" text-anchor="middle" class="text-secondary">알림</text>
+    <!-- Tab 4 (Profile - Active) -->
+    <rect x="281.25" y="0" width="93.75" height="44" fill="#E0E7FF" /> <!-- Highlight for active tab -->
+    <text x="328.125" y="30" text-anchor="middle" class="body-large" style="fill: #4338CA;">프로필</text>
+  </g>
+
+  <!-- Safe Area -->
+  <rect y="778" width="375" height="34" fill="#E2E8F0" />
+</svg>
