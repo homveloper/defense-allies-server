@@ -1,59 +1,28 @@
 <svg width="375" height="812" viewBox="0 0 375 812" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <style>
-      .h1 { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 24px; font-weight: bold; fill: #0F172A; }
-      .body-large { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 16px; fill: #0F172A; }
-      .body-regular { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #0F172A; }
-      .text-secondary { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 12px; fill: #64748B; }
-      .status-text { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 12px; }
-      .button-secondary-text { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; font-weight: 500; fill: #4338CA; } /* Indigo-600 for primary action text on light bg */
-      .icon-back { fill: #0F172A; }
-      .icon-add-friend { fill: #0F172A; stroke: #0F172A; stroke-width: 2; }
-    </style>
-    <linearGradient id="online-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#22C55E;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#16A34A;stop-opacity:1" />
-    </linearGradient>
-     <linearGradient id="ingame-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-
   <!-- Background -->
   <rect width="375" height="812" fill="#F8FAFC"/>
 
   <!-- Status Bar -->
-  <rect width="375" height="44" fill="#E2E8F0" />
-  <text x="187.5" y="28" text-anchor="middle" font-family="Inter, Pretendard, sans-serif" font-size="12px" fill="#0F172A">9:41</text>
-  <!-- Mockup status bar icons -->
-  <rect x="330" y="15" width="20" height="12" rx="2" stroke="#0F172A" stroke-width="1" fill="#FFFFFF"/>
-  <rect x="332" y="17" width="16" height="8" fill="#0F172A"/>
-  <rect x="305" y="15" width="18" height="12" rx="2" fill="none" stroke="#0F172A" stroke-width="1"/>
-  <line x1="308" y1="24" x2="310" y2="18" stroke="#0F172A" stroke-width="1"/>
-  <line x1="311" y1="24" x2="313" y2="20" stroke="#0F172A" stroke-width="1"/>
-  <line x1="314" y1="24" x2="316" y2="22" stroke="#0F172A" stroke-width="1"/>
+  <rect width="375" height="44" fill="#FFFFFF" />
 
   <!-- Header Area -->
   <g transform="translate(0, 44)">
     <!-- Back Button -->
     <g transform="translate(16, 16)">
-      <path class="icon-back" d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"/>
+      <text x="0" y="13" font-size="20px" fill="#0F172A" dominant-baseline="middle">&#x2190;</text>
     </g>
     <!-- Title -->
-    <text x="50" y="29" class="h1">친구 목록</text>
+    <text x="50" y="29" font-size="24px" font-weight="600" fill="#0F172A" dominant-baseline="middle">친구 목록</text>
     <!-- Add Friend Button -->
     <g transform="translate(325, 16)">
-      <circle cx="12" cy="12" r="10" fill="none" stroke="#0F172A" stroke-width="1.5"/>
-      <line x1="12" y1="8" x2="12" y2="16" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round"/>
-      <line x1="8" y1="12" x2="16" y2="12" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="12" y="13" font-size="24px" fill="#0F172A" text-anchor="middle" dominant-baseline="middle">&#xFF0B;</text>
     </g>
   </g>
 
   <!-- Search Bar Placeholder -->
   <rect x="20" y="110" width="335" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
-  <text x="35" y="135" class="body-regular" fill="#94A3B8" dominant-baseline="middle">닉네임으로 검색</text>
-  <path d="M295 120 L300 125 L295 130" fill="none" stroke="#94A3B8" stroke-width="1.5" transform="translate(35,1)"/> <!-- Search Icon -->
+  <text x="35" y="130" font-size="14px" fill="#94A3B8" dominant-baseline="middle">닉네임으로 검색</text>
+  <text x="325" y="130" font-size="16px" fill="#94A3B8" text-anchor="middle" dominant-baseline="middle">&#x1F50D;</text>
 
 
   <!-- Friend List Area -->
@@ -61,40 +30,38 @@
     <!-- Friend Entry 1: Online -->
     <rect y="0" width="335" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
     <circle cx="35" cy="35" r="18" fill="#D1D5DB"/> <!-- Avatar Placeholder -->
-    <text x="65" y="30" class="body-large">Friend_Alpha</text>
-    <circle cx="70" cy="50" r="4" fill="url(#online-gradient)"/>
-    <text x="80" y="53" class="status-text" fill="#16A34A">온라인</text>
-    <rect x="240" y="20" width="75" height="30" rx="6" fill="#EDE9FE"/> <!-- Light purple bg for button -->
-    <text x="277.5" y="40" class="button-secondary-text" text-anchor="middle">초대</text>
+    <text x="65" y="28" font-size="16px" font-weight="500" fill="#0F172A" dominant-baseline="middle">Friend_Alpha</text>
+    <circle cx="70" cy="48" r="4" fill="#22C55E"/> <!-- Online dot -->
+    <text x="80" y="51" font-size="12px" fill="#64748B" dominant-baseline="middle">온라인</text>
+    <rect x="240" y="20" width="75" height="30" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="277.5" y="35" font-size="14px" font-weight="500" fill="#2563EB" text-anchor="middle" dominant-baseline="middle">초대</text>
 
     <!-- Friend Entry 2: Offline -->
     <rect y="80" width="335" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
     <circle cx="35" cy="115" r="18" fill="#D1D5DB"/>
-    <text x="65" y="110" class="body-large">PlayerOmega</text>
-    <circle cx="70" cy="130" r="4" fill="#9CA3AF"/> <!-- Gray for offline -->
-    <text x="80" y="133" class="status-text" fill="#6B7280">오프라인</text>
-    <rect x="240" y="100" width="75" height="30" rx="6" fill="#F3F4F6"/> <!-- Lighter gray for disabled-like button -->
-    <text x="277.5" y="120" class="button-secondary-text" fill="#9CA3AF" text-anchor="middle">초대</text>
+    <text x="65" y="108" font-size="16px" font-weight="500" fill="#0F172A" dominant-baseline="middle">PlayerOmega</text>
+    <circle cx="70" cy="128" r="4" fill="#9CA3AF"/> <!-- Offline dot -->
+    <text x="80" y="131" font-size="12px" fill="#64748B" dominant-baseline="middle">오프라인</text>
+    <rect x="240" y="100" width="75" height="30" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="277.5" y="115" font-size="14px" font-weight="500" fill="#9CA3AF" text-anchor="middle" dominant-baseline="middle">초대</text>
 
     <!-- Friend Entry 3: In Game -->
     <rect y="160" width="335" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
     <circle cx="35" cy="195" r="18" fill="#D1D5DB"/>
-    <text x="65" y="190" class="body-large">User123</text>
-    <circle cx="70" cy="210" r="4" fill="url(#ingame-gradient)"/>
-    <text x="80" y="213" class="status-text" fill="#2563EB">게임 중</text>
-    <rect x="240" y="180" width="75" height="30" rx="6" fill="#DBEAFE"/> <!-- Light blue bg for button -->
-    <text x="277.5" y="200" class="button-secondary-text" text-anchor="middle">초대</text>
+    <text x="65" y="188" font-size="16px" font-weight="500" fill="#0F172A" dominant-baseline="middle">User123</text>
+    <circle cx="70" cy="208" r="4" fill="#3B82F6"/> <!-- In Game dot -->
+    <text x="80" y="211" font-size="12px" fill="#64748B" dominant-baseline="middle">게임 중</text>
+    <rect x="240" y="180" width="75" height="30" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="277.5" y="195" font-size="14px" font-weight="500" fill="#2563EB" text-anchor="middle" dominant-baseline="middle">초대</text>
     
     <!-- Friend Entry 4: Online -->
     <rect y="240" width="335" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
     <circle cx="35" cy="275" r="18" fill="#D1D5DB"/>
-    <text x="65" y="270" class="body-large">HelperBot</text>
-    <circle cx="70" cy="290" r="4" fill="url(#online-gradient)"/>
-    <text x="80" y="293" class="status-text" fill="#16A34A">온라인</text>
-    <rect x="240" y="260" width="75" height="30" rx="6" fill="#EDE9FE"/>
-    <text x="277.5" y="280" class="button-secondary-text" text-anchor="middle">초대</text>
+    <text x="65" y="268" font-size="16px" font-weight="500" fill="#0F172A" dominant-baseline="middle">HelperBot</text>
+    <circle cx="70" cy="288" r="4" fill="#22C55E"/> <!-- Online dot -->
+    <text x="80" y="291" font-size="12px" fill="#64748B" dominant-baseline="middle">온라인</text>
+    <rect x="240" y="260" width="75" height="30" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="277.5" y="275" font-size="14px" font-weight="500" fill="#2563EB" text-anchor="middle" dominant-baseline="middle">초대</text>
   </g>
-
-  <!-- Safe Area (Bottom) -->
-  <rect y="778" width="375" height="34" fill="#E2E8F0" />
+  <!-- Safe area space is implicitly there by not drawing over it -->
 </svg>
