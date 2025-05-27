@@ -1,64 +1,35 @@
 <svg width="375" height="812" viewBox="0 0 375 812" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <style>
-      .h2 { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 20px; font-weight: bold; fill: #0F172A; text-anchor: middle; }
-      .body-large { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 16px; fill: #0F172A; text-anchor: middle; }
-      .body-regular { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #64748B; text-anchor: middle; }
-      .button-primary-text { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 16px; font-weight: bold; fill: #FFFFFF; text-anchor: middle; }
-      .text-secondary { font-family: 'Inter', 'Pretendard', sans-serif; font-size: 14px; fill: #64748B; }
-      .icon-back { fill: #0F172A; }
-    </style>
-  </defs>
-
   <!-- Background -->
   <rect width="375" height="812" fill="#F8FAFC"/>
 
   <!-- Status Bar -->
-  <rect width="375" height="44" fill="#E2E8F0" />
-  <text x="187.5" y="28" text-anchor="middle" font-family="Inter, Pretendard, sans-serif" font-size="12px" fill="#0F172A">9:41</text>
-  <!-- Mockup status bar icons -->
-  <rect x="330" y="15" width="20" height="12" rx="2" stroke="#0F172A" stroke-width="1" fill="#FFFFFF"/>
-  <rect x="332" y="17" width="16" height="8" fill="#0F172A"/>
-  <rect x="305" y="15" width="18" height="12" rx="2" fill="none" stroke="#0F172A" stroke-width="1"/>
-  <line x1="308" y1="24" x2="310" y2="18" stroke="#0F172A" stroke-width="1"/>
-  <line x1="311" y1="24" x2="313" y2="20" stroke="#0F172A" stroke-width="1"/>
-  <line x1="314" y1="24" x2="316" y2="22" stroke="#0F172A" stroke-width="1"/>
+  <rect width="375" height="44" fill="#FFFFFF" />
 
   <!-- Back Navigation -->
   <g transform="translate(16, 58)">
-    <path class="icon-back" d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"/>
-    <text x="24" y="13" class="text-secondary" style="text-anchor: start;">뒤로</text>
+    <text x="0" y="13" font-size="18px" fill="#0F172A" dominant-baseline="middle">&#x2190;</text>
+    <text x="18" y="13" font-size="14px" fill="#64748B" text-anchor="start" dominant-baseline="middle">뒤로</text>
   </g>
 
   <!-- Main Content Area (Vertically Centered) -->
-  <!-- Using a transform to roughly center content. Precise centering depends on final content height. -->
-  <g transform="translate(187.5, 406)"> <!-- Centered horizontally, and roughly vertically -->
+  <g transform="translate(187.5, 406)"> 
 
-    <!-- Search Indicator (Animated Spinner Placeholder) -->
-    <circle cx="0" cy="-120" r="30" stroke="#4F46E5" stroke-width="4" stroke-dasharray="8 4" fill="none">
-      <animateTransform attributeName="transform" type="rotate" from="0 0 -120" to="360 0 -120" dur="1s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="0" cy="-120" r="20" stroke="#A5B4FC" stroke-width="3" stroke-dasharray="6 3" fill="none">
-      <animateTransform attributeName="transform" type="rotate" from="360 0 -120" to="0 0 -120" dur="1.5s" repeatCount="indefinite"/>
-    </circle>
+    <!-- Search Indicator -->
+    <text x="0" y="-120" font-size="40px" fill="#2563EB" text-anchor="middle" dominant-baseline="middle">&#x1F504;</text>
 
     <!-- Status Message -->
-    <text y="-40" class="h2">상대방 찾는 중...</text>
+    <text y="-50" font-size="20px" font-weight="600" fill="#0F172A" text-anchor="middle" dominant-baseline="middle">상대방 찾는 중...</text>
 
     <!-- Estimated Wait Time -->
-    <text y="0" class="body-large">예상 대기 시간: 약 1분 25초</text>
+    <text y="-10" font-size="16px" fill="#0F172A" text-anchor="middle" dominant-baseline="middle">예상 대기 시간: 약 1분 25초</text>
 
     <!-- Selected Settings Display -->
-    <text y="30" class="body-regular">게임 속도: 빠름</text>
-    <text y="50" class="body-regular">맵: 랜덤</text>
+    <text y="25" font-size="14px" fill="#64748B" text-anchor="middle" dominant-baseline="middle">게임 속도: 빠름</text>
+    <text y="45" font-size="14px" fill="#64748B" text-anchor="middle" dominant-baseline="middle">맵: 랜덤</text>
 
     <!-- Cancel Button -->
-    <rect x="-100" y="100" width="200" height="50" rx="8" fill="#EF4444"/> <!-- Red color for cancel -->
-    <text x="0" y="130" class="button-primary-text">매칭 취소</text>
-
+    <rect x="-100" y="100" width="200" height="50" rx="24" fill="#EF4444"/>
+    <text x="0" y="125" font-size="16px" font-weight="500" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">매칭 취소</text>
   </g>
-
-  <!-- Safe Area (Bottom) - Not strictly necessary if no bottom nav, but good for consistency -->
-  <rect y="778" width="375" height="34" fill="#E2E8F0" />
-
+  <!-- Safe area space is implicitly there by not drawing over it -->
 </svg>
