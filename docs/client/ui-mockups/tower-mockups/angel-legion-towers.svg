@@ -1,0 +1,189 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Angel Legion Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">신성함과 치유 - 신성 공격 +45%, 팀 치유 +40%, 악 속성 적에게 추가 피해</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#3B82F6" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#3B82F6">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 신성 공격 +45% • 팀 치유 +40% • 악 속성 적에게 추가 피해</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Divine Towers</text>
+  
+  <!-- 수호천사 (Guardian Angel) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="260" width="60" height="60" rx="8" fill="#3B82F6"/>
+  <rect x="94" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 천사 -->
+  <circle cx="114" cy="285" r="6" fill="#F8FAFC"/>
+  <rect x="108" y="291" width="12" height="15" rx="2" fill="#DBEAFE"/>
+  <!-- 날개 -->
+  <ellipse cx="104" cy="285" rx="6" ry="8" fill="#DBEAFE"/>
+  <ellipse cx="124" cy="285" rx="6" ry="8" fill="#DBEAFE"/>
+  <!-- 후광 -->
+  <circle cx="114" cy="280" r="8" fill="none" stroke="#F59E0B" stroke-width="1"/>
+  <!-- 방패 -->
+  <ellipse cx="120" cy="290" rx="3" ry="5" fill="#E5E7EB"/>
+  <ellipse cx="120" cy="290" rx="2" ry="4" fill="#3B82F6"/>
+  <!-- 신성한 빛 -->
+  <circle cx="114" cy="285" r="20" fill="#3B82F6" opacity="0.2"/>
+  <circle cx="114" cy="285" r="30" fill="#3B82F6" opacity="0.1"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">수호천사</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Guardian Angel</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">팀원 보호 및 치유</text>
+  
+  <!-- 신성한 빛 (Divine Light) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="260" width="60" height="60" rx="8" fill="#F59E0B"/>
+  <rect x="290" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 빛의 기둥 -->
+  <rect x="305" y="240" width="10" height="40" rx="2" fill="#FEF3C7"/>
+  <rect x="307" y="240" width="6" height="40" rx="1" fill="#F59E0B"/>
+  <!-- 빛 광선 -->
+  <line x1="310" y1="240" x2="295" y2="225" stroke="#F59E0B" stroke-width="2"/>
+  <line x1="310" y1="240" x2="325" y2="225" stroke="#F59E0B" stroke-width="2"/>
+  <line x1="310" y1="240" x2="310" y2="220" stroke="#F59E0B" stroke-width="2"/>
+  <line x1="310" y1="240" x2="300" y2="230" stroke="#F59E0B" stroke-width="1"/>
+  <line x1="310" y1="240" x2="320" y2="230" stroke="#F59E0B" stroke-width="1"/>
+  <!-- 빛 파티클 -->
+  <circle cx="305" cy="250" r="1" fill="#FEF3C7"/>
+  <circle cx="315" cy="255" r="1" fill="#FEF3C7"/>
+  <circle cx="300" cy="265" r="1" fill="#FEF3C7"/>
+  <circle cx="320" cy="270" r="1" fill="#FEF3C7"/>
+  <!-- 신성한 오라 -->
+  <circle cx="310" cy="260" r="25" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="310" cy="260" r="35" fill="#F59E0B" opacity="0.1"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">신성한 빛</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Divine Light</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">악 속성 적 정화</text>
+  
+  <!-- 치유의 성소 (Healing Sanctuary) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#22C55E"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 성소 -->
+  <rect x="496" y="280" width="20" height="20" rx="2" fill="#DBEAFE"/>
+  <!-- 십자가 -->
+  <rect x="504" y="275" width="4" height="15" fill="#22C55E"/>
+  <rect x="499" y="280" width="14" height="4" fill="#22C55E"/>
+  <!-- 치유 오라 -->
+  <circle cx="506" cy="285" r="3" fill="#22C55E"/>
+  <circle cx="501" cy="290" r="2" fill="#22C55E" opacity="0.7"/>
+  <circle cx="511" cy="290" r="2" fill="#22C55E" opacity="0.7"/>
+  <circle cx="506" cy="295" r="2" fill="#22C55E" opacity="0.7"/>
+  <!-- 치유 파동 -->
+  <circle cx="506" cy="285" r="15" fill="#22C55E" opacity="0.2"/>
+  <circle cx="506" cy="285" r="25" fill="#22C55E" opacity="0.1"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">치유의 성소</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Healing Sanctuary</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">지속적인 팀 치유</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 대천사 (Archangel) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="480" width="60" height="40" rx="4" fill="#3B82F6"/>
+  <!-- 대천사 -->
+  <circle cx="114" cy="495" r="8" fill="#F8FAFC"/>
+  <rect x="106" y="503" width="16" height="12" rx="2" fill="#DBEAFE"/>
+  <!-- 거대한 날개 -->
+  <ellipse cx="99" cy="495" rx="10" ry="12" fill="#DBEAFE"/>
+  <ellipse cx="129" cy="495" rx="10" ry="12" fill="#DBEAFE"/>
+  <!-- 신성한 검 -->
+  <rect x="125" y="490" width="2" height="15" fill="#E5E7EB"/>
+  <rect x="123" y="488" width="6" height="4" fill="#F59E0B"/>
+  <!-- 거대한 후광 -->
+  <circle cx="114" cy="490" r="12" fill="none" stroke="#F59E0B" stroke-width="2"/>
+  <!-- 신성한 권능 -->
+  <circle cx="114" cy="495" r="25" fill="#3B82F6" opacity="0.2"/>
+  <circle cx="114" cy="495" r="35" fill="#3B82F6" opacity="0.1"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">대천사</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">Archangel</text>
+  
+  <!-- 천국의 문 (Heaven's Gate) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="480" width="60" height="40" rx="4" fill="#F59E0B"/>
+  <!-- 천국의 문 -->
+  <rect x="290" y="490" width="40" height="20" rx="2" fill="#DBEAFE"/>
+  <!-- 문 장식 -->
+  <rect x="295" y="495" width="15" height="15" rx="1" fill="#F59E0B"/>
+  <rect x="315" y="495" width="15" height="15" rx="1" fill="#F59E0B"/>
+  <circle cx="302" cy="502" r="1" fill="#FFFFFF"/>
+  <circle cx="322" cy="502" r="1" fill="#FFFFFF"/>
+  <!-- 천사들 -->
+  <circle cx="300" cy="485" r="2" fill="#DBEAFE"/>
+  <circle cx="310" cy="485" r="2" fill="#DBEAFE"/>
+  <circle cx="320" cy="485" r="2" fill="#DBEAFE"/>
+  <circle cx="330" cy="485" r="2" fill="#DBEAFE"/>
+  <!-- 신성한 빛 -->
+  <circle cx="310" cy="495" r="20" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="310" cy="495" r="30" fill="#F59E0B" opacity="0.1"/>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">천국의 문</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Heaven's Gate</text>
+  
+  <!-- 신의 심판 (Divine Judgment) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="480" width="60" height="40" rx="4" fill="#F59E0B"/>
+  <!-- 심판의 저울 -->
+  <rect x="501" y="495" width="10" height="2" fill="#E5E7EB"/>
+  <circle cx="496" cy="496" r="3" fill="#F59E0B"/>
+  <circle cx="516" cy="496" r="3" fill="#F59E0B"/>
+  <rect x="505" y="485" width="2" height="15" fill="#E5E7EB"/>
+  <!-- 신성한 빛 -->
+  <line x1="506" y1="485" x2="506" y2="475" stroke="#F59E0B" stroke-width="3"/>
+  <line x1="506" y1="485" x2="501" y2="480" stroke="#F59E0B" stroke-width="2"/>
+  <line x1="506" y1="485" x2="511" y2="480" stroke="#F59E0B" stroke-width="2"/>
+  <!-- 심판 오라 -->
+  <circle cx="506" cy="495" r="20" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="506" cy="495" r="30" fill="#F59E0B" opacity="0.1"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">신의 심판</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Divine Judgment</text>
+  
+  <!-- 천사 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#3B82F6" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#3B82F6">천사 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Angel Cooperation</text>
+  
+  <!-- 천상의 요새 (Celestial Fortress) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#3B82F6" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#3B82F6"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 천상의 왕관 -->
+  <path d="M 684 305 L 694 300 L 704 305 L 704 308 L 684 308 Z" fill="#F59E0B"/>
+  <circle cx="689" cy="306" r="1" fill="#DBEAFE"/>
+  <circle cx="694" cy="304" r="1" fill="#DBEAFE"/>
+  <circle cx="699" cy="306" r="1" fill="#DBEAFE"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">천상의 요새</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 신성한 합창 (Divine Chorus) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#F59E0B" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#F59E0B"/>
+  <circle cx="694" cy="450" r="12" fill="#DBEAFE"/>
+  <circle cx="694" cy="450" r="8" fill="#3B82F6"/>
+  <circle cx="694" cy="450" r="4" fill="#F59E0B"/>
+  <!-- 음표들 -->
+  <circle cx="684" cy="445" r="1" fill="#F59E0B"/>
+  <circle cx="704" cy="445" r="1" fill="#F59E0B"/>
+  <circle cx="689" cy="455" r="1" fill="#F59E0B"/>
+  <circle cx="699" cy="455" r="1" fill="#F59E0B"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">신성한 합창</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">팀 전체 버프</text>
+  
+  <!-- 최후의 심판 (Final Judgment) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#F59E0B" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">최후의 심판</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">궁극 정화 공격</text>
+</svg>

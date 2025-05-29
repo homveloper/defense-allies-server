@@ -1,0 +1,207 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Mechanical Empire Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">기술력과 자동화 - 자동 수리 +40%, 업그레이드 비용 -30%, 연쇄 반응 공격</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#06B6D4" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#06B6D4">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 자동 수리 +40% • 업그레이드 비용 -30% • 연쇄 반응 공격</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Tech Towers</text>
+  
+  <!-- 자동 터렛 (Auto Turret) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="260" width="60" height="60" rx="8" fill="#06B6D4"/>
+  <rect x="94" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 터렛 베이스 -->
+  <circle cx="114" cy="290" r="12" fill="#64748B"/>
+  <circle cx="114" cy="290" r="8" fill="#06B6D4"/>
+  <!-- 포신 -->
+  <rect x="114" y="285" width="15" height="6" rx="1" fill="#64748B"/>
+  <rect x="129" y="287" width="4" height="2" fill="#64748B"/>
+  <!-- 센서 -->
+  <circle cx="114" cy="280" r="3" fill="#EF4444"/>
+  <circle cx="114" cy="280" r="1" fill="#FFFFFF"/>
+  <!-- 회전 표시 -->
+  <circle cx="114" cy="290" r="15" fill="none" stroke="#06B6D4" stroke-width="1" stroke-dasharray="2,2"/>
+  <!-- 전자 회로 -->
+  <rect x="104" y="295" width="20" height="2" fill="#22C55E"/>
+  <rect x="109" y="300" width="10" height="2" fill="#22C55E"/>
+  <!-- 자동화 오라 -->
+  <circle cx="114" cy="290" r="20" fill="#06B6D4" opacity="0.2"/>
+  <circle cx="114" cy="290" r="30" fill="#06B6D4" opacity="0.1"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">자동 터렛</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Auto Turret</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">자동 조준 및 사격</text>
+  
+  <!-- 레이저 캐논 (Laser Cannon) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="260" width="60" height="60" rx="8" fill="#8B5CF6"/>
+  <rect x="290" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 레이저 캐논 -->
+  <rect x="300" y="285" width="20" height="8" rx="2" fill="#64748B"/>
+  <rect x="320" y="287" width="8" height="4" rx="1" fill="#8B5CF6"/>
+  <!-- 레이저 빔 -->
+  <rect x="328" y="288" width="15" height="2" fill="#8B5CF6"/>
+  <rect x="343" y="288.5" width="8" height="1" fill="#C084FC"/>
+  <!-- 에너지 코어 -->
+  <circle cx="310" cy="295" r="4" fill="#8B5CF6"/>
+  <circle cx="310" cy="295" r="2" fill="#C084FC"/>
+  <!-- 냉각 시스템 -->
+  <rect x="295" y="275" width="30" height="2" fill="#06B6D4"/>
+  <rect x="295" y="278" width="30" height="2" fill="#06B6D4"/>
+  <!-- 에너지 파티클 -->
+  <circle cx="305" cy="290" r="1" fill="#8B5CF6"/>
+  <circle cx="315" cy="285" r="1" fill="#8B5CF6"/>
+  <circle cx="300" cy="300" r="1" fill="#8B5CF6"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">레이저 캐논</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Laser Cannon</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">고정밀 에너지 공격</text>
+  
+  <!-- 드론 팩토리 (Drone Factory) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#22C55E"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 팩토리 -->
+  <rect x="496" y="280" width="20" height="20" rx="2" fill="#64748B"/>
+  <rect x="501" y="285" width="10" height="10" rx="1" fill="#22C55E"/>
+  <!-- 드론들 -->
+  <rect x="490" y="275" width="4" height="4" rx="1" fill="#06B6D4"/>
+  <rect x="518" y="275" width="4" height="4" rx="1" fill="#06B6D4"/>
+  <rect x="485" y="305" width="4" height="4" rx="1" fill="#06B6D4"/>
+  <rect x="523" y="305" width="4" height="4" rx="1" fill="#06B6D4"/>
+  <!-- 드론 프로펠러 -->
+  <line x1="488" y1="277" x2="496" y2="277" stroke="#64748B" stroke-width="0.5"/>
+  <line x1="516" y1="277" x2="524" y2="277" stroke="#64748B" stroke-width="0.5"/>
+  <line x1="483" y1="307" x2="491" y2="307" stroke="#64748B" stroke-width="0.5"/>
+  <line x1="521" y1="307" x2="529" y2="307" stroke="#64748B" stroke-width="0.5"/>
+  <!-- 생산 라인 -->
+  <rect x="501" y="290" width="10" height="1" fill="#F59E0B"/>
+  <rect x="501" y="292" width="10" height="1" fill="#F59E0B"/>
+  <rect x="501" y="294" width="10" height="1" fill="#F59E0B"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">드론 팩토리</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Drone Factory</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">자동 드론 생산 및 배치</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 플라즈마 제너레이터 (Plasma Generator) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="480" width="60" height="40" rx="4" fill="#8B5CF6"/>
+  <!-- 플라즈마 코어 -->
+  <circle cx="114" cy="500" r="15" fill="#64748B"/>
+  <circle cx="114" cy="500" r="10" fill="#8B5CF6"/>
+  <circle cx="114" cy="500" r="6" fill="#C084FC"/>
+  <circle cx="114" cy="500" r="3" fill="#E879F9"/>
+  <!-- 에너지 링 -->
+  <circle cx="114" cy="500" r="18" fill="none" stroke="#8B5CF6" stroke-width="2"/>
+  <circle cx="114" cy="500" r="22" fill="none" stroke="#8B5CF6" stroke-width="1"/>
+  <!-- 플라즈마 방출 -->
+  <circle cx="104" cy="490" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <circle cx="124" cy="510" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <circle cx="104" cy="510" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <circle cx="124" cy="490" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <!-- 에너지 필드 -->
+  <circle cx="114" cy="500" r="25" fill="#8B5CF6" opacity="0.2"/>
+  <circle cx="114" cy="500" r="35" fill="#8B5CF6" opacity="0.1"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">플라즈마 제너레이터</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">Plasma Generator</text>
+  
+  <!-- 사이버 요새 (Cyber Fortress) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="480" width="60" height="40" rx="4" fill="#64748B"/>
+  <!-- 요새 구조 -->
+  <rect x="290" y="490" width="40" height="20" rx="2" fill="#374151"/>
+  <!-- 사이버 모듈들 -->
+  <rect x="295" y="495" width="8" height="8" rx="1" fill="#06B6D4"/>
+  <rect x="307" y="495" width="8" height="8" rx="1" fill="#22C55E"/>
+  <rect x="319" y="495" width="8" height="8" rx="1" fill="#F59E0B"/>
+  <!-- 홀로그램 -->
+  <rect x="300" y="485" width="20" height="10" rx="1" fill="#06B6D4" opacity="0.5"/>
+  <!-- 데이터 스트림 -->
+  <rect x="292" y="487" width="36" height="1" fill="#22C55E"/>
+  <rect x="292" y="489" width="36" height="1" fill="#22C55E"/>
+  <rect x="292" y="491" width="36" height="1" fill="#22C55E"/>
+  <!-- 방어막 -->
+  <circle cx="310" cy="500" r="20" fill="none" stroke="#06B6D4" stroke-width="1" stroke-dasharray="3,1"/>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">사이버 요새</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Cyber Fortress</text>
+  
+  <!-- 메가 로봇 (Mega Robot) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="480" width="60" height="40" rx="4" fill="#EF4444"/>
+  <!-- 로봇 몸체 -->
+  <rect x="486" y="490" width="40" height="20" rx="2" fill="#64748B"/>
+  <!-- 로봇 머리 -->
+  <rect x="501" y="485" width="10" height="10" rx="2" fill="#374151"/>
+  <!-- 눈 -->
+  <circle cx="504" cy="488" r="1" fill="#EF4444"/>
+  <circle cx="508" cy="488" r="1" fill="#EF4444"/>
+  <!-- 팔 -->
+  <rect x="481" y="495" width="8" height="4" rx="1" fill="#64748B"/>
+  <rect x="521" y="495" width="8" height="4" rx="1" fill="#64748B"/>
+  <!-- 무기 -->
+  <rect x="475" y="496" width="6" height="2" fill="#EF4444"/>
+  <rect x="529" y="496" width="6" height="2" fill="#EF4444"/>
+  <!-- 다리 -->
+  <rect x="491" y="510" width="6" height="8" rx="1" fill="#64748B"/>
+  <rect x="513" y="510" width="6" height="8" rx="1" fill="#64748B"/>
+  <!-- 에너지 코어 -->
+  <circle cx="506" cy="500" r="3" fill="#06B6D4"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">메가 로봇</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Mega Robot</text>
+  
+  <!-- 기계 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#06B6D4" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#06B6D4">기계 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Mechanical Cooperation</text>
+  
+  <!-- AI 중앙 컴퓨터 (AI Central Computer) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#06B6D4" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#06B6D4"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- AI 코어 -->
+  <circle cx="694" cy="320" r="6" fill="#8B5CF6"/>
+  <circle cx="694" cy="320" r="3" fill="#C084FC"/>
+  <!-- 데이터 스트림 -->
+  <rect x="689" y="315" width="10" height="1" fill="#22C55E"/>
+  <rect x="689" y="317" width="10" height="1" fill="#22C55E"/>
+  <rect x="689" y="319" width="10" height="1" fill="#22C55E"/>
+  <rect x="689" y="321" width="10" height="1" fill="#22C55E"/>
+  <rect x="689" y="323" width="10" height="1" fill="#22C55E"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">AI 중앙 컴퓨터</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 나노 스웜 (Nano Swarm) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#22C55E" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#22C55E"/>
+  <circle cx="694" cy="450" r="12" fill="#64748B"/>
+  <circle cx="694" cy="450" r="8" fill="#22C55E"/>
+  <!-- 나노봇들 -->
+  <circle cx="684" cy="445" r="1" fill="#06B6D4"/>
+  <circle cx="704" cy="445" r="1" fill="#06B6D4"/>
+  <circle cx="689" cy="455" r="1" fill="#06B6D4"/>
+  <circle cx="699" cy="455" r="1" fill="#06B6D4"/>
+  <circle cx="694" cy="440" r="1" fill="#06B6D4"/>
+  <circle cx="694" cy="460" r="1" fill="#06B6D4"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">나노 스웜</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">자가 복제 및 수리</text>
+  
+  <!-- 테크놀로지 네트워크 (Technology Network) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#8B5CF6" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">테크놀로지 네트워크</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">모든 기계 연결</text>
+</svg>

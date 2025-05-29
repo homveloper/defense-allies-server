@@ -1,0 +1,195 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Dragon Clan Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">압도적 화력과 위엄 - 화염 공격 +60%, 공중 유닛 특화, 보스급 적 추가 피해</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#F59E0B" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#F59E0B">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 화염 공격 +60% • 공중 유닛 특화 • 보스급 적에게 추가 피해</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Dragon Towers</text>
+  
+  <!-- 용의 둥지 (Dragon Nest) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="280" width="60" height="40" rx="4" fill="#92400E"/>
+  <!-- 둥지 -->
+  <ellipse cx="114" cy="270" rx="25" ry="15" fill="#92400E"/>
+  <ellipse cx="114" cy="270" rx="20" ry="10" fill="#F59E0B"/>
+  <!-- 드래곤 알 -->
+  <ellipse cx="109" cy="270" rx="4" ry="6" fill="#EF4444"/>
+  <ellipse cx="119" cy="270" rx="4" ry="6" fill="#EF4444"/>
+  <!-- 어린 드래곤 -->
+  <circle cx="114" cy="255" r="6" fill="#EF4444"/>
+  <circle cx="114" cy="250" r="3" fill="#EF4444"/>
+  <!-- 날개 -->
+  <ellipse cx="108" cy="255" rx="4" ry="2" fill="#F59E0B"/>
+  <ellipse cx="120" cy="255" rx="4" ry="2" fill="#F59E0B"/>
+  <!-- 화염 -->
+  <circle cx="114" cy="245" r="2" fill="#F59E0B"/>
+  <circle cx="112" cy="242" r="1" fill="#FEF3C7"/>
+  <circle cx="116" cy="242" r="1" fill="#FEF3C7"/>
+  <!-- 화염 오라 -->
+  <circle cx="114" cy="260" r="30" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="114" cy="260" r="40" fill="#F59E0B" opacity="0.1"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">용의 둥지</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Dragon Nest</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">강력한 드래곤 소환</text>
+  
+  <!-- 화염 브레스 (Fire Breath) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="260" width="60" height="60" rx="8" fill="#EF4444"/>
+  <rect x="290" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 드래곤 머리 -->
+  <ellipse cx="310" cy="285" rx="8" ry="6" fill="#EF4444"/>
+  <circle cx="307" cy="283" r="1" fill="#F59E0B"/>
+  <circle cx="313" cy="283" r="1" fill="#F59E0B"/>
+  <!-- 입 -->
+  <ellipse cx="310" cy="288" rx="3" ry="2" fill="#374151"/>
+  <!-- 화염 브레스 -->
+  <ellipse cx="325" cy="288" rx="8" ry="4" fill="#F59E0B"/>
+  <ellipse cx="335" cy="288" rx="6" ry="3" fill="#FEF3C7"/>
+  <ellipse cx="342" cy="288" rx="4" ry="2" fill="#FEF3C7"/>
+  <!-- 뿔 -->
+  <path d="M 305 278 L 307 273 L 309 278 Z" fill="#64748B"/>
+  <path d="M 311 278 L 313 273 L 315 278 Z" fill="#64748B"/>
+  <!-- 화염 파티클 -->
+  <circle cx="320" cy="285" r="1" fill="#EF4444"/>
+  <circle cx="330" cy="290" r="1" fill="#F59E0B"/>
+  <circle cx="325" cy="292" r="1" fill="#EF4444"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">화염 브레스</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Fire Breath</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">직선 관통 화염 공격</text>
+  
+  <!-- 용의 보물 (Dragon Treasure) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#F59E0B"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 보물 상자 -->
+  <rect x="496" y="285" width="20" height="15" rx="2" fill="#92400E"/>
+  <rect x="501" y="280" width="10" height="5" rx="1" fill="#F59E0B"/>
+  <!-- 보석들 -->
+  <circle cx="501" cy="290" r="2" fill="#8B5CF6"/>
+  <circle cx="506" cy="288" r="2" fill="#EF4444"/>
+  <circle cx="511" cy="290" r="2" fill="#10B981"/>
+  <circle cx="506" cy="293" r="2" fill="#3B82F6"/>
+  <!-- 금화들 -->
+  <circle cx="490" cy="295" r="2" fill="#F59E0B"/>
+  <circle cx="522" cy="295" r="2" fill="#F59E0B"/>
+  <circle cx="498" cy="300" r="2" fill="#F59E0B"/>
+  <circle cx="514" cy="300" r="2" fill="#F59E0B"/>
+  <!-- 황금 오라 -->
+  <circle cx="506" cy="290" r="15" fill="#F59E0B" opacity="0.3"/>
+  <circle cx="506" cy="290" r="25" fill="#F59E0B" opacity="0.2"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">용의 보물</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Dragon Treasure</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">팀 전체 자원 대폭 증가</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 고대 용 (Ancient Dragon) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="480" width="60" height="40" rx="4" fill="#EF4444"/>
+  <!-- 거대 드래곤 -->
+  <ellipse cx="114" cy="495" rx="15" ry="10" fill="#DC2626"/>
+  <circle cx="114" cy="490" r="8" fill="#DC2626"/>
+  <!-- 눈 -->
+  <circle cx="111" cy="488" r="1" fill="#F59E0B"/>
+  <circle cx="117" cy="488" r="1" fill="#F59E0B"/>
+  <!-- 거대한 날개 -->
+  <ellipse cx="99" cy="495" rx="8" ry="5" fill="#EF4444"/>
+  <ellipse cx="129" cy="495" rx="8" ry="5" fill="#EF4444"/>
+  <!-- 화염 -->
+  <circle cx="114" cy="485" r="3" fill="#F59E0B"/>
+  <circle cx="112" cy="482" r="2" fill="#FEF3C7"/>
+  <circle cx="116" cy="482" r="2" fill="#FEF3C7"/>
+  <!-- 위엄 오라 -->
+  <circle cx="114" cy="495" r="25" fill="#DC2626" opacity="0.2"/>
+  <circle cx="114" cy="495" r="35" fill="#DC2626" opacity="0.1"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">고대 용</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">Ancient Dragon</text>
+  
+  <!-- 용암 분화구 (Lava Crater) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="480" width="60" height="40" rx="4" fill="#DC2626"/>
+  <!-- 분화구 -->
+  <ellipse cx="310" cy="500" rx="20" ry="10" fill="#92400E"/>
+  <ellipse cx="310" cy="500" rx="15" ry="7" fill="#EF4444"/>
+  <ellipse cx="310" cy="500" rx="10" ry="5" fill="#F59E0B"/>
+  <!-- 용암 -->
+  <circle cx="305" cy="498" r="2" fill="#EF4444"/>
+  <circle cx="315" cy="502" r="2" fill="#EF4444"/>
+  <circle cx="310" cy="495" r="2" fill="#F59E0B"/>
+  <!-- 화산 가스 -->
+  <circle cx="300" cy="490" r="2" fill="#64748B" opacity="0.5"/>
+  <circle cx="320" cy="490" r="2" fill="#64748B" opacity="0.5"/>
+  <circle cx="310" cy="485" r="3" fill="#64748B" opacity="0.3"/>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">용암 분화구</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Lava Crater</text>
+  
+  <!-- 드래곤 로드 (Dragon Lord) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="480" width="60" height="40" rx="4" fill="#DC2626"/>
+  <!-- 드래곤 로드 -->
+  <ellipse cx="506" cy="495" rx="12" ry="8" fill="#7C2D12"/>
+  <circle cx="506" cy="490" r="6" fill="#7C2D12"/>
+  <!-- 왕관 -->
+  <path d="M 500 485 L 506 480 L 512 485 L 512 488 L 500 488 Z" fill="#F59E0B"/>
+  <circle cx="503" cy="486" r="1" fill="#EF4444"/>
+  <circle cx="506" cy="484" r="1" fill="#EF4444"/>
+  <circle cx="509" cy="486" r="1" fill="#EF4444"/>
+  <!-- 날개 -->
+  <ellipse cx="494" cy="495" rx="6" ry="4" fill="#EF4444"/>
+  <ellipse cx="518" cy="495" rx="6" ry="4" fill="#EF4444"/>
+  <!-- 권위 오라 -->
+  <circle cx="506" cy="495" r="20" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="506" cy="495" r="30" fill="#F59E0B" opacity="0.1"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">드래곤 로드</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Dragon Lord</text>
+  
+  <!-- 드래곤 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#F59E0B" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#F59E0B">드래곤 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Dragon Cooperation</text>
+  
+  <!-- 용왕의 궁전 (Dragon King Palace) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#F59E0B" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#F59E0B"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 용왕 왕관 -->
+  <path d="M 684 305 L 694 300 L 704 305 L 704 308 L 684 308 Z" fill="#F59E0B"/>
+  <circle cx="689" cy="306" r="1" fill="#EF4444"/>
+  <circle cx="694" cy="304" r="1" fill="#EF4444"/>
+  <circle cx="699" cy="306" r="1" fill="#EF4444"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">용왕의 궁전</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 화염의 심장 (Heart of Fire) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#EF4444" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#EF4444"/>
+  <circle cx="694" cy="450" r="12" fill="#DC2626"/>
+  <circle cx="694" cy="450" r="8" fill="#EF4444"/>
+  <circle cx="694" cy="450" r="4" fill="#F59E0B"/>
+  <!-- 심장 박동 -->
+  <circle cx="694" cy="450" r="16" fill="#EF4444" opacity="0.3"/>
+  <circle cx="694" cy="450" r="20" fill="#EF4444" opacity="0.2"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">화염의 심장</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">모든 화염 강화</text>
+  
+  <!-- 용의 분노 (Dragon's Wrath) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#DC2626" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">용의 분노</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">궁극 화염 공격</text>
+</svg>

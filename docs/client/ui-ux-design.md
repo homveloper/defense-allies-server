@@ -14,6 +14,8 @@
 3. **Visual Hierarchy**: 명확한 시각적 계층 구조
 4. **Consistent**: 일관된 디자인 시스템
 
+
+
 ## 🎨 톤앤매너
 
 ### 컬러 팔레트
@@ -343,9 +345,100 @@ graph TD
 
 ### 비주얼 컴포넌트 쇼케이스 (Visual Component Showcase)
 
-![컴포넌트 쇼케이스](assets/ui-mockups/component-showcase.svg)
+![컴포넌트 쇼케이스](ui-mockups/component-showcase.svg)
 
-주요 UI 컴포넌트(버튼, 카드, 입력 필드 등)의 다양한 시각적 예시입니다.
+Defense Allies의 완전한 UI 컴포넌트 라이브러리를 보여주는 종합 쇼케이스입니다. 다음 요소들을 포함합니다:
+
+**기본 컴포넌트**:
+- 컬러 팔레트 (Primary, Secondary, Neutral colors)
+- 타이포그래피 시스템 (Heading 1-3, Body text variants)
+- 버튼 컴포넌트 (Primary, Secondary, Danger, Ghost)
+- 카드 컴포넌트 (Default, Interactive, Status)
+
+**입력 및 상호작용**:
+- 텍스트 입력 필드
+- 검색 입력 필드
+- 토글 스위치 및 체크박스
+
+**게임 특화 요소**:
+- 게임 아이콘 (타워, 체력, 골드, 웨이브)
+- 상태 표시기 (진행률 바, 체력 바)
+- 배지 및 라벨 (온라인 상태, 레벨, 랭크)
+- 알림 시스템 (성공/오류 토스트)
+
+**리스트 및 데이터 표시**:
+- 친구 목록 아이템
+- 게임 기록 아이템
+- 타워 선택 카드
+- 리소스 디스플레이
+
+**디자인 시스템**:
+- 스페이싱 가이드 (4px 기반 시스템)
+- 그림자 효과 (Small, Medium, Large)
+
+이 쇼케이스는 개발자와 디자이너가 일관된 UI를 구현할 수 있도록 하는 완전한 참조 가이드입니다.
+
+### 타워 디자인 모크업 (Tower Design Mockups)
+
+각 종족별 타워 디자인을 시각화한 상세 모크업 컬렉션입니다:
+
+#### 인간 연합 (Human Alliance)
+![Human Alliance Towers](ui-mockups/tower-mockups/human-alliance-towers.svg)
+- **종족 특성**: 균형과 적응성, 모든 타워 건설 가능, 협력 보너스 +20%
+- **기본 타워**: 기사단 요새, 상인 길드, 마법사 탑
+- **고급 타워**: 성벽 요새, 대성당, 왕궁
+- **협력 타워**: 연합 요새, 평화의 탑, 통합 지휘소
+
+#### 엘프 왕국 (Elven Kingdom)
+![Elven Kingdom Towers](ui-mockups/tower-mockups/elven-kingdom-towers.svg)
+- **종족 특성**: 정밀함과 자연의 힘, 원거리 공격 +25%, 타워 사거리 +20%
+- **기본 타워**: 고대 나무, 달빛 궁수, 자연의 덫
+- **고급 타워**: 세계수, 바람의 탑, 별빛 관측소
+- **협력 타워**: 생명의 나무, 자연의 수호자, 엘프 연합
+
+#### 드워프 클랜 (Dwarven Clan)
+![Dwarven Clan Towers](ui-mockups/tower-mockups/dwarven-clan-towers.svg)
+- **종족 특성**: 견고함과 화력, 방어력 +30%, 폭발 공격 +40%, 타워 내구도 +50%
+- **기본 타워**: 화포 요새, 철벽 방어막, 용광로
+- **고급 타워**: 거대 발리스타, 화약 저장고, 드래곤 킬러
+- **협력 타워**: 거대 화포, 요새 도시, 마스터 포지
+
+#### 오크 부족 (Orc Tribe)
+![Orc Tribe Towers](ui-mockups/tower-mockups/orc-tribe-towers.svg)
+- **종족 특성**: 공격성과 재생력, 공격 속도 +35%, 체력 재생 +25%, 전투 중 공격력 증가
+- **기본 타워**: 전쟁 토템, 광전사 막사, 피의 제단
+- **고급 타워**: 전쟁 우두머리, 분노의 탑, 야수 우리
+- **협력 타워**: 대족장 요새, 전쟁 드럼, 혈맹 제단
+
+#### 언데드 군단 (Undead Legion)
+![Undead Legion Towers](ui-mockups/tower-mockups/undead-legion-towers.svg)
+- **종족 특성**: 지속성과 디버프, 독/저주 공격 +50%, 적 디버프 효과 +30%
+- **기본 타워**: 네크로맨서 탑, 저주의 오벨리스크, 뼈 감옥
+- **고급 타워**: 리치 왕좌, 영혼 수확기, 어둠의 성채
+- **협력 타워**: 죽음의 군주, 영혼의 문, 영원한 저주
+
+#### 드래곤 종족 (Dragon Clan)
+![Dragon Clan Towers](ui-mockups/tower-mockups/dragon-clan-towers.svg)
+- **종족 특성**: 압도적 화력과 위엄, 화염 공격 +60%, 공중 유닛 특화, 보스급 적 추가 피해
+- **기본 타워**: 용의 둥지, 화염 브레스, 용의 보물
+- **고급 타워**: 고대 용, 용암 분화구, 드래곤 로드
+- **협력 타워**: 용왕의 궁전, 화염의 심장, 용의 분노
+
+#### 천사 군단 (Angel Legion)
+![Angel Legion Towers](ui-mockups/tower-mockups/angel-legion-towers.svg)
+- **종족 특성**: 신성함과 치유, 신성 공격 +45%, 팀 치유 +40%, 악 속성 적에게 추가 피해
+- **기본 타워**: 수호천사, 신성한 빛, 치유의 성소
+- **고급 타워**: 대천사, 천국의 문, 신의 심판
+- **협력 타워**: 천상의 요새, 신성한 합창, 최후의 심판
+
+#### 기계 문명 (Mechanical Empire)
+![Mechanical Empire Towers](ui-mockups/tower-mockups/mechanical-empire-towers.svg)
+- **종족 특성**: 기술력과 자동화, 자동 수리 +40%, 업그레이드 비용 -30%, 연쇄 반응 공격
+- **기본 타워**: 자동 터렛, 레이저 캐논, 드론 팩토리
+- **고급 타워**: 플라즈마 제너레이터, 사이버 요새, 메가 로봇
+- **협력 타워**: AI 중앙 컴퓨터, 나노 스웜, 테크놀로지 네트워크
+
+각 타워 디자인은 종족의 고유한 특성과 테마를 반영하며, 게임 내에서 시각적으로 구별 가능하도록 설계되었습니다.
 
 ## 📱 반응형 설계
 

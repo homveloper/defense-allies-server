@@ -1,0 +1,163 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Human Alliance Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">균형과 적응성 - 모든 타워 건설 가능, 협력 보너스 +20%</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#2563EB" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#2563EB">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 자원 효율성 +15% • 협력 보너스 +20% • 모든 타워 건설 가능</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Basic Towers</text>
+  
+  <!-- 기사단 요새 (Knights Fortress) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="240" width="60" height="80" rx="8" fill="#2563EB"/>
+  <rect x="94" y="250" width="40" height="60" rx="4" fill="#FFFFFF"/>
+  <rect x="104" y="260" width="20" height="40" rx="2" fill="#2563EB"/>
+  <!-- 방패 장식 -->
+  <path d="M 114 270 L 124 270 L 124 285 L 119 290 L 114 285 Z" fill="#F59E0B"/>
+  <!-- 깃발 -->
+  <rect x="119" y="240" width="2" height="20" fill="#64748B"/>
+  <path d="M 121 240 L 135 245 L 121 250 Z" fill="#EF4444"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">기사단 요새</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Knights Fortress</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">주변 타워 방어력 +15%</text>
+  
+  <!-- 상인 길드 (Merchant Guild) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="240" width="60" height="80" rx="8" fill="#F59E0B"/>
+  <rect x="290" y="250" width="40" height="60" rx="4" fill="#FFFFFF"/>
+  <!-- 금고 -->
+  <rect x="300" y="270" width="20" height="15" rx="2" fill="#F59E0B"/>
+  <circle cx="310" cy="277" r="2" fill="#FFFFFF"/>
+  <!-- 동전들 -->
+  <circle cx="295" cy="295" r="3" fill="#F59E0B"/>
+  <circle cx="305" cy="300" r="3" fill="#F59E0B"/>
+  <circle cx="315" cy="295" r="3" fill="#F59E0B"/>
+  <!-- 상점 간판 -->
+  <rect x="285" y="245" width="30" height="8" rx="2" fill="#22C55E"/>
+  <text x="300" y="252" text-anchor="middle" font-size="6" fill="#FFFFFF">SHOP</text>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">상인 길드</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Merchant Guild</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">자원 생성 +25%</text>
+  
+  <!-- 마법사 탑 (Mage Tower) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="240" width="60" height="80" rx="8" fill="#8B5CF6"/>
+  <rect x="486" y="250" width="40" height="60" rx="4" fill="#FFFFFF"/>
+  <!-- 마법 구체 -->
+  <circle cx="506" cy="270" r="8" fill="#8B5CF6"/>
+  <circle cx="506" cy="270" r="4" fill="#FFFFFF"/>
+  <!-- 마법 효과 -->
+  <circle cx="496" cy="285" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <circle cx="516" cy="290" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <circle cx="501" cy="295" r="2" fill="#8B5CF6" opacity="0.7"/>
+  <!-- 지팡이 -->
+  <rect x="505" y="240" width="2" height="15" fill="#64748B"/>
+  <circle cx="506" cy="240" r="3" fill="#8B5CF6"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">마법사 탑</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Mage Tower</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">다양한 마법 공격</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 성벽 요새 (Castle Wall) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="44" y="460" width="140" height="60" rx="4" fill="#64748B"/>
+  <rect x="54" y="470" width="30" height="40" rx="2" fill="#FFFFFF"/>
+  <rect x="94" y="470" width="30" height="40" rx="2" fill="#FFFFFF"/>
+  <rect x="134" y="470" width="30" height="40" rx="2" fill="#FFFFFF"/>
+  <!-- 성벽 꼭대기 -->
+  <rect x="44" y="460" width="140" height="8" fill="#94A3B8"/>
+  <!-- 깃발들 -->
+  <rect x="64" y="450" width="1" height="10" fill="#64748B"/>
+  <rect x="114" y="450" width="1" height="10" fill="#64748B"/>
+  <rect x="154" y="450" width="1" height="10" fill="#64748B"/>
+  <path d="M 65 450 L 75 453 L 65 456 Z" fill="#EF4444"/>
+  <path d="M 115 450 L 125 453 L 115 456 Z" fill="#EF4444"/>
+  <path d="M 155 450 L 165 453 L 155 456 Z" fill="#EF4444"/>
+  
+  <text x="104" y="545" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">성벽 요새</text>
+  <text x="104" y="560" text-anchor="middle" font-size="11" fill="#64748B">Castle Wall</text>
+  <text x="104" y="575" text-anchor="middle" font-size="10" fill="#64748B">높은 방어력, 적 진행 차단</text>
+  
+  <!-- 대성당 (Cathedral) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="460" width="60" height="60" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <!-- 십자가 -->
+  <rect x="308" y="470" width="4" height="20" fill="#F59E0B"/>
+  <rect x="302" y="476" width="16" height="4" fill="#F59E0B"/>
+  <!-- 종탑 -->
+  <rect x="295" y="450" width="10" height="20" rx="2" fill="#64748B"/>
+  <rect x="315" y="450" width="10" height="20" rx="2" fill="#64748B"/>
+  <!-- 종 -->
+  <circle cx="300" cy="455" r="2" fill="#F59E0B"/>
+  <circle cx="320" cy="455" r="2" fill="#F59E0B"/>
+  <!-- 빛 효과 -->
+  <circle cx="310" cy="485" r="15" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="310" cy="485" r="10" fill="#F59E0B" opacity="0.3"/>
+  
+  <text x="300" y="545" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">대성당</text>
+  <text x="300" y="560" text-anchor="middle" font-size="11" fill="#64748B">Cathedral</text>
+  <text x="300" y="575" text-anchor="middle" font-size="10" fill="#64748B">팀 전체 치유 및 버프</text>
+  
+  <!-- 왕궁 (Royal Palace) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="460" width="60" height="60" rx="8" fill="#F59E0B"/>
+  <rect x="486" y="470" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 왕관 -->
+  <path d="M 496 465 L 506 460 L 516 465 L 516 470 L 496 470 Z" fill="#F59E0B"/>
+  <circle cx="501" cy="467" r="1" fill="#FFFFFF"/>
+  <circle cx="506" cy="465" r="1" fill="#FFFFFF"/>
+  <circle cx="511" cy="467" r="1" fill="#FFFFFF"/>
+  <!-- 보석 -->
+  <circle cx="506" cy="485" r="4" fill="#8B5CF6"/>
+  <!-- 황금 장식 -->
+  <rect x="491" y="475" width="30" height="2" fill="#F59E0B"/>
+  <rect x="491" y="485" width="30" height="2" fill="#F59E0B"/>
+  <rect x="491" y="495" width="30" height="2" fill="#F59E0B"/>
+  
+  <text x="496" y="545" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">왕궁</text>
+  <text x="496" y="560" text-anchor="middle" font-size="11" fill="#64748B">Royal Palace</text>
+  <text x="496" y="575" text-anchor="middle" font-size="10" fill="#64748B">최고급 지휘 센터</text>
+  
+  <!-- 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#2563EB" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#2563EB">협력 타워</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Cooperation Towers</text>
+  
+  <!-- 연합 요새 (Alliance Fortress) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#2563EB" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#2563EB"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 연합 깃발 -->
+  <rect x="693" y="295" width="2" height="15" fill="#64748B"/>
+  <path d="M 695 295 L 710 300 L 695 305 Z" fill="#2563EB"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">연합 요새</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 평화의 탑 (Peace Tower) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#22C55E" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#22C55E"/>
+  <circle cx="694" cy="450" r="8" fill="#FFFFFF"/>
+  <!-- 평화 상징 -->
+  <path d="M 694 445 L 694 455 M 689 450 L 699 450" stroke="#22C55E" stroke-width="2"/>
+  <circle cx="694" cy="450" r="6" fill="none" stroke="#22C55E" stroke-width="1"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">평화의 탑</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">전체 치유 효과</text>
+  
+  <!-- 통합 지휘소 (Unified Command) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#F59E0B" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">통합 지휘소</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">팀 전략 강화</text>
+</svg>

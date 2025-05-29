@@ -1,0 +1,183 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Orc Tribe Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">공격성과 재생력 - 공격 속도 +35%, 체력 재생 +25%, 전투 중 공격력 증가</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#DC2626" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#DC2626">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 공격 속도 +35% • 체력 재생 +25% • 전투 중 공격력 증가</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">War Towers</text>
+  
+  <!-- 전쟁 토템 (War Totem) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="280" width="60" height="40" rx="4" fill="#92400E"/>
+  <!-- 토템 기둥 -->
+  <rect x="104" y="240" width="20" height="40" rx="2" fill="#92400E"/>
+  <!-- 토템 머리 -->
+  <rect x="99" y="235" width="30" height="20" rx="4" fill="#DC2626"/>
+  <circle cx="109" cy="245" r="2" fill="#FFFFFF"/>
+  <circle cx="119" cy="245" r="2" fill="#FFFFFF"/>
+  <!-- 이빨 -->
+  <path d="M 104 250 L 106 255 L 108 250 Z" fill="#FFFFFF"/>
+  <path d="M 120 250 L 122 255 L 124 250 Z" fill="#FFFFFF"/>
+  <!-- 깃털 장식 -->
+  <rect x="101" y="230" width="2" height="10" fill="#F59E0B"/>
+  <rect x="105" y="225" width="2" height="15" fill="#F59E0B"/>
+  <rect x="109" y="220" width="2" height="20" fill="#F59E0B"/>
+  <rect x="117" y="225" width="2" height="15" fill="#F59E0B"/>
+  <rect x="121" y="230" width="2" height="10" fill="#F59E0B"/>
+  <rect x="125" y="230" width="2" height="10" fill="#F59E0B"/>
+  <!-- 전투 오라 -->
+  <circle cx="114" cy="245" r="25" fill="#DC2626" opacity="0.2"/>
+  <circle cx="114" cy="245" r="35" fill="#DC2626" opacity="0.1"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">전쟁 토템</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">War Totem</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">주변 타워 공격속도 증가</text>
+  
+  <!-- 광전사 막사 (Berserker Barracks) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="260" width="60" height="60" rx="8" fill="#92400E"/>
+  <rect x="290" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 막사 구조 -->
+  <rect x="295" y="275" width="30" height="25" rx="2" fill="#92400E"/>
+  <rect x="300" y="280" width="20" height="15" rx="1" fill="#64748B"/>
+  <!-- 광전사 실루엣 -->
+  <circle cx="310" cy="287" r="4" fill="#DC2626"/>
+  <rect x="307" y="291" width="6" height="8" rx="1" fill="#DC2626"/>
+  <!-- 도끼 -->
+  <rect x="315" y="285" width="6" height="2" fill="#64748B"/>
+  <rect x="318" y="283" width="3" height="6" fill="#64748B"/>
+  <!-- 분노 효과 -->
+  <circle cx="310" cy="287" r="8" fill="#DC2626" opacity="0.3"/>
+  <circle cx="310" cy="287" r="12" fill="#DC2626" opacity="0.2"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">광전사 막사</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Berserker Barracks</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">근접 전투 유닛 생성</text>
+  
+  <!-- 피의 제단 (Blood Altar) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#DC2626"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 제단 -->
+  <rect x="496" y="285" width="20" height="15" rx="2" fill="#92400E"/>
+  <rect x="501" y="280" width="10" height="5" rx="1" fill="#DC2626"/>
+  <!-- 해골 장식 -->
+  <circle cx="506" cy="275" r="3" fill="#F8FAFC"/>
+  <circle cx="504" cy="274" r="1" fill="#374151"/>
+  <circle cx="508" cy="274" r="1" fill="#374151"/>
+  <!-- 피 효과 -->
+  <circle cx="506" cy="290" r="2" fill="#DC2626"/>
+  <circle cx="503" cy="293" r="1" fill="#DC2626"/>
+  <circle cx="509" cy="293" r="1" fill="#DC2626"/>
+  <!-- 붉은 오라 -->
+  <circle cx="506" cy="285" r="15" fill="#DC2626" opacity="0.2"/>
+  <circle cx="506" cy="285" r="20" fill="#DC2626" opacity="0.1"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">피의 제단</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Blood Altar</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">적 처치시 능력 증가</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 전쟁 우두머리 (War Chief) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="480" width="60" height="40" rx="4" fill="#DC2626"/>
+  <!-- 우두머리 왕좌 -->
+  <rect x="94" y="490" width="40" height="20" rx="2" fill="#92400E"/>
+  <rect x="99" y="485" width="30" height="10" rx="2" fill="#92400E"/>
+  <!-- 우두머리 -->
+  <circle cx="114" cy="490" r="6" fill="#22C55E"/>
+  <rect x="108" y="496" width="12" height="10" rx="2" fill="#22C55E"/>
+  <!-- 왕관 -->
+  <path d="M 108 485 L 114 480 L 120 485 L 120 488 L 108 488 Z" fill="#F59E0B"/>
+  <!-- 도끼 -->
+  <rect x="125" y="488" width="8" height="3" fill="#64748B"/>
+  <rect x="128" y="485" width="5" height="9" fill="#64748B"/>
+  <!-- 지휘 오라 -->
+  <circle cx="114" cy="495" r="20" fill="#F59E0B" opacity="0.2"/>
+  <circle cx="114" cy="495" r="30" fill="#F59E0B" opacity="0.1"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">전쟁 우두머리</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">War Chief</text>
+  
+  <!-- 분노의 탑 (Rage Tower) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="480" width="60" height="40" rx="4" fill="#DC2626"/>
+  <!-- 분노 구조물 -->
+  <rect x="290" y="490" width="40" height="20" rx="2" fill="#92400E"/>
+  <!-- 분노 에너지 -->
+  <circle cx="310" cy="500" r="8" fill="#DC2626"/>
+  <circle cx="310" cy="500" r="5" fill="#EF4444"/>
+  <circle cx="310" cy="500" r="2" fill="#F87171"/>
+  <!-- 분노 파동 -->
+  <circle cx="310" cy="500" r="12" fill="#DC2626" opacity="0.3"/>
+  <circle cx="310" cy="500" r="18" fill="#DC2626" opacity="0.2"/>
+  <circle cx="310" cy="500" r="25" fill="#DC2626" opacity="0.1"/>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">분노의 탑</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Rage Tower</text>
+  
+  <!-- 야수 우리 (Beast Cage) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="480" width="60" height="40" rx="4" fill="#92400E"/>
+  <!-- 우리 -->
+  <rect x="486" y="490" width="40" height="20" rx="2" fill="#64748B"/>
+  <!-- 우리 창살 -->
+  <rect x="490" y="490" width="2" height="20" fill="#374151"/>
+  <rect x="495" y="490" width="2" height="20" fill="#374151"/>
+  <rect x="500" y="490" width="2" height="20" fill="#374151"/>
+  <rect x="505" y="490" width="2" height="20" fill="#374151"/>
+  <rect x="510" y="490" width="2" height="20" fill="#374151"/>
+  <rect x="515" y="490" width="2" height="20" fill="#374151"/>
+  <rect x="520" y="490" width="2" height="20" fill="#374151"/>
+  <!-- 야수 눈 -->
+  <circle cx="498" cy="498" r="2" fill="#EF4444"/>
+  <circle cx="514" cy="498" r="2" fill="#EF4444"/>
+  <!-- 발톱 자국 -->
+  <line x1="492" y1="502" x2="495" y2="505" stroke="#374151" stroke-width="1"/>
+  <line x1="517" y1="502" x2="520" y2="505" stroke="#374151" stroke-width="1"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">야수 우리</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Beast Cage</text>
+  
+  <!-- 오크 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#DC2626" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#DC2626">오크 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Orc Cooperation</text>
+  
+  <!-- 대족장 요새 (Great Chief Fortress) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#DC2626" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#DC2626"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 대족장 왕관 -->
+  <path d="M 684 305 L 694 300 L 704 305 L 704 308 L 684 308 Z" fill="#F59E0B"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">대족장 요새</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 전쟁 드럼 (War Drums) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#92400E" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#92400E"/>
+  <circle cx="694" cy="450" r="12" fill="#64748B"/>
+  <circle cx="694" cy="450" r="8" fill="#92400E"/>
+  <!-- 드럼스틱 -->
+  <rect x="688" y="445" width="12" height="3" fill="#F59E0B"/>
+  <circle cx="688" cy="446" r="2" fill="#F59E0B"/>
+  <circle cx="700" cy="446" r="2" fill="#F59E0B"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">전쟁 드럼</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">팀 전체 버서커</text>
+  
+  <!-- 혈맹 제단 (Blood Pact Altar) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#DC2626" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">혈맹 제단</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">생명력 공유</text>
+</svg>

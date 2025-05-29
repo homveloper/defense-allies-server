@@ -1,0 +1,175 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Dwarven Clan Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">견고함과 화력 - 방어력 +30%, 폭발 공격 +40%, 타워 내구도 +50%</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#EF4444" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#EF4444">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 방어력 +30% • 폭발 공격 +40% • 타워 내구도 +50%</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Forge Towers</text>
+  
+  <!-- 화포 요새 (Cannon Fortress) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="260" width="60" height="60" rx="8" fill="#64748B"/>
+  <rect x="94" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 대포 -->
+  <rect x="104" y="285" width="20" height="8" rx="2" fill="#64748B"/>
+  <circle cx="124" cy="289" r="3" fill="#64748B"/>
+  <!-- 포탄 -->
+  <circle cx="130" cy="289" r="2" fill="#EF4444"/>
+  <!-- 폭발 효과 -->
+  <circle cx="135" cy="289" r="4" fill="#F59E0B" opacity="0.5"/>
+  <circle cx="135" cy="289" r="6" fill="#EF4444" opacity="0.3"/>
+  <!-- 요새 벽 -->
+  <rect x="89" y="265" width="5" height="50" fill="#94A3B8"/>
+  <rect x="126" y="265" width="5" height="50" fill="#94A3B8"/>
+  <!-- 연기 -->
+  <circle cx="127" cy="280" r="2" fill="#64748B" opacity="0.3"/>
+  <circle cx="125" cy="275" r="3" fill="#64748B" opacity="0.2"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">화포 요새</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Cannon Fortress</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">강력한 범위 공격</text>
+  
+  <!-- 철벽 방어막 (Iron Wall) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="240" width="60" height="80" rx="8" fill="#64748B"/>
+  <rect x="290" y="250" width="40" height="60" rx="4" fill="#94A3B8"/>
+  <!-- 철판 -->
+  <rect x="295" y="255" width="30" height="10" rx="1" fill="#64748B"/>
+  <rect x="295" y="270" width="30" height="10" rx="1" fill="#64748B"/>
+  <rect x="295" y="285" width="30" height="10" rx="1" fill="#64748B"/>
+  <rect x="295" y="300" width="30" height="10" rx="1" fill="#64748B"/>
+  <!-- 못 -->
+  <circle cx="300" cy="260" r="1" fill="#374151"/>
+  <circle cx="320" cy="260" r="1" fill="#374151"/>
+  <circle cx="300" cy="275" r="1" fill="#374151"/>
+  <circle cx="320" cy="275" r="1" fill="#374151"/>
+  <circle cx="300" cy="290" r="1" fill="#374151"/>
+  <circle cx="320" cy="290" r="1" fill="#374151"/>
+  <circle cx="300" cy="305" r="1" fill="#374151"/>
+  <circle cx="320" cy="305" r="1" fill="#374151"/>
+  <!-- 방어막 효과 -->
+  <rect x="275" y="240" width="70" height="80" rx="8" fill="#64748B" opacity="0.2"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">철벽 방어막</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Iron Wall</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">적 진행 완전 차단</text>
+  
+  <!-- 용광로 (Forge) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#EF4444"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 용광로 -->
+  <rect x="496" y="280" width="20" height="20" rx="2" fill="#EF4444"/>
+  <rect x="501" y="285" width="10" height="10" rx="1" fill="#F59E0B"/>
+  <!-- 불꽃 -->
+  <circle cx="506" cy="275" r="3" fill="#F59E0B"/>
+  <circle cx="503" cy="272" r="2" fill="#FEF3C7"/>
+  <circle cx="509" cy="272" r="2" fill="#FEF3C7"/>
+  <!-- 망치 -->
+  <rect x="490" y="290" width="8" height="3" fill="#64748B"/>
+  <rect x="488" y="288" width="4" height="7" fill="#92400E"/>
+  <!-- 불꽃 튀김 -->
+  <circle cx="485" cy="285" r="1" fill="#F59E0B"/>
+  <circle cx="527" cy="288" r="1" fill="#F59E0B"/>
+  <circle cx="492" cy="275" r="1" fill="#F59E0B"/>
+  <circle cx="520" cy="278" r="1" fill="#F59E0B"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">용광로</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Forge</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">주변 타워 화염 속성</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 거대 발리스타 (Giant Ballista) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="480" width="60" height="40" rx="4" fill="#64748B"/>
+  <!-- 발리스타 본체 -->
+  <rect x="94" y="490" width="40" height="20" rx="2" fill="#92400E"/>
+  <!-- 활 부분 -->
+  <path d="M 89 500 Q 84 495 89 490" stroke="#92400E" stroke-width="3" fill="none"/>
+  <path d="M 139 500 Q 144 495 139 490" stroke="#92400E" stroke-width="3" fill="none"/>
+  <!-- 화살 -->
+  <rect x="114" y="499" width="15" height="2" fill="#64748B"/>
+  <path d="M 129 500 L 134 498 L 134 502 Z" fill="#64748B"/>
+  <!-- 받침대 -->
+  <rect x="104" y="510" width="20" height="10" rx="2" fill="#64748B"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">거대 발리스타</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">Giant Ballista</text>
+  
+  <!-- 화약 저장고 (Gunpowder Storage) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="480" width="60" height="40" rx="4" fill="#64748B"/>
+  <!-- 저장고 -->
+  <rect x="290" y="490" width="40" height="20" rx="2" fill="#92400E"/>
+  <!-- 화약통들 -->
+  <circle cx="300" cy="500" r="4" fill="#374151"/>
+  <circle cx="310" cy="500" r="4" fill="#374151"/>
+  <circle cx="320" cy="500" r="4" fill="#374151"/>
+  <!-- 도화선 -->
+  <line x1="324" y1="500" x2="335" y2="500" stroke="#EF4444" stroke-width="2"/>
+  <!-- 경고 표시 -->
+  <path d="M 295 485 L 305 485 L 300 475 Z" fill="#F59E0B"/>
+  <text x="300" y="482" text-anchor="middle" font-size="6" fill="#FFFFFF">!</text>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">화약 저장고</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Gunpowder Storage</text>
+  
+  <!-- 드래곤 킬러 (Dragon Killer) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="480" width="60" height="40" rx="4" fill="#64748B"/>
+  <!-- 거대 쇠뇌 -->
+  <rect x="486" y="490" width="40" height="20" rx="2" fill="#374151"/>
+  <!-- 용 사냥 창 -->
+  <rect x="506" y="489" width="20" height="4" fill="#EF4444"/>
+  <path d="M 526 491 L 535 489 L 535 493 Z" fill="#EF4444"/>
+  <!-- 용 비늘 장식 -->
+  <circle cx="491" cy="495" r="2" fill="#10B981"/>
+  <circle cx="521" cy="495" r="2" fill="#10B981"/>
+  <!-- 조준경 -->
+  <circle cx="496" cy="500" r="3" fill="#64748B"/>
+  <circle cx="496" cy="500" r="1" fill="#FFFFFF"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">드래곤 킬러</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Dragon Killer</text>
+  
+  <!-- 드워프 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#EF4444" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#EF4444">드워프 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Dwarven Cooperation</text>
+  
+  <!-- 거대 화포 (Mega Cannon) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#EF4444" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#EF4444"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 거대 포구 -->
+  <rect x="694" y="315" width="15" height="10" rx="2" fill="#64748B"/>
+  <circle cx="709" cy="320" r="3" fill="#64748B"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">거대 화포</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 요새 도시 (Fortress City) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#64748B" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#64748B"/>
+  <rect x="684" y="440" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 성벽 -->
+  <rect x="679" y="435" width="30" height="5" fill="#94A3B8"/>
+  <rect x="679" y="455" width="30" height="5" fill="#94A3B8"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">요새 도시</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">최강 방어력</text>
+  
+  <!-- 마스터 포지 (Master Forge) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#F59E0B" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">마스터 포지</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">모든 무기 강화</text>
+</svg>

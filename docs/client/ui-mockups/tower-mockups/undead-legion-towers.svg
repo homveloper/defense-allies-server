@@ -1,0 +1,180 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Undead Legion Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">지속성과 디버프 - 독/저주 공격 +50%, 적 디버프 효과 +30%</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#7C3AED" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#7C3AED">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 독/저주 공격 +50% • 적 디버프 효과 +30% • 파괴된 타워 부활 가능</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Dark Towers</text>
+  
+  <!-- 네크로맨서 탑 (Necromancer Tower) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="260" width="60" height="60" rx="8" fill="#7C3AED"/>
+  <rect x="94" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 네크로맨서 -->
+  <circle cx="114" cy="285" r="6" fill="#374151"/>
+  <rect x="108" y="291" width="12" height="15" rx="2" fill="#374151"/>
+  <!-- 지팡이 -->
+  <rect x="119" y="280" width="2" height="20" fill="#92400E"/>
+  <circle cx="120" cy="278" r="3" fill="#7C3AED"/>
+  <!-- 해골 -->
+  <circle cx="104" cy="295" r="3" fill="#F8FAFC"/>
+  <circle cx="102" cy="294" r="1" fill="#374151"/>
+  <circle cx="106" cy="294" r="1" fill="#374151"/>
+  <circle cx="124" cy="295" r="3" fill="#F8FAFC"/>
+  <circle cx="122" cy="294" r="1" fill="#374151"/>
+  <circle cx="126" cy="294" r="1" fill="#374151"/>
+  <!-- 어둠 오라 -->
+  <circle cx="114" cy="290" r="20" fill="#7C3AED" opacity="0.2"/>
+  <circle cx="114" cy="290" r="30" fill="#7C3AED" opacity="0.1"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">네크로맨서 탑</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Necromancer Tower</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">죽은 적을 아군으로 부활</text>
+  
+  <!-- 저주의 오벨리스크 (Curse Obelisk) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="280" width="60" height="40" rx="4" fill="#374151"/>
+  <!-- 오벨리스크 -->
+  <rect x="305" y="240" width="10" height="40" rx="2" fill="#374151"/>
+  <path d="M 305 240 L 310 235 L 315 240 Z" fill="#374151"/>
+  <!-- 저주 룬 -->
+  <circle cx="310" cy="250" r="2" fill="#7C3AED"/>
+  <circle cx="310" cy="260" r="2" fill="#7C3AED"/>
+  <circle cx="310" cy="270" r="2" fill="#7C3AED"/>
+  <!-- 저주 파동 -->
+  <circle cx="310" cy="260" r="15" fill="#7C3AED" opacity="0.2"/>
+  <circle cx="310" cy="260" r="25" fill="#7C3AED" opacity="0.15"/>
+  <circle cx="310" cy="260" r="35" fill="#7C3AED" opacity="0.1"/>
+  <!-- 어둠 기운 -->
+  <circle cx="295" cy="255" r="2" fill="#374151" opacity="0.5"/>
+  <circle cx="325" cy="265" r="2" fill="#374151" opacity="0.5"/>
+  <circle cx="300" cy="275" r="2" fill="#374151" opacity="0.5"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">저주의 오벨리스크</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Curse Obelisk</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">광범위 디버프 효과</text>
+  
+  <!-- 뼈 감옥 (Bone Prison) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#64748B"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 뼈 감옥 -->
+  <rect x="491" y="275" width="30" height="25" rx="2" fill="#F8FAFC"/>
+  <!-- 뼈 창살 -->
+  <rect x="494" y="275" width="2" height="25" fill="#E5E7EB"/>
+  <rect x="499" y="275" width="2" height="25" fill="#E5E7EB"/>
+  <rect x="504" y="275" width="2" height="25" fill="#E5E7EB"/>
+  <rect x="509" y="275" width="2" height="25" fill="#E5E7EB"/>
+  <rect x="514" y="275" width="2" height="25" fill="#E5E7EB"/>
+  <rect x="519" y="275" width="2" height="25" fill="#E5E7EB"/>
+  <!-- 갇힌 영혼 -->
+  <circle cx="506" cy="287" r="3" fill="#7C3AED" opacity="0.7"/>
+  <!-- 뼈 장식 -->
+  <circle cx="491" cy="270" r="2" fill="#E5E7EB"/>
+  <circle cx="521" cy="270" r="2" fill="#E5E7EB"/>
+  <circle cx="491" cy="305" r="2" fill="#E5E7EB"/>
+  <circle cx="521" cy="305" r="2" fill="#E5E7EB"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">뼈 감옥</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Bone Prison</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">적을 일시적으로 무력화</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 리치 왕좌 (Lich Throne) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="480" width="60" height="40" rx="4" fill="#374151"/>
+  <!-- 왕좌 -->
+  <rect x="94" y="490" width="40" height="20" rx="2" fill="#7C3AED"/>
+  <rect x="99" y="485" width="30" height="10" rx="2" fill="#7C3AED"/>
+  <!-- 리치 -->
+  <circle cx="114" cy="490" r="5" fill="#F8FAFC"/>
+  <circle cx="112" cy="488" r="1" fill="#EF4444"/>
+  <circle cx="116" cy="488" r="1" fill="#EF4444"/>
+  <rect x="109" y="495" width="10" height="8" rx="2" fill="#374151"/>
+  <!-- 왕관 -->
+  <path d="M 109 485 L 114 480 L 119 485 L 119 488 L 109 488 Z" fill="#64748B"/>
+  <!-- 마법 오라 -->
+  <circle cx="114" cy="495" r="20" fill="#7C3AED" opacity="0.2"/>
+  <circle cx="114" cy="495" r="30" fill="#7C3AED" opacity="0.1"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">리치 왕좌</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">Lich Throne</text>
+  
+  <!-- 영혼 수확기 (Soul Harvester) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="480" width="60" height="40" rx="4" fill="#374151"/>
+  <!-- 수확기 -->
+  <rect x="290" y="490" width="40" height="20" rx="2" fill="#64748B"/>
+  <!-- 낫 -->
+  <path d="M 310 485 Q 320 480 325 485 Q 320 490 310 485" stroke="#E5E7EB" stroke-width="2" fill="none"/>
+  <rect x="310" y="485" width="2" height="15" fill="#92400E"/>
+  <!-- 영혼들 -->
+  <circle cx="295" cy="495" r="2" fill="#7C3AED" opacity="0.7"/>
+  <circle cx="305" cy="492" r="2" fill="#7C3AED" opacity="0.7"/>
+  <circle cx="315" cy="498" r="2" fill="#7C3AED" opacity="0.7"/>
+  <circle cx="325" cy="495" r="2" fill="#7C3AED" opacity="0.7"/>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">영혼 수확기</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Soul Harvester</text>
+  
+  <!-- 어둠의 성채 (Dark Citadel) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="480" width="60" height="40" rx="4" fill="#374151"/>
+  <!-- 성채 -->
+  <rect x="486" y="490" width="40" height="20" rx="2" fill="#64748B"/>
+  <!-- 탑들 -->
+  <rect x="491" y="485" width="6" height="15" rx="1" fill="#374151"/>
+  <rect x="503" y="485" width="6" height="15" rx="1" fill="#374151"/>
+  <rect x="515" y="485" width="6" height="15" rx="1" fill="#374151"/>
+  <!-- 어둠 오라 -->
+  <circle cx="506" cy="495" r="15" fill="#374151" opacity="0.3"/>
+  <circle cx="506" cy="495" r="25" fill="#374151" opacity="0.2"/>
+  <!-- 보라색 빛 -->
+  <circle cx="496" cy="488" r="1" fill="#7C3AED"/>
+  <circle cx="508" cy="488" r="1" fill="#7C3AED"/>
+  <circle cx="520" cy="488" r="1" fill="#7C3AED"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">어둠의 성채</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Dark Citadel</text>
+  
+  <!-- 언데드 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#7C3AED" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#7C3AED">언데드 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Undead Cooperation</text>
+  
+  <!-- 죽음의 군주 (Death Lord) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#7C3AED" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#7C3AED"/>
+  <rect x="684" y="310" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 죽음의 왕관 -->
+  <path d="M 684 305 L 694 300 L 704 305 L 704 308 L 684 308 Z" fill="#374151"/>
+  <circle cx="694" cy="306" r="1" fill="#EF4444"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">죽음의 군주</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">4명 협력 필요</text>
+  
+  <!-- 영혼의 문 (Soul Gate) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#374151" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#374151"/>
+  <rect x="684" y="440" width="20" height="20" rx="2" fill="#FFFFFF"/>
+  <!-- 문 -->
+  <rect x="689" y="445" width="10" height="15" rx="1" fill="#7C3AED"/>
+  <circle cx="694" cy="452" r="1" fill="#FFFFFF"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">영혼의 문</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">차원 소환</text>
+  
+  <!-- 영원한 저주 (Eternal Curse) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#7C3AED" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">영원한 저주</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">지속 디버프</text>
+</svg>

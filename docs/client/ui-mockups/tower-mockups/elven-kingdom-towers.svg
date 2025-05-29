@@ -1,0 +1,168 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 배경 -->
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  
+  <!-- 헤더 -->
+  <rect x="0" y="0" width="800" height="80" fill="#FFFFFF"/>
+  <text x="24" y="35" font-size="24" font-weight="600" fill="#0F172A">Elven Kingdom Towers</text>
+  <text x="24" y="55" font-size="14" fill="#64748B">정밀함과 자연의 힘 - 원거리 공격 +25%, 타워 사거리 +20%</text>
+  
+  <!-- 종족 특성 -->
+  <rect x="24" y="100" width="752" height="60" rx="8" fill="#10B981" opacity="0.1"/>
+  <text x="40" y="125" font-size="16" font-weight="600" fill="#10B981">종족 특성</text>
+  <text x="40" y="145" font-size="12" fill="#0F172A">• 원거리 공격 +25% • 타워 사거리 +20% • 자연 마법 면역</text>
+  
+  <!-- 기본 타워들 -->
+  <text x="24" y="200" font-size="18" font-weight="600" fill="#0F172A">Nature Towers</text>
+  
+  <!-- 고대 나무 (Ancient Tree) -->
+  <rect x="24" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="280" width="60" height="40" rx="4" fill="#92400E"/>
+  <!-- 나무 줄기 -->
+  <rect x="99" y="240" width="30" height="40" rx="4" fill="#92400E"/>
+  <!-- 나뭇잎 -->
+  <circle cx="114" cy="245" r="20" fill="#10B981"/>
+  <circle cx="104" cy="235" r="15" fill="#22C55E"/>
+  <circle cx="124" cy="235" r="15" fill="#22C55E"/>
+  <!-- 성장 효과 -->
+  <circle cx="114" cy="245" r="25" fill="#10B981" opacity="0.2"/>
+  <circle cx="114" cy="245" r="30" fill="#10B981" opacity="0.1"/>
+  <!-- 뿌리 -->
+  <path d="M 99 320 Q 89 330 94 340" stroke="#92400E" stroke-width="3" fill="none"/>
+  <path d="M 129 320 Q 139 330 134 340" stroke="#92400E" stroke-width="3" fill="none"/>
+  
+  <text x="104" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">고대 나무</text>
+  <text x="104" y="360" text-anchor="middle" font-size="11" fill="#64748B">Ancient Tree</text>
+  <text x="104" y="375" text-anchor="middle" font-size="10" fill="#64748B">시간이 지날수록 강해짐</text>
+  
+  <!-- 달빛 궁수 (Moonlight Archer) -->
+  <rect x="220" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="260" width="60" height="60" rx="8" fill="#6366F1"/>
+  <rect x="290" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 궁수 실루엣 -->
+  <circle cx="310" cy="285" r="6" fill="#6366F1"/>
+  <rect x="307" y="291" width="6" height="15" rx="1" fill="#6366F1"/>
+  <!-- 활 -->
+  <path d="M 300 285 Q 295 280 300 275" stroke="#92400E" stroke-width="2" fill="none"/>
+  <line x1="300" y1="280" x2="295" y2="280" stroke="#92400E" stroke-width="1"/>
+  <!-- 달빛 효과 -->
+  <circle cx="310" cy="285" r="15" fill="#6366F1" opacity="0.2"/>
+  <circle cx="310" cy="285" r="20" fill="#6366F1" opacity="0.1"/>
+  <!-- 달 -->
+  <circle cx="325" cy="250" r="8" fill="#F1F5F9"/>
+  <circle cx="328" cy="247" r="6" fill="#F8FAFC"/>
+  
+  <text x="300" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">달빛 궁수</text>
+  <text x="300" y="360" text-anchor="middle" font-size="11" fill="#64748B">Moonlight Archer</text>
+  <text x="300" y="375" text-anchor="middle" font-size="10" fill="#64748B">밤에 공격력 2배</text>
+  
+  <!-- 자연의 덫 (Nature Trap) -->
+  <rect x="416" y="220" width="180" height="160" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="260" width="60" height="60" rx="8" fill="#22C55E"/>
+  <rect x="486" y="270" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 덫 구조 -->
+  <circle cx="506" cy="290" r="12" fill="none" stroke="#92400E" stroke-width="2"/>
+  <path d="M 494 290 L 518 290 M 506 278 L 506 302" stroke="#92400E" stroke-width="2"/>
+  <!-- 가시 덩굴 -->
+  <path d="M 496 285 Q 501 280 506 285 Q 511 280 516 285" stroke="#10B981" stroke-width="2" fill="none"/>
+  <path d="M 496 295 Q 501 300 506 295 Q 511 300 516 295" stroke="#10B981" stroke-width="2" fill="none"/>
+  <!-- 잎사귀 -->
+  <circle cx="498" cy="283" r="2" fill="#22C55E"/>
+  <circle cx="514" cy="283" r="2" fill="#22C55E"/>
+  <circle cx="498" cy="297" r="2" fill="#22C55E"/>
+  <circle cx="514" cy="297" r="2" fill="#22C55E"/>
+  
+  <text x="496" y="345" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">자연의 덫</text>
+  <text x="496" y="360" text-anchor="middle" font-size="11" fill="#64748B">Nature Trap</text>
+  <text x="496" y="375" text-anchor="middle" font-size="10" fill="#64748B">적 속박 및 지속 피해</text>
+  
+  <!-- 고급 타워들 -->
+  <text x="24" y="420" font-size="18" font-weight="600" fill="#0F172A">Advanced Towers</text>
+  
+  <!-- 세계수 (World Tree) -->
+  <rect x="24" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="84" y="500" width="60" height="20" rx="4" fill="#92400E"/>
+  <!-- 거대한 줄기 -->
+  <rect x="94" y="460" width="40" height="40" rx="6" fill="#92400E"/>
+  <!-- 거대한 나뭇잎 -->
+  <circle cx="114" cy="455" r="25" fill="#10B981"/>
+  <circle cx="99" cy="445" r="20" fill="#22C55E"/>
+  <circle cx="129" cy="445" r="20" fill="#22C55E"/>
+  <circle cx="114" cy="430" r="18" fill="#34D399"/>
+  <!-- 마법 오라 -->
+  <circle cx="114" cy="455" r="35" fill="#10B981" opacity="0.15"/>
+  <circle cx="114" cy="455" r="45" fill="#10B981" opacity="0.1"/>
+  <!-- 뿌리 시스템 -->
+  <path d="M 84 520 Q 74 530 79 540" stroke="#92400E" stroke-width="4" fill="none"/>
+  <path d="M 144 520 Q 154 530 149 540" stroke="#92400E" stroke-width="4" fill="none"/>
+  <path d="M 114 520 Q 104 535 114 545" stroke="#92400E" stroke-width="4" fill="none"/>
+  
+  <text x="104" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">세계수</text>
+  <text x="104" y="580" text-anchor="middle" font-size="11" fill="#64748B">World Tree</text>
+  
+  <!-- 바람의 탑 (Wind Tower) -->
+  <rect x="220" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="280" y="460" width="60" height="60" rx="8" fill="#06B6D4"/>
+  <rect x="290" y="470" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 바람 소용돌이 -->
+  <circle cx="310" cy="490" r="12" fill="none" stroke="#06B6D4" stroke-width="2"/>
+  <path d="M 298 490 Q 310 478 322 490 Q 310 502 298 490" stroke="#06B6D4" stroke-width="2" fill="none"/>
+  <!-- 바람 효과 -->
+  <path d="M 285 485 Q 290 480 295 485" stroke="#06B6D4" stroke-width="1" fill="none"/>
+  <path d="M 325 485 Q 330 480 335 485" stroke="#06B6D4" stroke-width="1" fill="none"/>
+  <path d="M 285 495 Q 290 500 295 495" stroke="#06B6D4" stroke-width="1" fill="none"/>
+  <path d="M 325 495 Q 330 500 335 495" stroke="#06B6D4" stroke-width="1" fill="none"/>
+  
+  <text x="300" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">바람의 탑</text>
+  <text x="300" y="580" text-anchor="middle" font-size="11" fill="#64748B">Wind Tower</text>
+  
+  <!-- 별빛 관측소 (Starlight Observatory) -->
+  <rect x="416" y="440" width="180" height="140" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="476" y="460" width="60" height="60" rx="8" fill="#8B5CF6"/>
+  <rect x="486" y="470" width="40" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 망원경 -->
+  <rect x="501" y="480" width="10" height="20" rx="2" fill="#64748B"/>
+  <circle cx="506" cy="478" r="4" fill="#8B5CF6"/>
+  <!-- 별들 -->
+  <circle cx="495" cy="465" r="1" fill="#F59E0B"/>
+  <circle cx="517" cy="468" r="1" fill="#F59E0B"/>
+  <circle cx="508" cy="462" r="1" fill="#F59E0B"/>
+  <circle cx="490" cy="475" r="1" fill="#F59E0B"/>
+  <circle cx="522" cy="475" r="1" fill="#F59E0B"/>
+  <!-- 별빛 광선 -->
+  <line x1="506" y1="478" x2="495" y2="465" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+  <line x1="506" y1="478" x2="517" y2="468" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+  <line x1="506" y1="478" x2="508" y2="462" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+  
+  <text x="496" y="565" text-anchor="middle" font-size="14" font-weight="600" fill="#0F172A">별빛 관측소</text>
+  <text x="496" y="580" text-anchor="middle" font-size="11" fill="#64748B">Starlight Observatory</text>
+  
+  <!-- 자연 협력 타워 -->
+  <rect x="612" y="220" width="164" height="360" rx="12" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+  <text x="694" y="245" text-anchor="middle" font-size="16" font-weight="600" fill="#10B981">자연 협력</text>
+  <text x="694" y="260" text-anchor="middle" font-size="12" fill="#64748B">Nature Cooperation</text>
+  
+  <!-- 생명의 나무 (Tree of Life) -->
+  <rect x="632" y="280" width="124" height="80" rx="8" fill="#10B981" opacity="0.1"/>
+  <rect x="674" y="300" width="40" height="40" rx="4" fill="#10B981"/>
+  <circle cx="694" cy="320" r="15" fill="#22C55E"/>
+  <circle cx="694" cy="320" r="10" fill="#34D399"/>
+  <circle cx="694" cy="320" r="5" fill="#6EE7B7"/>
+  <text x="694" y="375" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">생명의 나무</text>
+  <text x="694" y="390" text-anchor="middle" font-size="10" fill="#64748B">팀 전체 재생</text>
+  
+  <!-- 자연의 수호자 (Nature Guardian) -->
+  <rect x="632" y="410" width="124" height="80" rx="8" fill="#22C55E" opacity="0.1"/>
+  <rect x="674" y="430" width="40" height="40" rx="4" fill="#22C55E"/>
+  <circle cx="694" cy="450" r="8" fill="#FFFFFF"/>
+  <!-- 수호자 형상 -->
+  <circle cx="694" cy="445" r="3" fill="#22C55E"/>
+  <rect x="691" y="448" width="6" height="8" rx="1" fill="#22C55E"/>
+  <text x="694" y="505" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">자연의 수호자</text>
+  <text x="694" y="520" text-anchor="middle" font-size="10" fill="#64748B">강력한 방어</text>
+  
+  <!-- 엘프 연합 (Elven Alliance) -->
+  <rect x="632" y="540" width="124" height="40" rx="8" fill="#6366F1" opacity="0.1"/>
+  <text x="694" y="560" text-anchor="middle" font-size="12" font-weight="600" fill="#0F172A">엘프 연합</text>
+  <text x="694" y="575" text-anchor="middle" font-size="10" fill="#64748B">정밀 사격 강화</text>
+</svg>

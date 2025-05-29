@@ -37,6 +37,7 @@
 6. **드래곤 종족** (Dragon Clan) - 압도적 화력과 위엄
 7. **기계 문명** (Mechanical Empire) - 기술력과 자동화
 8. **정령 종족** (Elemental Spirits) - 원소 조작과 변화
+9. **악마 군단** (Demon Legion) - 파괴와 혼돈
 
 #### 💪 종족별 특성 원칙
 - **Strengths**: 각 종족의 고유 강점 (수치적 보너스)
