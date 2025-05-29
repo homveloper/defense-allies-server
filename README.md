@@ -12,6 +12,28 @@
 - **매치 시스템**: 실시간 매칭 및 게임 세션 관리
 - **핵심 특징**: 팀워크 기반 방어 전략, 실시간 협력 플레이
 
+### 🧠 혁신적 AI 밸런싱 시스템
+
+Defense Allies는 **혁신적인 매트릭스 기반 밸런싱과 Transformer AI 기술을 결합**한 진보적인 게임 밸런싱 시스템을 도입합니다.
+
+#### 🔢 매트릭스 밸런싱 시스템
+- **18개 종족 × 162개 타워**: 각각 고유한 2×2 파워 매트릭스로 정의
+- **수학적 균형 보장**: 프로베니우스 노름, 고유값, 행렬식 기반 정확한 밸런싱
+- **동적 상호작용**: 매트릭스 곱셈을 통한 협력 효과, 아다마르 곱을 통한 환경 효과
+- **120가지 환경 조합**: 시간(4) × 날씨(5) × 지형(6)의 복합 환경 시스템
+
+#### 🤖 Transformer 기반 실시간 밸런싱
+- **Normalizing Flow + Transformer**: 확률 분포 모델링과 시퀀스 어텐션의 결합
+- **3차원 불확실성 정량화**: Aleatoric, Epistemic, Distributional 불확실성 측정
+- **실시간 적응**: 100ms 이하 추론 시간으로 게임 중 즉시 밸런스 조정
+- **해석 가능한 AI**: Multi-Head Attention을 통한 밸런싱 결정 과정 시각화
+
+#### 🎯 시스템의 역할
+1. **완벽한 게임 밸런스**: 수학적으로 보장된 공정한 경쟁 환경
+2. **무한한 전략 다양성**: 매 게임마다 다른 최적 전략 요구
+3. **협력 중심 게임플레이**: 단일 종족으로는 모든 상황 대응 불가
+4. **지속적 진화**: AI가 플레이어 패턴을 학습하여 지속적으로 개선
+
 ## 🏗️ 아키텍처
 
 본 프로젝트는 **Redis 중심의 단순화된 아키텍처**를 채택하여 빠른 개발과 높은 성능을 추구합니다.
@@ -86,6 +108,16 @@ graph TB
 - **실시간 통신**: REST API + JSON RPC + Server-Sent Events
 - **메시징**: Redis Pub/Sub
 
+### AI 밸런싱 시스템
+- **매트릭스 연산**: NumPy + SciPy (선형대수학 기반 밸런싱)
+- **딥러닝 프레임워크**: PyTorch (Normalizing Flow + Transformer)
+- **확률 모델링**: Normalizing Flow (가역 변환, 정보 손실 없음)
+- **시퀀스 모델링**: Transformer (Multi-Head Attention, 시간적 의존성)
+- **불확실성 정량화**: Bayesian Neural Networks (3차원 불확실성)
+- **실시간 추론**: TorchScript (100ms 이하 추론 시간)
+- **데이터 생성**: 시뮬레이션 기반 학습 데이터 (50,000+ 샘플)
+- **모델 검증**: 자동 품질 검증 시스템 (A/B/C 등급)
+
 ### Redis 활용 전략
 - **Primary Storage**: 모든 게임 데이터를 Redis에 저장
 - **Cache Layer**: 빈번히 접근하는 데이터 캐싱
@@ -157,7 +189,13 @@ defense-allies-server/
 │   │   ├── redis/                 # Redis 유틸리티
 │   │   ├── websocket/             # WebSocket 유틸리티
 │   │   ├── utils/                 # 공통 유틸리티
-│   │   └── monitoring/            # 모니터링 유틸리티
+│   │   ├── monitoring/            # 모니터링 유틸리티
+│   │   └── ai/                    # AI 밸런싱 시스템
+│   │       ├── matrix/            # 매트릭스 밸런싱
+│   │       ├── transformer/       # Transformer 모델
+│   │       ├── flow/              # Normalizing Flow
+│   │       ├── simulation/        # 시뮬레이션 데이터 생성
+│   │       └── uncertainty/       # 불확실성 정량화
 │   ├── configs/                   # 설정 파일
 │   │   ├── config.go
 │   │   ├── local.yaml
@@ -261,6 +299,15 @@ defense-allies-server/
     │   ├── game-mechanics.md     # 게임 메커니즘
     │   ├── tower-system.md       # 타워 시스템
     │   └── multiplayer.md        # 멀티플레이어 설계
+    ├── discussion/               # AI 밸런싱 시스템 설계 문서
+    │   ├── race-system-design.md          # 18종족 시스템 설계
+    │   ├── matrix-balancing-system.md     # 매트릭스 밸런싱 시스템
+    │   ├── tower-matrix-system.md         # 타워 매트릭스 시스템
+    │   ├── autoencoder-balancing-system.md # 오토인코더 밸런싱
+    │   ├── normalizing-flow-transformer-balancing.md # Flow + Transformer
+    │   ├── simulation-training-data.md    # 시뮬레이션 학습 데이터
+    │   ├── power-rating-system.md         # 파워 레이팅 시스템
+    │   └── implementation-summary.md      # 구현 완료 요약
     ├── development/              # 개발 가이드
     │   ├── setup.md              # 개발 환경 설정
     │   ├── coding-standards.md   # 코딩 표준
@@ -538,21 +585,54 @@ curl http://localhost:8080/health/detailed
 - [ ] WebSocket 기반 실시간 통신
 - [ ] 게임 세션 관리
 
-### Phase 3: 고급 기능 (지속적)
+### Phase 3: AI 밸런싱 시스템 (2개월)
+- [ ] 매트릭스 밸런싱 시스템 구현
+  - [ ] 18개 종족 × 162개 타워 매트릭스 정의
+  - [ ] 프로베니우스 노름 기반 밸런스 검증
+  - [ ] 환경 변수 매트릭스 시스템 (120가지 조합)
+- [ ] Transformer 기반 실시간 밸런싱
+  - [ ] Normalizing Flow 모델 구현
+  - [ ] Multi-Head Attention 시퀀스 모델링
+  - [ ] 3차원 불확실성 정량화 시스템
+- [ ] 시뮬레이션 학습 데이터 생성
+  - [ ] 게임 메커니즘 시뮬레이터 구현
+  - [ ] 50,000+ 고품질 학습 샘플 생성
+  - [ ] 자동 품질 검증 파이프라인
+
+### Phase 4: 고급 기능 (지속적)
 - [ ] 플레이어 통계 및 랭킹 (Redis Sorted Sets)
 - [ ] 게임 리플레이 시스템
 - [ ] 실시간 관전 기능
 - [ ] 성능 최적화 및 모니터링
+- [ ] AI 밸런싱 성능 모니터링 대시보드
 
 ### Redis 최적화 계획
 - [ ] Redis 클러스터링 (확장성)
 - [ ] Redis Streams를 활용한 이벤트 로깅
 - [ ] Redis 메모리 최적화
 - [ ] 백업 및 복구 전략
+- [ ] AI 모델 결과 캐싱 최적화
 
 ## 📄 라이선스
 
 이 프로젝트는 [MIT License](LICENSE) 하에 배포됩니다.
+
+## 🧠 AI 밸런싱 시스템 상세
+
+Defense Allies의 핵심 혁신인 AI 밸런싱 시스템에 대한 자세한 내용은 다음 문서들을 참조하세요:
+
+### 📚 주요 문서
+- **[매트릭스 밸런싱 시스템](docs/discussion/matrix-balancing-system.md)**: 수학적 게임 밸런스의 핵심
+- **[18종족 시스템 설계](docs/discussion/race-system-design.md)**: 다양성과 균형의 조화
+- **[Normalizing Flow + Transformer](docs/discussion/normalizing-flow-transformer-balancing.md)**: 차세대 AI 기술 적용
+- **[파워 레이팅 시스템](docs/discussion/power-rating-system.md)**: 복잡한 매트릭스를 단일 수치로
+- **[구현 완료 요약](docs/discussion/implementation-summary.md)**: 전체 시스템 개요
+
+### 🎯 시스템의 핵심 가치
+1. **수학적 정확성**: 프로베니우스 노름 기반 완벽한 밸런스
+2. **무한한 다양성**: 18종족 × 162타워 × 120환경 = 거의 무한한 조합
+3. **실시간 적응**: AI가 게임 중 즉시 밸런스 조정
+4. **협력 중심**: 팀워크 없이는 승리 불가능한 설계
 
 ## 📞 연락처
 
@@ -562,4 +642,4 @@ curl http://localhost:8080/health/detailed
 
 ---
 
-**Defense Allies** - 함께하는 방어의 재미! 🛡️⚔️
+**Defense Allies** - 수학과 AI가 만든 완벽한 협력 게임! 🛡️⚔️🤖
