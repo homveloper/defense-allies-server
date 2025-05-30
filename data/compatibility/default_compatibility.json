@@ -1,0 +1,259 @@
+{
+  "version": "1.0",
+  "description": "Default type compatibility rules for Defense Allies tower system",
+  "categories": [
+    {
+      "name": "numeric",
+      "description": "Numeric data types that can be converted between each other",
+      "types": ["int", "float"],
+      "internal_compatible": true,
+      "conversion_cost": 1
+    },
+    {
+      "name": "basic_types",
+      "description": "Basic primitive types",
+      "types": ["string", "bool", "int", "float"],
+      "internal_compatible": false,
+      "conversion_cost": 2
+    },
+    {
+      "name": "spatial",
+      "description": "Spatial and geometric types",
+      "types": ["vector2", "position", "area", "range"],
+      "internal_compatible": true,
+      "conversion_cost": 1
+    },
+    {
+      "name": "single_entities",
+      "description": "Single game entity types",
+      "types": ["target", "enemy", "tower", "player"],
+      "internal_compatible": true,
+      "conversion_cost": 0
+    },
+    {
+      "name": "entity_collections",
+      "description": "Collections of game entities",
+      "types": ["targets", "enemies", "towers", "players"],
+      "internal_compatible": true,
+      "conversion_cost": 1
+    },
+    {
+      "name": "game_effects",
+      "description": "Game effects and events",
+      "types": ["effect", "effects", "event", "events"],
+      "internal_compatible": false,
+      "conversion_cost": 0
+    },
+    {
+      "name": "damage_types",
+      "description": "Different types of damage calculations",
+      "types": ["damage"],
+      "internal_compatible": true,
+      "conversion_cost": 0
+    },
+    {
+      "name": "universal",
+      "description": "Universal types that can connect to anything",
+      "types": ["any", "object", "map"],
+      "internal_compatible": true,
+      "conversion_cost": 0
+    }
+  ],
+  "rules": [
+    {
+      "from_type": "int",
+      "to_type": "float",
+      "bidirectional": true,
+      "cost": 1,
+      "transform": "float(value)"
+    },
+    {
+      "from_type": "int",
+      "to_type": "string",
+      "bidirectional": false,
+      "cost": 2,
+      "transform": "string(value)"
+    },
+    {
+      "from_type": "float",
+      "to_type": "string",
+      "bidirectional": false,
+      "cost": 2,
+      "transform": "string(value)"
+    },
+    {
+      "from_type": "bool",
+      "to_type": "string",
+      "bidirectional": false,
+      "cost": 2,
+      "transform": "string(value)"
+    },
+    {
+      "from_type": "target",
+      "to_type": "targets",
+      "bidirectional": false,
+      "cost": 0,
+      "transform": "[value]"
+    },
+    {
+      "from_type": "targets",
+      "to_type": "target",
+      "bidirectional": false,
+      "cost": 1,
+      "transform": "value.length > 0 ? value[0] : null"
+    },
+    {
+      "from_type": "enemy",
+      "to_type": "enemies",
+      "bidirectional": false,
+      "cost": 0,
+      "transform": "[value]"
+    },
+    {
+      "from_type": "enemies",
+      "to_type": "enemy",
+      "bidirectional": false,
+      "cost": 1,
+      "transform": "value.length > 0 ? value[0] : null"
+    },
+    {
+      "from_type": "tower",
+      "to_type": "towers",
+      "bidirectional": false,
+      "cost": 0,
+      "transform": "[value]"
+    },
+    {
+      "from_type": "towers",
+      "to_type": "tower",
+      "bidirectional": false,
+      "cost": 1,
+      "transform": "value.length > 0 ? value[0] : null"
+    },
+    {
+      "from_type": "player",
+      "to_type": "players",
+      "bidirectional": false,
+      "cost": 0,
+      "transform": "[value]"
+    },
+    {
+      "from_type": "players",
+      "to_type": "player",
+      "bidirectional": false,
+      "cost": 1,
+      "transform": "value.length > 0 ? value[0] : null"
+    },
+    {
+      "from_type": "effect",
+      "to_type": "effects",
+      "bidirectional": false,
+      "cost": 0,
+      "transform": "[value]"
+    },
+    {
+      "from_type": "effects",
+      "to_type": "effect",
+      "bidirectional": false,
+      "cost": 1,
+      "transform": "value.length > 0 ? value[0] : null"
+    },
+    {
+      "from_type": "event",
+      "to_type": "events",
+      "bidirectional": false,
+      "cost": 0,
+      "transform": "[value]"
+    },
+    {
+      "from_type": "events",
+      "to_type": "event",
+      "bidirectional": false,
+      "cost": 1,
+      "transform": "value.length > 0 ? value[0] : null"
+    },
+    {
+      "from_type": "target",
+      "to_type": "enemy",
+      "bidirectional": true,
+      "cost": 0,
+      "transform": "value"
+    },
+    {
+      "from_type": "targets",
+      "to_type": "enemies",
+      "bidirectional": true,
+      "cost": 0,
+      "transform": "value"
+    },
+    {
+      "from_type": "position",
+      "to_type": "vector2",
+      "bidirectional": true,
+      "cost": 0,
+      "transform": "value"
+    },
+    {
+      "from_type": "vector2",
+      "to_type": "position",
+      "bidirectional": true,
+      "cost": 0,
+      "transform": "value"
+    },
+    {
+      "from_type": "any",
+      "to_type": "string",
+      "bidirectional": false,
+      "cost": 3,
+      "transform": "JSON.stringify(value)"
+    },
+    {
+      "from_type": "any",
+      "to_type": "object",
+      "bidirectional": true,
+      "cost": 0,
+      "transform": "value"
+    },
+    {
+      "from_type": "object",
+      "to_type": "map",
+      "bidirectional": true,
+      "cost": 1,
+      "transform": "value"
+    }
+  ],
+  "presets": [
+    {
+      "name": "minimal",
+      "description": "Minimal compatibility rules for basic tower functionality",
+      "categories": ["numeric", "single_entities"],
+      "rules": []
+    },
+    {
+      "name": "standard",
+      "description": "Standard compatibility rules for most tower systems",
+      "categories": ["numeric", "single_entities", "entity_collections", "spatial"],
+      "rules": []
+    },
+    {
+      "name": "advanced",
+      "description": "Advanced compatibility rules with full feature support",
+      "categories": ["numeric", "basic_types", "single_entities", "entity_collections", "spatial", "game_effects", "damage_types"],
+      "rules": []
+    },
+    {
+      "name": "development",
+      "description": "Development preset with universal compatibility for testing",
+      "categories": ["universal", "numeric", "basic_types", "single_entities", "entity_collections", "spatial", "game_effects", "damage_types"],
+      "rules": [
+        {
+          "from_type": "any",
+          "to_type": "string",
+          "bidirectional": false,
+          "cost": 0,
+          "transform": "debug_string(value)"
+        }
+      ]
+    }
+  ]
+}

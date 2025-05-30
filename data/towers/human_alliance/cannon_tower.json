@@ -1,0 +1,184 @@
+{
+  "id": "human_cannon_tower",
+  "name": "Cannon Tower",
+  "description": "A powerful siege tower equipped with heavy cannons. Deals massive area damage but with slower attack speed and higher cost.",
+  "version": "1.0",
+  "race": "human_alliance",
+  "category": "offensive",
+  "tags": ["heavy", "physical", "area_damage", "siege", "explosive"],
+  
+  "cost": {
+    "build_cost": {
+      "gold": 250,
+      "wood": 100,
+      "stone": 75,
+      "iron": 25
+    },
+    "upgrade_costs": {
+      "2": { "gold": 300, "stone": 50, "iron": 25 },
+      "3": { "gold": 400, "stone": 75, "iron": 50 },
+      "4": { "gold": 550, "stone": 100, "iron": 75 },
+      "5": { "gold": 750, "iron": 100, "gems": 10 },
+      "6": { "gold": 1000, "iron": 150, "gems": 15 },
+      "7": { "gold": 1300, "iron": 200, "gems": 25 },
+      "8": { "gold": 1700, "gems": 40 },
+      "9": { "gold": 2200, "gems": 60 },
+      "10": { "gold": 2800, "gems": 100 }
+    },
+    "sell_value": 0.7
+  },
+  
+  "stats": {
+    "damage": 120.0,
+    "range": 7.0,
+    "attack_speed": 0.6,
+    "crit_chance": 0.1,
+    "crit_multiplier": 2.5,
+    "accuracy": 0.85,
+    "penetration": 15.0,
+    "splash": 3.0
+  },
+  
+  "scaling": {
+    "damage_per_level": 20.0,
+    "range_per_level": 0.1,
+    "uses_power_matrix": true,
+    "matrix_multiplier": 1.2,
+    "max_level": 10
+  },
+  
+  "restrictions": {
+    "terrain_types": ["ground"],
+    "min_distance": 3.0,
+    "required_level": 3,
+    "required_tech": ["siege_engineering"],
+    "allowed_races": ["human_alliance"]
+  },
+  
+  "appearance": {
+    "model_path": "models/towers/human/cannon_tower.fbx",
+    "texture_path": "textures/towers/human/cannon_tower_diffuse.png",
+    "animation_set": "cannon_tower_animations",
+    "scale": 1.2,
+    "muzzle_flash": "effects/cannon_muzzle_flash.vfx",
+    "projectile_effect": "effects/cannonball_projectile.vfx",
+    "hit_effect": "effects/cannon_explosion.vfx",
+    "aura_effect": "effects/smoke_aura.vfx",
+    "attack_sound": "audio/cannon_fire.wav",
+    "hit_sound": "audio/explosion.wav",
+    "build_sound": "audio/heavy_construction.wav",
+    "upgrade_sound": "audio/metal_upgrade.wav",
+    "icon_path": "ui/icons/towers/cannon_tower.png",
+    "portrait_path": "ui/portraits/towers/cannon_tower.png",
+    "primary_color": "#2F4F4F",
+    "secondary_color": "#696969"
+  },
+  
+  "assembly": {
+    "components": [
+      {
+        "id": "targeting_component",
+        "type": "single_target",
+        "config": {
+          "range": 7.0,
+          "priority": "strongest",
+          "require_line_of_sight": true,
+          "target_types": ["ground"],
+          "prefer_groups": true
+        },
+        "position": { "x": 100, "y": 100 }
+      },
+      {
+        "id": "area_component",
+        "type": "area_of_effect",
+        "config": {
+          "range": 3.0,
+          "shape": "circle",
+          "falloff": "linear",
+          "max_targets": 8
+        },
+        "position": { "x": 300, "y": 100 }
+      },
+      {
+        "id": "damage_component",
+        "type": "basic_damage",
+        "config": {
+          "base_damage": 120.0,
+          "damage_type": "physical",
+          "critical_chance": 0.1,
+          "critical_multiplier": 2.5,
+          "variance": 0.15,
+          "armor_penetration": 15.0,
+          "scaling": {
+            "power_matrix": true,
+            "tower_level": 20.0,
+            "game_time": 0.0
+          }
+        },
+        "position": { "x": 500, "y": 100 }
+      },
+      {
+        "id": "projectile_component",
+        "type": "projectile",
+        "config": {
+          "speed": 8.0,
+          "lifetime": 3.0,
+          "gravity": 2.0,
+          "homing": false,
+          "pierce": false,
+          "effect_path": "effects/cannonball_projectile.vfx",
+          "explosion_effect": "effects/cannon_explosion.vfx",
+          "explosion_radius": 3.0
+        },
+        "position": { "x": 700, "y": 100 }
+      }
+    ],
+    
+    "connections": [
+      {
+        "id": "targeting_to_area",
+        "from_component": "targeting_component",
+        "from_output": "target",
+        "to_component": "area_component",
+        "to_input": "center_target",
+        "type": "sequential",
+        "enabled": true,
+        "priority": "normal"
+      },
+      {
+        "id": "area_to_damage",
+        "from_component": "area_component",
+        "from_output": "targets_in_range",
+        "to_component": "damage_component",
+        "to_input": "targets",
+        "type": "sequential",
+        "enabled": true,
+        "priority": "normal"
+      },
+      {
+        "id": "damage_to_projectile",
+        "from_component": "damage_component",
+        "from_output": "damage_events",
+        "to_component": "projectile_component",
+        "to_input": "damage_events",
+        "type": "sequential",
+        "enabled": true,
+        "priority": "normal"
+      }
+    ],
+    
+    "entry_points": ["targeting_component"],
+    "exit_points": ["projectile_component"],
+    "expected_targets": 5,
+    "execution_frequency": 0.6
+  },
+  
+  "author": "Defense Allies Team",
+  "metadata": {
+    "design_notes": "Heavy area damage tower for dealing with groups. High cost but very effective against clusters.",
+    "balance_version": "1.0",
+    "art_status": "final",
+    "audio_status": "final",
+    "gameplay_tags": ["area_damage", "expensive", "powerful", "slow"]
+  }
+}

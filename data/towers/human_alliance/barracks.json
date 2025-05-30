@@ -1,0 +1,106 @@
+{
+  "id": "human_barracks",
+  "name": "Barracks",
+  "description": "A military barracks that spawns human soldiers to block enemy paths and provides area buffs to nearby towers. Essential for defensive strategies.",
+  "version": "1.0",
+  "race": "human_alliance",
+  "category": "support",
+  "tags": ["support", "spawner", "buff", "defensive", "blocking"],
+
+  "cost": {
+    "build_cost": {
+      "gold": 120,
+      "wood": 80,
+      "stone": 40
+    },
+    "upgrade_costs": {
+      "2": { "gold": 180, "wood": 40, "stone": 20 },
+      "3": { "gold": 240, "wood": 60, "stone": 40 },
+      "4": { "gold": 320, "stone": 60, "iron": 20 },
+      "5": { "gold": 420, "stone": 80, "iron": 40 },
+      "6": { "gold": 550, "iron": 60, "gems": 5 },
+      "7": { "gold": 720, "iron": 80, "gems": 10 },
+      "8": { "gold": 940, "iron": 100, "gems": 15 },
+      "9": { "gold": 1220, "gems": 25 },
+      "10": { "gold": 1580, "gems": 40 }
+    },
+    "sell_value": 0.8
+  },
+
+  "stats": {
+    "damage": 0.0,
+    "range": 6.0,
+    "attack_speed": 0.0,
+    "health": 800.0,
+    "armor": 5.0
+  },
+
+  "scaling": {
+    "health_per_level": 120.0,
+    "range_per_level": 0.1,
+    "uses_power_matrix": false,
+    "matrix_multiplier": 0.0,
+    "max_level": 10
+  },
+
+  "restrictions": {
+    "terrain_types": ["ground"],
+    "min_distance": 4.0,
+    "required_level": 2,
+    "max_count": 3,
+    "allowed_races": ["human_alliance"]
+  },
+
+  "appearance": {
+    "model_path": "models/towers/human/barracks.fbx",
+    "texture_path": "textures/towers/human/barracks_diffuse.png",
+    "animation_set": "barracks_animations",
+    "scale": 1.3,
+    "aura_effect": "effects/command_aura.vfx",
+    "build_sound": "audio/barracks_construction.wav",
+    "upgrade_sound": "audio/military_upgrade.wav",
+    "icon_path": "ui/icons/towers/barracks.png",
+    "portrait_path": "ui/portraits/towers/barracks.png",
+    "primary_color": "#8B0000",
+    "secondary_color": "#CD853F"
+  },
+
+  "assembly": {
+    "components": [
+      {
+        "id": "support_component",
+        "type": "basic_damage",
+        "config": {
+          "base_damage": 0.0,
+          "damage_type": "support",
+          "critical_chance": 0.0,
+          "critical_multiplier": 1.0,
+          "variance": 0.0,
+          "armor_penetration": 0.0,
+          "scaling": {
+            "power_matrix": false,
+            "tower_level": 0.0,
+            "game_time": 0.0
+          }
+        },
+        "position": { "x": 100, "y": 100 }
+      }
+    ],
+
+    "connections": [],
+
+    "entry_points": ["support_component"],
+    "exit_points": ["support_component"],
+    "expected_targets": 0,
+    "execution_frequency": 0.1
+  },
+
+  "author": "Defense Allies Team",
+  "metadata": {
+    "design_notes": "Support tower that provides area buffs and spawns blocking units. Key for defensive strategies.",
+    "balance_version": "1.0",
+    "art_status": "final",
+    "audio_status": "final",
+    "gameplay_tags": ["support", "defensive", "area_buff", "spawner", "strategic"]
+  }
+}
