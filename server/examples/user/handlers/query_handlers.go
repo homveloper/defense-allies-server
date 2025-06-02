@@ -159,6 +159,11 @@ func (h *UserQueryHandler) handleListUsers(ctx context.Context, query *projectio
 	for _, readModel := range readModels {
 		if userView, ok := readModel.(*projections.UserView); ok {
 			userViews = append(userViews, userView)
+		} else {
+			return &cqrs.QueryResult{
+				Success: false,
+				Error:   fmt.Errorf("invalid read model type: expected *projections.UserView, got %T", readModel),
+			}, nil
 		}
 	}
 

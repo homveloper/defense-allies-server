@@ -113,9 +113,10 @@ func runRedisExample(ctx context.Context) error {
 	// Create Redis-based implementations
 	stateStore := cqrs.NewRedisStateStore(client, "user_example")
 
-	// Create factory for UserView read models
+	// Create factory and serializer for UserView read models
 	factory := projections.NewUserReadModelFactory()
-	readStore := cqrs.NewRedisReadStore(client, "user_example", factory)
+	serializer := cqrs.NewJSONReadModelSerializer(factory)
+	readStore := cqrs.NewRedisReadStore(client, "user_example", serializer)
 
 	// Create User-specific repository
 	repository := &UserRedisRepository{stateStore: stateStore}

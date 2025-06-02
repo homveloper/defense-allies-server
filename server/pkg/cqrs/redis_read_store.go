@@ -15,7 +15,6 @@ type RedisReadStore struct {
 	client     *RedisClientManager
 	keyBuilder *RedisKeyBuilder
 	serializer ReadModelSerializer
-	factory    ReadModelFactory
 }
 
 // ReadModelFactory interface for creating read models by type
@@ -26,11 +25,20 @@ type ReadModelFactory interface {
 // ReadModelSerializer interface for read model serialization
 type ReadModelSerializer interface {
 	SerializeReadModel(model ReadModel) ([]byte, error)
-	DeserializeReadModel(data []byte, modelType string, factory ReadModelFactory) (ReadModel, error)
+	DeserializeReadModel(data []byte, modelType string) (ReadModel, error)
 }
 
 // JSONReadModelSerializer implements JSON-based read model serialization
-type JSONReadModelSerializer struct{}
+type JSONReadModelSerializer struct {
+	factory ReadModelFactory
+}
+
+// NewJSONReadModelSerializer creates a new JSONReadModelSerializer
+func NewJSONReadModelSerializer(factory ReadModelFactory) *JSONReadModelSerializer {
+	return &JSONReadModelSerializer{
+		factory: factory,
+	}
+}
 
 // ReadModelData represents serialized read model data
 type ReadModelData struct {
@@ -42,12 +50,11 @@ type ReadModelData struct {
 }
 
 // NewRedisReadStore creates a new Redis read store
-func NewRedisReadStore(client *RedisClientManager, keyPrefix string, factory ReadModelFactory) *RedisReadStore {
+func NewRedisReadStore(client *RedisClientManager, keyPrefix string, serializer ReadModelSerializer) *RedisReadStore {
 	return &RedisReadStore{
 		client:     client,
 		keyBuilder: NewRedisKeyBuilder(keyPrefix),
-		serializer: &JSONReadModelSerializer{},
-		factory:    factory,
+		serializer: serializer,
 	}
 }
 
@@ -104,7 +111,7 @@ func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType stri
 			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to get read model", err)
 		}
 
-		readModel, err = rs.serializer.DeserializeReadModel([]byte(data), modelType, rs.factory)
+		readModel, err = rs.serializer.DeserializeReadModel([]byte(data), modelType)
 		if err != nil {
 			return NewCQRSError(ErrCodeSerializationError.String(), "failed to deserialize read model", err)
 		}
@@ -181,7 +188,7 @@ func (rs *RedisReadStore) Query(ctx context.Context, criteria QueryCriteria) ([]
 			}
 			modelType := parts[len(parts)-2]
 
-			readModel, err := rs.serializer.DeserializeReadModel([]byte(data), modelType, rs.factory)
+			readModel, err := rs.serializer.DeserializeReadModel([]byte(data), modelType)
 			if err != nil {
 				continue // Skip invalid entries
 			}
@@ -367,15 +374,15 @@ func (s *JSONReadModelSerializer) SerializeReadModel(model ReadModel) ([]byte, e
 	return json.Marshal(modelData)
 }
 
-func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string, factory ReadModelFactory) (ReadModel, error) {
+func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string) (ReadModel, error) {
 	var modelData ReadModelData
 	if err := json.Unmarshal(data, &modelData); err != nil {
 		return nil, err
 	}
 
 	// Use factory to create the correct type
-	if factory != nil {
-		readModel, err := factory.CreateReadModel(modelType, modelData.ID, modelData.Data)
+	if s.factory != nil {
+		readModel, err := s.factory.CreateReadModel(modelType, modelData.ID, modelData.Data)
 		if err != nil {
 			// Fallback to BaseReadModel if factory fails
 			readModel = NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
