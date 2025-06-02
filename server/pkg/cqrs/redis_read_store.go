@@ -15,12 +15,18 @@ type RedisReadStore struct {
 	client     *RedisClientManager
 	keyBuilder *RedisKeyBuilder
 	serializer ReadModelSerializer
+	factory    ReadModelFactory
+}
+
+// ReadModelFactory interface for creating read models by type
+type ReadModelFactory interface {
+	CreateReadModel(modelType string, id string, data interface{}) (ReadModel, error)
 }
 
 // ReadModelSerializer interface for read model serialization
 type ReadModelSerializer interface {
 	SerializeReadModel(model ReadModel) ([]byte, error)
-	DeserializeReadModel(data []byte, modelType string) (ReadModel, error)
+	DeserializeReadModel(data []byte, modelType string, factory ReadModelFactory) (ReadModel, error)
 }
 
 // JSONReadModelSerializer implements JSON-based read model serialization
@@ -36,11 +42,12 @@ type ReadModelData struct {
 }
 
 // NewRedisReadStore creates a new Redis read store
-func NewRedisReadStore(client *RedisClientManager, keyPrefix string) *RedisReadStore {
+func NewRedisReadStore(client *RedisClientManager, keyPrefix string, factory ReadModelFactory) *RedisReadStore {
 	return &RedisReadStore{
 		client:     client,
 		keyBuilder: NewRedisKeyBuilder(keyPrefix),
 		serializer: &JSONReadModelSerializer{},
+		factory:    factory,
 	}
 }
 
@@ -97,7 +104,7 @@ func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType stri
 			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to get read model", err)
 		}
 
-		readModel, err = rs.serializer.DeserializeReadModel([]byte(data), modelType)
+		readModel, err = rs.serializer.DeserializeReadModel([]byte(data), modelType, rs.factory)
 		if err != nil {
 			return NewCQRSError(ErrCodeSerializationError.String(), "failed to deserialize read model", err)
 		}
@@ -174,7 +181,7 @@ func (rs *RedisReadStore) Query(ctx context.Context, criteria QueryCriteria) ([]
 			}
 			modelType := parts[len(parts)-2]
 
-			readModel, err := rs.serializer.DeserializeReadModel([]byte(data), modelType)
+			readModel, err := rs.serializer.DeserializeReadModel([]byte(data), modelType, rs.factory)
 			if err != nil {
 				continue // Skip invalid entries
 			}
@@ -360,12 +367,29 @@ func (s *JSONReadModelSerializer) SerializeReadModel(model ReadModel) ([]byte, e
 	return json.Marshal(modelData)
 }
 
-func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string) (ReadModel, error) {
+func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string, factory ReadModelFactory) (ReadModel, error) {
 	var modelData ReadModelData
 	if err := json.Unmarshal(data, &modelData); err != nil {
 		return nil, err
 	}
 
+	// Use factory to create the correct type
+	if factory != nil {
+		readModel, err := factory.CreateReadModel(modelType, modelData.ID, modelData.Data)
+		if err != nil {
+			// Fallback to BaseReadModel if factory fails
+			readModel = NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
+		}
+
+		// Set version and last updated if it's a BaseReadModel
+		if baseModel, ok := readModel.(*BaseReadModel); ok {
+			baseModel.SetVersion(modelData.Version)
+			baseModel.SetLastUpdated(modelData.LastUpdated)
+		}
+		return readModel, nil
+	}
+
+	// Fallback to BaseReadModel
 	readModel := NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
 	readModel.SetVersion(modelData.Version)
 	readModel.SetLastUpdated(modelData.LastUpdated)
