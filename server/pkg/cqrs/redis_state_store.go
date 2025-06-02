@@ -18,7 +18,7 @@ type RedisStateStore struct {
 
 // StateSerializer interface for aggregate state serialization
 type StateSerializer interface {
-	SerializeAggregate(aggregate Aggregate) ([]byte, error)
+	SerializeAggregate(aggregate AggregateRoot) ([]byte, error)
 	DeserializeAggregate(data []byte, aggregateType string) (AggregateRoot, error)
 }
 
@@ -48,23 +48,17 @@ func NewRedisStateStore(client *RedisClientManager, keyPrefix string) *RedisStat
 }
 
 // Save saves an aggregate to Redis
-func (ss *RedisStateStore) Save(ctx context.Context, aggregate interface{}, expectedVersion int) error {
+func (ss *RedisStateStore) Save(ctx context.Context, aggregate AggregateRoot, expectedVersion int) error {
 	if aggregate == nil {
 		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate cannot be nil", nil)
 	}
 
-	// Cast to Aggregate interface for additional methods
-	agg, ok := aggregate.(Aggregate)
-	if !ok {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate must implement Aggregate interface", nil)
-	}
-
-	if err := agg.Validate(); err != nil {
+	if err := aggregate.Validate(); err != nil {
 		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate validation failed", err)
 	}
 
-	aggregateKey := ss.keyBuilder.AggregateKey(agg.AggregateType(), agg.AggregateID())
-	lockKey := ss.keyBuilder.LockKey(agg.AggregateType(), agg.AggregateID())
+	aggregateKey := ss.keyBuilder.AggregateKey(aggregate.AggregateType(), aggregate.AggregateID())
+	lockKey := ss.keyBuilder.LockKey(aggregate.AggregateType(), aggregate.AggregateID())
 
 	return ss.client.ExecuteCommand(ctx, func() error {
 		// Acquire distributed lock
@@ -91,7 +85,7 @@ func (ss *RedisStateStore) Save(ctx context.Context, aggregate interface{}, expe
 		}
 
 		// Serialize aggregate
-		data, err := ss.serializer.SerializeAggregate(agg)
+		data, err := ss.serializer.SerializeAggregate(aggregate)
 		if err != nil {
 			return NewCQRSError(ErrCodeSerializationError.String(), "failed to serialize aggregate", err)
 		}
@@ -247,7 +241,7 @@ func (ss *RedisStateStore) releaseLock(ctx context.Context, lockKey string) erro
 
 // JSONStateSerializer implementation
 
-func (s *JSONStateSerializer) SerializeAggregate(aggregate Aggregate) ([]byte, error) {
+func (s *JSONStateSerializer) SerializeAggregate(aggregate AggregateRoot) ([]byte, error) {
 	// Note: In a real implementation, you would need to handle different aggregate types
 	// For now, we'll create a generic representation
 	aggregateData := AggregateData{

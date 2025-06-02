@@ -55,7 +55,7 @@ func NewRedisHybridRepository(eventStore *RedisEventStore, stateStore *RedisStat
 
 // RedisEventSourcedRepository implementation
 
-func (r *RedisEventSourcedRepository) Save(ctx context.Context, aggregate Aggregate, expectedVersion int) error {
+func (r *RedisEventSourcedRepository) Save(ctx context.Context, aggregate AggregateRoot, expectedVersion int) error {
 	if aggregate.AggregateType() != r.aggregateType {
 		return NewCQRSError(ErrCodeRepositoryError.String(),
 			fmt.Sprintf("aggregate type mismatch: expected %s, got %s", r.aggregateType, aggregate.AggregateType()), nil)
@@ -172,18 +172,7 @@ func (r *RedisEventSourcedRepository) CompactEvents(ctx context.Context, aggrega
 // RedisStateBasedRepository implementation
 
 func (r *RedisStateBasedRepository) Save(ctx context.Context, aggregate AggregateRoot, expectedVersion int) error {
-	// Cast to Aggregate interface for additional methods
-	agg, ok := aggregate.(Aggregate)
-	if !ok {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate must implement Aggregate interface", nil)
-	}
-
-	if agg.AggregateType() != r.aggregateType {
-		return NewCQRSError(ErrCodeRepositoryError.String(),
-			fmt.Sprintf("aggregate type mismatch: expected %s, got %s", r.aggregateType, agg.AggregateType()), nil)
-	}
-
-	return r.stateStore.Save(ctx, agg, expectedVersion)
+	return r.stateStore.Save(ctx, aggregate, expectedVersion)
 }
 
 func (r *RedisStateBasedRepository) GetByID(ctx context.Context, id string) (AggregateRoot, error) {

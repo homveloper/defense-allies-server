@@ -19,11 +19,6 @@ type AggregateRoot interface {
 
 	// Additional methods needed for Redis implementation
 	SetOriginalVersion(version int) // Set original version (for loading)
-}
-
-// Aggregate extends AggregateRoot with Defense Allies specific features
-type Aggregate interface {
-	AggregateRoot
 
 	// Additional metadata
 	AggregateType() string // Aggregate type identification
@@ -40,7 +35,7 @@ type Aggregate interface {
 
 // EventSourcedAggregate supports event sourcing (optional)
 type EventSourcedAggregate interface {
-	Aggregate
+	AggregateRoot
 
 	// Event history management
 	LoadFromHistory(events []EventMessage) error
@@ -58,7 +53,7 @@ type EventSourcedAggregate interface {
 
 // StateBasedAggregate for traditional CRUD operations
 type StateBasedAggregate interface {
-	Aggregate
+	AggregateRoot
 
 	// Direct state load/save
 	LoadState() error
