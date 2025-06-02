@@ -345,43 +345,42 @@ Set containing active session IDs
 
 ## 핵심 인터페이스 설계 (go.cqrs 기반 확장)
 
-### 1. AggregateRoot Interface (go.cqrs 호환)
+### 1. AggregateRoot Interface (통합된 인터페이스)
 ```go
-// go.cqrs의 AggregateRoot 인터페이스를 기반으로 한 핵심 인터페이스
+// AggregateRoot는 모든 Aggregate가 구현해야 하는 통합 인터페이스
+// go.cqrs 호환성과 Defense Allies 확장 기능을 모두 포함
 type AggregateRoot interface {
-    // 기본 식별자 및 버전 관리
+    // 기본 식별자 및 버전 관리 (go.cqrs 호환)
     AggregateID() string
     OriginalVersion() int  // 로드 시점의 버전
     CurrentVersion() int   // 현재 버전
     IncrementVersion()     // 버전 증가
 
-    // 이벤트 적용 및 추적
+    // 이벤트 적용 및 추적 (go.cqrs 호환)
     Apply(event EventMessage, isNew bool) // 이벤트 적용
     TrackChange(event EventMessage)       // 변경사항 추적
     GetChanges() []EventMessage           // 미커밋 변경사항 조회
     ClearChanges()                        // 변경사항 초기화
-}
 
-// Defense Allies 확장 인터페이스
-type Aggregate interface {
-    AggregateRoot
-
-    // 추가 메타데이터
+    // 추가 메타데이터 (Defense Allies 확장)
     AggregateType() string    // Aggregate 타입 식별
     CreatedAt() time.Time     // 생성 시간
     UpdatedAt() time.Time     // 마지막 업데이트 시간
 
-    // 유효성 검증
+    // 유효성 검증 (Defense Allies 확장)
     Validate() error          // 비즈니스 규칙 검증
 
-    // 상태 관리
+    // 상태 관리 (Defense Allies 확장)
     IsDeleted() bool          // 삭제 상태 확인
     MarkAsDeleted()           // 소프트 삭제 마킹
+
+    // 버전 관리 헬퍼 (Redis 구현체 지원)
+    SetOriginalVersion(version int)
 }
 
 // 이벤트 소싱을 지원하는 Aggregate (선택적)
 type EventSourcedAggregate interface {
-    Aggregate
+    AggregateRoot
 
     // 이벤트 히스토리 관리
     LoadFromHistory(events []EventMessage) error
@@ -399,7 +398,7 @@ type EventSourcedAggregate interface {
 
 // 상태 기반 Aggregate (일반적인 CRUD 방식)
 type StateBasedAggregate interface {
-    Aggregate
+    AggregateRoot
 
     // 직접 상태 로드/저장
     LoadState() error
@@ -1334,17 +1333,16 @@ require (
 ### Phase 1: 기반 인프라 구축 (2-3주)
 
 #### 1.1 Core CQRS Framework (go.cqrs 기반)
-- [ ] **핵심 인터페이스 정의 (go.cqrs 호환)**
-  - [x] `pkg/cqrs/aggregate_root.go` - AggregateRoot 기본 인터페이스 (go.cqrs 호환)
-    - ### 1. AggregateRoot Interface (go.cqrs 호환)
-  - [ ] `pkg/cqrs/aggregate.go` - Defense Allies 확장 Aggregate 인터페이스
-    - ### 1. AggregateRoot Interface (go.cqrs 호환)
+- [x] **핵심 인터페이스 정의 (통합된 AggregateRoot)**
+  - [x] `pkg/cqrs/aggregate_root.go` - 통합된 AggregateRoot 인터페이스 (go.cqrs 호환 + Defense Allies 확장)
+    - ### 1. AggregateRoot Interface (통합된 인터페이스)
+  - ~~`pkg/cqrs/aggregate.go`~~ - ~~별도 Aggregate 인터페이스 (AggregateRoot로 통합됨)~~
   - [ ] `pkg/cqrs/event_sourced_aggregate.go` - 이벤트 소싱 Aggregate (선택적)
-    - ### 1. AggregateRoot Interface (go.cqrs 호환)
+    - ### 1. AggregateRoot Interface (통합된 인터페이스)
   - [ ] `pkg/cqrs/state_based_aggregate.go` - 상태 기반 Aggregate
-    - ### 1. AggregateRoot Interface (go.cqrs 호환)
+    - ### 1. AggregateRoot Interface (통합된 인터페이스)
   - [ ] `pkg/cqrs/hybrid_aggregate.go` - 하이브리드 Aggregate
-    - ### 1. AggregateRoot Interface (go.cqrs 호환)
+    - ### 1. AggregateRoot Interface (통합된 인터페이스)
   - [x] `pkg/cqrs/event_message.go` - EventMessage 인터페이스 (go.cqrs 호환)
     - ### 2. EventMessage Interface (go.cqrs 확장)
   - [ ] `pkg/cqrs/domain_event.go` - DomainEvent 확장 인터페이스

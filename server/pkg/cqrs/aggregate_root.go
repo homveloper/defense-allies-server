@@ -16,6 +16,9 @@ type AggregateRoot interface {
 	TrackChange(event EventMessage)       // Track changes
 	GetChanges() []EventMessage           // Get uncommitted changes
 	ClearChanges()                        // Clear changes
+
+	// Additional methods needed for Redis implementation
+	SetOriginalVersion(version int) // Set original version (for loading)
 }
 
 // Aggregate extends AggregateRoot with Defense Allies specific features
