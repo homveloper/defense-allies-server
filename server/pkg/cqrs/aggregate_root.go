@@ -7,9 +7,9 @@ import "time"
 type AggregateRoot interface {
 	// Basic identification and version management
 	AggregateID() string
-	OriginalVersion() int  // Version at load time
-	CurrentVersion() int   // Current version
-	IncrementVersion()     // Increment version
+	OriginalVersion() int // Version at load time
+	CurrentVersion() int  // Current version
+	IncrementVersion()    // Increment version
 
 	// Event application and tracking
 	Apply(event EventMessage, isNew bool) // Apply event
@@ -31,8 +31,8 @@ type Aggregate interface {
 	Validate() error // Business rule validation
 
 	// State management
-	IsDeleted() bool    // Check if deleted
-	MarkAsDeleted()     // Mark as soft deleted
+	IsDeleted() bool // Check if deleted
+	MarkAsDeleted()  // Mark as soft deleted
 }
 
 // EventSourcedAggregate supports event sourcing (optional)

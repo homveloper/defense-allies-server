@@ -1351,11 +1351,11 @@ require (
     - ### 2. EventMessage Interface (go.cqrs 확장)
   - [x] `pkg/cqrs/command.go` - Command 인터페이스
     - ### 3. Command Interface (go.cqrs 확장)
-  - [ ] `pkg/cqrs/snapshot.go` - SnapshotData 인터페이스
+  - [x] `pkg/cqrs/snapshot.go` - SnapshotData 인터페이스
     - ### 5. SnapshotData Interface
 
-- [ ] **Repository 인터페이스들**
-  - [ ] `pkg/cqrs/repository.go` - 기본 Repository 인터페이스
+- [x] **Repository 인터페이스들**
+  - [x] `pkg/cqrs/repository.go` - 기본 Repository 인터페이스
     - ### 6. Repository Interface (go.cqrs 확장)
   - [ ] `pkg/cqrs/event_sourced_repository.go` - 이벤트 소싱 Repository
     - ### 6. Repository Interface (go.cqrs 확장)
@@ -1366,8 +1366,8 @@ require (
   - [ ] `pkg/cqrs/repository_factory.go` - Repository 팩토리
     - ### 8. Storage Strategy Interface (저장 방식 선택)
 
-- [ ] **Event Bus 및 핸들러**
-  - [ ] `pkg/cqrs/event_bus.go` - EventBus 인터페이스
+- [x] **Event Bus 및 핸들러**
+  - [x] `pkg/cqrs/event_bus.go` - EventBus 인터페이스
     - ### 7. Event Bus Interface (go.cqrs 확장)
   - [ ] `pkg/cqrs/event_handler.go` - EventHandler 인터페이스
     - ### 7. Event Bus Interface (go.cqrs 확장)
@@ -1375,27 +1375,27 @@ require (
     - ### 7. Event Bus Interface (go.cqrs 확장)
   - [ ] `pkg/cqrs/command_handler.go` - CommandHandler 인터페이스
     - ### 3. Command Interface (go.cqrs 확장)
-  - [ ] `pkg/cqrs/command_dispatcher.go` - CommandDispatcher 인터페이스
+  - [x] `pkg/cqrs/command_dispatcher.go` - CommandDispatcher 인터페이스
     - ### 3. Command Interface (go.cqrs 확장)
 
-- [ ] **Query Side 인터페이스**
+- [x] **Query Side 인터페이스**
   - [x] `pkg/cqrs/query.go` - Query 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
   - [ ] `pkg/cqrs/query_handler.go` - QueryHandler 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/query_dispatcher.go` - QueryDispatcher 인터페이스
+  - [x] `pkg/cqrs/query_dispatcher.go` - QueryDispatcher 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
   - [ ] `pkg/cqrs/read_model.go` - ReadModel 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/projection.go` - Projection 인터페이스
+  - [x] `pkg/cqrs/projection.go` - Projection 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
   - [ ] `pkg/cqrs/projection_manager.go` - ProjectionManager 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
   - [ ] `pkg/cqrs/read_store.go` - ReadStore 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
 
-- [ ] **저장 전략 및 설정**
-  - [ ] `pkg/cqrs/storage_strategy.go` - 저장 전략 인터페이스
+- [x] **저장 전략 및 설정**
+  - [x] `pkg/cqrs/storage_strategy.go` - 저장 전략 인터페이스
     - ### 8. Storage Strategy Interface (저장 방식 선택)
   - [ ] `pkg/cqrs/storage_configuration.go` - 저장소 설정 구조체
     - ### 8. Storage Strategy Interface (저장 방식 선택)
@@ -1411,17 +1411,17 @@ require (
     - ### 3. Command Interface (go.cqrs 확장)
   - [x] `pkg/cqrs/base_query.go` - 기본 Query 구현체
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/base_read_model.go` - 기본 ReadModel 구현체
+  - [x] `pkg/cqrs/base_read_model.go` - 기본 ReadModel 구현체
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/base_snapshot.go` - 기본 SnapshotData 구현체
+  - [x] `pkg/cqrs/base_snapshot.go` - 기본 SnapshotData 구현체
     - ### 5. SnapshotData Interface
-  - [ ] `pkg/cqrs/configurable_storage_strategy.go` - 설정 기반 저장 전략
+  - [x] `pkg/cqrs/configurable_storage_strategy.go` - 설정 기반 저장 전략
     - ### 8. Storage Strategy Interface (저장 방식 선택)
-  - [ ] `pkg/cqrs/in_memory_event_bus.go` - 인메모리 EventBus (테스트용)
+  - [x] `pkg/cqrs/in_memory_event_bus.go` - 인메모리 EventBus (테스트용)
     - ### 7. Event Bus Interface (go.cqrs 확장)
-  - [ ] `pkg/cqrs/in_memory_query_dispatcher.go` - 인메모리 QueryDispatcher (테스트용)
+  - [x] `pkg/cqrs/in_memory_query_dispatcher.go` - 인메모리 QueryDispatcher (테스트용)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/in_memory_projection_manager.go` - 인메모리 ProjectionManager (테스트용)
+  - [x] `pkg/cqrs/in_memory_projection_manager.go` - 인메모리 ProjectionManager (테스트용)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
 
 - [ ] **직렬화 인터페이스 및 구현체**
