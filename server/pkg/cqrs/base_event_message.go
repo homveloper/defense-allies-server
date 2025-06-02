@@ -97,8 +97,8 @@ func (e *BaseEventMessage) GetMetadata(key string) (interface{}, bool) {
 	return value, exists
 }
 
-// BaseDomainEvent extends BaseEventMessage with DomainEvent features
-type BaseDomainEvent struct {
+// BaseDomainEventMessage extends BaseEventMessage with DomainEventMessage features
+type BaseDomainEventMessage struct {
 	*BaseEventMessage
 	causationID   string
 	correlationID string
@@ -108,9 +108,9 @@ type BaseDomainEvent struct {
 	isSystem      bool
 }
 
-// NewBaseDomainEvent creates a new BaseDomainEvent
-func NewBaseDomainEvent(eventType, aggregateID, aggregateType string, version int, eventData interface{}) *BaseDomainEvent {
-	return &BaseDomainEvent{
+// NewBaseDomainEventMessage creates a new BaseDomainEventMessage
+func NewBaseDomainEventMessage(eventType, aggregateID, aggregateType string, version int, eventData interface{}) *BaseDomainEventMessage {
+	return &BaseDomainEventMessage{
 		BaseEventMessage: NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData),
 		category:         DomainEvent,
 		priority:         Normal,
@@ -118,33 +118,33 @@ func NewBaseDomainEvent(eventType, aggregateID, aggregateType string, version in
 	}
 }
 
-// DomainEvent interface implementation
+// DomainEventMessage interface implementation
 
-func (e *BaseDomainEvent) CausationID() string {
+func (e *BaseDomainEventMessage) CausationID() string {
 	return e.causationID
 }
 
-func (e *BaseDomainEvent) CorrelationID() string {
+func (e *BaseDomainEventMessage) CorrelationID() string {
 	return e.correlationID
 }
 
-func (e *BaseDomainEvent) UserID() string {
+func (e *BaseDomainEventMessage) UserID() string {
 	return e.userID
 }
 
-func (e *BaseDomainEvent) IsSystemEvent() bool {
+func (e *BaseDomainEventMessage) IsSystemEvent() bool {
 	return e.isSystem
 }
 
-func (e *BaseDomainEvent) GetEventCategory() EventCategory {
+func (e *BaseDomainEventMessage) GetEventCategory() EventCategory {
 	return e.category
 }
 
-func (e *BaseDomainEvent) GetPriority() EventPriority {
+func (e *BaseDomainEventMessage) GetPriority() EventPriority {
 	return e.priority
 }
 
-func (e *BaseDomainEvent) ValidateEvent() error {
+func (e *BaseDomainEventMessage) ValidateEvent() error {
 	if e.eventID == "" {
 		return fmt.Errorf("event ID cannot be empty")
 	}
@@ -157,35 +157,35 @@ func (e *BaseDomainEvent) ValidateEvent() error {
 	return nil
 }
 
-func (e *BaseDomainEvent) GetChecksum() string {
-	data := fmt.Sprintf("%s:%s:%s:%d:%v", 
+func (e *BaseDomainEventMessage) GetChecksum() string {
+	data := fmt.Sprintf("%s:%s:%s:%d:%v",
 		e.eventID, e.eventType, e.aggregateID, e.version, e.eventData)
 	hash := sha256.Sum256([]byte(data))
 	return fmt.Sprintf("%x", hash)
 }
 
-// Helper methods for BaseDomainEvent
+// Helper methods for BaseDomainEventMessage
 
-func (e *BaseDomainEvent) SetCausationID(causationID string) {
+func (e *BaseDomainEventMessage) SetCausationID(causationID string) {
 	e.causationID = causationID
 }
 
-func (e *BaseDomainEvent) SetCorrelationID(correlationID string) {
+func (e *BaseDomainEventMessage) SetCorrelationID(correlationID string) {
 	e.correlationID = correlationID
 }
 
-func (e *BaseDomainEvent) SetUserID(userID string) {
+func (e *BaseDomainEventMessage) SetUserID(userID string) {
 	e.userID = userID
 }
 
-func (e *BaseDomainEvent) SetCategory(category EventCategory) {
+func (e *BaseDomainEventMessage) SetCategory(category EventCategory) {
 	e.category = category
 }
 
-func (e *BaseDomainEvent) SetPriority(priority EventPriority) {
+func (e *BaseDomainEventMessage) SetPriority(priority EventPriority) {
 	e.priority = priority
 }
 
-func (e *BaseDomainEvent) SetIsSystem(isSystem bool) {
+func (e *BaseDomainEventMessage) SetIsSystem(isSystem bool) {
 	e.isSystem = isSystem
 }

@@ -69,8 +69,8 @@ func (ep EventPriority) String() string {
 	}
 }
 
-// DomainEvent extends EventMessage with Defense Allies specific features
-type DomainEvent interface {
+// DomainEventMessage extends EventMessage with Defense Allies specific features
+type DomainEventMessage interface {
 	EventMessage
 
 	// Additional domain information
@@ -79,9 +79,9 @@ type DomainEvent interface {
 	UserID() string        // User who triggered the event
 
 	// Event classification
-	IsSystemEvent() bool                // Whether this is a system event
-	GetEventCategory() EventCategory    // Event category
-	GetPriority() EventPriority         // Event priority
+	IsSystemEvent() bool             // Whether this is a system event
+	GetEventCategory() EventCategory // Event category
+	GetPriority() EventPriority      // Event priority
 
 	// Validation and security
 	ValidateEvent() error // Event validation

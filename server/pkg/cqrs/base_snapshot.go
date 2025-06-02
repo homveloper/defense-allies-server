@@ -52,7 +52,7 @@ func (s *InMemorySnapshotStore) Load(ctx context.Context, aggregateID string) (S
 	defer s.mutex.RUnlock()
 
 	// Try to find snapshot with any aggregate type (since we only have aggregateID)
-	for key, snapshot := range s.snapshots {
+	for _, snapshot := range s.snapshots {
 		if snapshot.AggregateID() == aggregateID {
 			return snapshot, nil
 		}

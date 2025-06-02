@@ -1,0 +1,247 @@
+package cqrs
+
+import (
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestNewBaseEventMessage(t *testing.T) {
+	// Arrange
+	eventType := "TestEvent"
+	aggregateID := "test-id"
+	aggregateType := "TestAggregate"
+	version := 1
+	eventData := "test data"
+
+	// Act
+	event := NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData)
+
+	// Assert
+	assert.NotNil(t, event)
+	assert.NotEmpty(t, event.EventID())
+	assert.Equal(t, eventType, event.EventType())
+	assert.Equal(t, aggregateID, event.AggregateID())
+	assert.Equal(t, aggregateType, event.AggregateType())
+	assert.Equal(t, version, event.Version())
+	assert.Equal(t, eventData, event.EventData())
+	assert.NotNil(t, event.Metadata())
+	assert.NotZero(t, event.Timestamp())
+}
+
+func TestBaseEventMessage_Metadata(t *testing.T) {
+	// Arrange
+	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+
+	// Act & Assert - Add metadata
+	event.AddMetadata("key1", "value1")
+	event.AddMetadata("key2", 42)
+
+	metadata := event.Metadata()
+	assert.Len(t, metadata, 2)
+	assert.Equal(t, "value1", metadata["key1"])
+	assert.Equal(t, 42, metadata["key2"])
+
+	// Test GetMetadata
+	value, exists := event.GetMetadata("key1")
+	assert.True(t, exists)
+	assert.Equal(t, "value1", value)
+
+	value, exists = event.GetMetadata("nonexistent")
+	assert.False(t, exists)
+	assert.Nil(t, value)
+}
+
+func TestBaseEventMessage_SetTimestamp(t *testing.T) {
+	// Arrange
+	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	newTimestamp := time.Now().Add(-1 * time.Hour)
+
+	// Act
+	event.SetTimestamp(newTimestamp)
+
+	// Assert
+	assert.Equal(t, newTimestamp, event.Timestamp())
+}
+
+func TestBaseEventMessage_SetEventID(t *testing.T) {
+	// Arrange
+	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	newEventID := "custom-event-id"
+
+	// Act
+	event.SetEventID(newEventID)
+
+	// Assert
+	assert.Equal(t, newEventID, event.EventID())
+}
+
+func TestNewBaseDomainEvent(t *testing.T) {
+	// Arrange
+	eventType := "TestDomainEvent"
+	aggregateID := "test-id"
+	aggregateType := "TestAggregate"
+	version := 1
+	eventData := "test data"
+
+	// Act
+	event := NewBaseDomainEventMessage(eventType, aggregateID, aggregateType, version, eventData)
+
+	// Assert
+	assert.NotNil(t, event)
+	assert.NotEmpty(t, event.EventID())
+	assert.Equal(t, eventType, event.EventType())
+	assert.Equal(t, aggregateID, event.AggregateID())
+	assert.Equal(t, aggregateType, event.AggregateType())
+	assert.Equal(t, version, event.Version())
+	assert.Equal(t, eventData, event.EventData())
+
+	// Domain event specific fields
+	assert.Equal(t, DomainEvent, event.GetEventCategory())
+	assert.Equal(t, Normal, event.GetPriority())
+	assert.False(t, event.IsSystemEvent())
+	assert.Empty(t, event.CausationID())
+	assert.Empty(t, event.CorrelationID())
+	assert.Empty(t, event.UserID())
+}
+
+func TestBaseDomainEvent_SetFields(t *testing.T) {
+	// Arrange
+	event := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+
+	// Act
+	event.SetCausationID("causation-123")
+	event.SetCorrelationID("correlation-456")
+	event.SetUserID("user-789")
+	event.SetCategory(SystemEvent)
+	event.SetPriority(High)
+	event.SetIsSystem(true)
+
+	// Assert
+	assert.Equal(t, "causation-123", event.CausationID())
+	assert.Equal(t, "correlation-456", event.CorrelationID())
+	assert.Equal(t, "user-789", event.UserID())
+	assert.Equal(t, SystemEvent, event.GetEventCategory())
+	assert.Equal(t, High, event.GetPriority())
+	assert.True(t, event.IsSystemEvent())
+}
+
+func TestBaseDomainEvent_ValidateEvent(t *testing.T) {
+	tests := []struct {
+		name        string
+		eventID     string
+		eventType   string
+		aggregateID string
+		expectError bool
+	}{
+		{
+			name:        "Valid event",
+			eventID:     "event-123",
+			eventType:   "TestEvent",
+			aggregateID: "aggregate-456",
+			expectError: false,
+		},
+		{
+			name:        "Empty event ID",
+			eventID:     "",
+			eventType:   "TestEvent",
+			aggregateID: "aggregate-456",
+			expectError: true,
+		},
+		{
+			name:        "Empty event type",
+			eventID:     "event-123",
+			eventType:   "",
+			aggregateID: "aggregate-456",
+			expectError: true,
+		},
+		{
+			name:        "Empty aggregate ID",
+			eventID:     "event-123",
+			eventType:   "TestEvent",
+			aggregateID: "",
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			event := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+			event.SetEventID(tt.eventID)
+			event.BaseEventMessage.eventType = tt.eventType
+			event.BaseEventMessage.aggregateID = tt.aggregateID
+
+			// Act
+			err := event.ValidateEvent()
+
+			// Assert
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestBaseDomainEvent_GetChecksum(t *testing.T) {
+	// Arrange
+	event1 := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event2 := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event3 := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "different data")
+
+	// Set same event IDs for consistent checksums
+	event1.SetEventID("same-id")
+	event2.SetEventID("same-id")
+	event3.SetEventID("same-id")
+
+	// Act
+	checksum1 := event1.GetChecksum()
+	checksum2 := event2.GetChecksum()
+	checksum3 := event3.GetChecksum()
+
+	// Assert
+	assert.NotEmpty(t, checksum1)
+	assert.Equal(t, checksum1, checksum2)    // Same data should produce same checksum
+	assert.NotEqual(t, checksum1, checksum3) // Different data should produce different checksum
+}
+
+func TestEventCategory_String(t *testing.T) {
+	tests := []struct {
+		category EventCategory
+		expected string
+	}{
+		{UserAction, "user_action"},
+		{SystemEvent, "system_event"},
+		{IntegrationEvent, "integration_event"},
+		{DomainEvent, "domain_event"},
+		{EventCategory(999), "unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.expected, func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.category.String())
+		})
+	}
+}
+
+func TestEventPriority_String(t *testing.T) {
+	tests := []struct {
+		priority EventPriority
+		expected string
+	}{
+		{Low, "low"},
+		{Normal, "normal"},
+		{High, "high"},
+		{Critical, "critical"},
+		{EventPriority(999), "unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.expected, func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.priority.String())
+		})
+	}
+}

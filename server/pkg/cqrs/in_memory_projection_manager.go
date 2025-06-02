@@ -100,9 +100,16 @@ func (pm *InMemoryProjectionManager) Start(ctx context.Context) error {
 
 	// Start all projections
 	for _, projection := range pm.projections {
+		oldState := projection.GetState()
+
+		// Try to set state through different projection types
 		if baseProjection, ok := projection.(*BaseProjection); ok {
 			baseProjection.SetState(ProjectionRunning)
-			pm.metrics.RunningProjections++
+			pm.updateStateCounters(oldState, ProjectionRunning)
+		} else {
+			// For embedded BaseProjection (like TestProjection)
+			projection.Rebuild(context.Background()) // This sets state to running
+			pm.updateStateCounters(oldState, projection.GetState())
 		}
 	}
 
@@ -121,10 +128,17 @@ func (pm *InMemoryProjectionManager) Stop(ctx context.Context) error {
 
 	// Stop all projections
 	for _, projection := range pm.projections {
-		if baseProjection, ok := projection.(*BaseProjection); ok {
-			if baseProjection.GetState() == ProjectionRunning {
+		if projection.GetState() == ProjectionRunning {
+			oldState := projection.GetState()
+
+			// Try to set state through different projection types
+			if baseProjection, ok := projection.(*BaseProjection); ok {
 				baseProjection.SetState(ProjectionStopped)
-				pm.metrics.RunningProjections--
+				pm.updateStateCounters(oldState, ProjectionStopped)
+			} else {
+				// For embedded BaseProjection (like TestProjection)
+				projection.Reset(context.Background()) // This sets state to stopped
+				pm.updateStateCounters(oldState, projection.GetState())
 			}
 		}
 	}
@@ -264,14 +278,17 @@ func (pm *InMemoryProjectionManager) ProcessEvent(ctx context.Context, event Eve
 
 			pm.mutex.Lock()
 			pm.metrics.Errors = append(pm.metrics.Errors, projectionError)
-			
+
 			// Mark projection as faulted
-			if baseProjection, ok := projection.(*BaseProjection); ok {
-				if baseProjection.GetState() == ProjectionRunning {
+			if projection.GetState() == ProjectionRunning {
+				oldState := projection.GetState()
+
+				if baseProjection, ok := projection.(*BaseProjection); ok {
 					baseProjection.SetState(ProjectionFaulted)
-					pm.metrics.RunningProjections--
-					pm.metrics.FaultedProjections++
 				}
+				// For other projection types, we can't directly set to faulted
+				// but we can track the state change in metrics
+				pm.updateStateCounters(oldState, ProjectionFaulted)
 			}
 			pm.mutex.Unlock()
 
@@ -283,7 +300,7 @@ func (pm *InMemoryProjectionManager) ProcessEvent(ctx context.Context, event Eve
 	pm.mutex.Lock()
 	pm.metrics.ProcessedEvents++
 	pm.metrics.LastProcessedEvent = time.Now()
-	
+
 	processingTime := time.Since(start)
 	if pm.metrics.ProcessedEvents == 1 {
 		pm.metrics.AverageProcessingTime = processingTime
