@@ -40,6 +40,12 @@ type User struct {
 	lastLoginAt        *time.Time
 	deactivatedAt      *time.Time
 	deactivationReason string
+
+	// Role management
+	roleManager *RoleManager
+
+	// Profile information
+	profile *UserProfile
 }
 
 // NewUser creates a new User aggregate
@@ -59,7 +65,13 @@ func NewUser(userID, email, name string) (*User, error) {
 		email:         email,
 		name:          name,
 		status:        UserStatusActive,
+		roleManager:   NewRoleManager(),
+		profile:       NewUserProfile("", name), // Initialize with name as display name
 	}
+
+	// Assign default user role
+	defaultRole := NewRole(RoleTypeUser, "system")
+	user.roleManager.AddRole(defaultRole)
 
 	// Apply the creation event
 	event := NewUserCreatedEvent(userID, email, name)
@@ -72,6 +84,8 @@ func NewUser(userID, email, name string) (*User, error) {
 func LoadUserFromHistory(userID string, events []cqrs.EventMessage) (*User, error) {
 	user := &User{
 		BaseAggregate: cqrs.NewBaseAggregate(userID, "User"),
+		roleManager:   NewRoleManager(),
+		profile:       NewUserProfile("", ""), // Will be populated from events
 	}
 
 	for _, event := range events {
@@ -202,6 +216,217 @@ func (u *User) IsActive() bool {
 	return u.status == UserStatusActive && !u.IsDeleted()
 }
 
+// Role management methods
+
+// AssignRole assigns a role to the user
+func (u *User) AssignRole(roleType RoleType, assignedBy string) error {
+	if u.IsDeleted() {
+		return errors.New("cannot assign role to deleted user")
+	}
+
+	if u.status == UserStatusDeactivated {
+		return errors.New("cannot assign role to deactivated user")
+	}
+
+	role := NewRole(roleType, assignedBy)
+	u.roleManager.AddRole(role)
+
+	event := NewRoleAssignedEvent(u.AggregateID(), roleType, assignedBy, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// AssignRoleWithExpiry assigns a role with expiration to the user
+func (u *User) AssignRoleWithExpiry(roleType RoleType, assignedBy string, expiresAt time.Time) error {
+	if u.IsDeleted() {
+		return errors.New("cannot assign role to deleted user")
+	}
+
+	if u.status == UserStatusDeactivated {
+		return errors.New("cannot assign role to deactivated user")
+	}
+
+	if expiresAt.Before(time.Now()) {
+		return errors.New("expiration time cannot be in the past")
+	}
+
+	role := NewRoleWithExpiry(roleType, assignedBy, expiresAt)
+	u.roleManager.AddRole(role)
+
+	event := NewRoleAssignedWithExpiryEvent(u.AggregateID(), roleType, assignedBy, expiresAt, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// RevokeRole revokes a role from the user
+func (u *User) RevokeRole(roleType RoleType, revokedBy string) error {
+	if u.IsDeleted() {
+		return errors.New("cannot revoke role from deleted user")
+	}
+
+	if !u.roleManager.HasRole(roleType) {
+		return errors.Errorf("user does not have role: %s", roleType.String())
+	}
+
+	// Cannot revoke the last user role
+	if roleType == RoleTypeUser && len(u.roleManager.GetActiveRoles()) == 1 {
+		return errors.New("cannot revoke the last user role")
+	}
+
+	u.roleManager.RemoveRole(roleType)
+
+	event := NewRoleRevokedEvent(u.AggregateID(), roleType, revokedBy, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// HasRole checks if the user has a specific role
+func (u *User) HasRole(roleType RoleType) bool {
+	return u.roleManager.HasRole(roleType)
+}
+
+// HasPermission checks if the user has a specific permission
+func (u *User) HasPermission(permission string) bool {
+	return u.roleManager.HasPermission(permission)
+}
+
+// GetRoles returns all active roles
+func (u *User) GetRoles() []*Role {
+	return u.roleManager.GetActiveRoles()
+}
+
+// GetPermissions returns all permissions from active roles
+func (u *User) GetPermissions() []string {
+	return u.roleManager.GetAllPermissions()
+}
+
+// Profile management methods
+
+// UpdateProfile updates the user's profile information
+func (u *User) UpdateProfile(firstName, lastName, bio string) error {
+	if u.IsDeleted() {
+		return errors.New("cannot update profile of deleted user")
+	}
+
+	if u.status == UserStatusDeactivated {
+		return errors.New("cannot update profile of deactivated user")
+	}
+
+	u.profile.UpdateBasicInfo(firstName, lastName, bio)
+
+	// Create changes map for event
+	changes := map[string]interface{}{
+		"first_name": firstName,
+		"last_name":  lastName,
+		"bio":        bio,
+	}
+
+	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// UpdateDisplayName updates the user's display name
+func (u *User) UpdateDisplayName(displayName string) error {
+	if u.IsDeleted() {
+		return errors.New("cannot update display name of deleted user")
+	}
+
+	if u.status == UserStatusDeactivated {
+		return errors.New("cannot update display name of deactivated user")
+	}
+
+	if err := u.profile.UpdateDisplayName(displayName); err != nil {
+		return err
+	}
+
+	changes := map[string]interface{}{
+		"display_name": displayName,
+	}
+
+	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// UpdateContactInfo updates the user's contact information
+func (u *User) UpdateContactInfo(phoneNumber, address, city, country, postalCode string) error {
+	if u.IsDeleted() {
+		return errors.New("cannot update contact info of deleted user")
+	}
+
+	if u.status == UserStatusDeactivated {
+		return errors.New("cannot update contact info of deactivated user")
+	}
+
+	u.profile.UpdateContactInfo(phoneNumber, address, city, country, postalCode)
+
+	changes := map[string]interface{}{
+		"phone_number": phoneNumber,
+		"address":      address,
+		"city":         city,
+		"country":      country,
+		"postal_code":  postalCode,
+	}
+
+	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// SetAvatar sets the user's avatar
+func (u *User) SetAvatar(avatarURL string) error {
+	if u.IsDeleted() {
+		return errors.New("cannot set avatar of deleted user")
+	}
+
+	if u.status == UserStatusDeactivated {
+		return errors.New("cannot set avatar of deactivated user")
+	}
+
+	u.profile.SetAvatar(avatarURL)
+
+	changes := map[string]interface{}{
+		"avatar": avatarURL,
+	}
+
+	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// SetPreference sets a user preference
+func (u *User) SetPreference(key string, value interface{}) error {
+	if u.IsDeleted() {
+		return errors.New("cannot set preference of deleted user")
+	}
+
+	u.profile.SetPreference(key, value)
+
+	changes := map[string]interface{}{
+		"preferences": map[string]interface{}{
+			key: value,
+		},
+	}
+
+	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	u.Apply(event, true)
+
+	return nil
+}
+
+// GetProfile returns the user's profile
+func (u *User) GetProfile() *UserProfile {
+	return u.profile
+}
+
 // Apply applies an event to the aggregate
 func (u *User) Apply(event cqrs.EventMessage, isNew bool) {
 	u.BaseAggregate.Apply(event, isNew)
@@ -231,6 +456,80 @@ func (u *User) applyEvent(event cqrs.EventMessage) error {
 		u.status = UserStatusActive
 		u.deactivatedAt = nil
 		u.deactivationReason = ""
+
+	case *RoleAssignedEvent:
+		role := NewRole(e.RoleType, e.AssignedBy)
+		role.AssignedAt = e.AssignedAt
+		u.roleManager.AddRole(role)
+
+	case *RoleAssignedWithExpiryEvent:
+		role := NewRoleWithExpiry(e.RoleType, e.AssignedBy, e.ExpiresAt)
+		role.AssignedAt = e.AssignedAt
+		u.roleManager.AddRole(role)
+
+	case *RoleRevokedEvent:
+		u.roleManager.RemoveRole(e.RoleType)
+
+	case *ProfileUpdatedEvent:
+		// Apply profile changes from event
+		if u.profile == nil {
+			u.profile = NewUserProfile("", "")
+		}
+
+		for key, value := range e.Changes {
+			switch key {
+			case "first_name":
+				if v, ok := value.(string); ok {
+					u.profile.FirstName = v
+				}
+			case "last_name":
+				if v, ok := value.(string); ok {
+					u.profile.LastName = v
+				}
+			case "bio":
+				if v, ok := value.(string); ok {
+					u.profile.Bio = v
+				}
+			case "display_name":
+				if v, ok := value.(string); ok {
+					u.profile.DisplayName = v
+				}
+			case "avatar":
+				if v, ok := value.(string); ok {
+					u.profile.Avatar = v
+				}
+			case "phone_number":
+				if v, ok := value.(string); ok {
+					u.profile.PhoneNumber = v
+				}
+			case "address":
+				if v, ok := value.(string); ok {
+					u.profile.Address = v
+				}
+			case "city":
+				if v, ok := value.(string); ok {
+					u.profile.City = v
+				}
+			case "country":
+				if v, ok := value.(string); ok {
+					u.profile.Country = v
+				}
+			case "postal_code":
+				if v, ok := value.(string); ok {
+					u.profile.PostalCode = v
+				}
+			case "preferences":
+				if prefs, ok := value.(map[string]interface{}); ok {
+					if u.profile.Preferences == nil {
+						u.profile.Preferences = make(map[string]interface{})
+					}
+					for k, v := range prefs {
+						u.profile.Preferences[k] = v
+					}
+				}
+			}
+		}
+		u.profile.UpdatedAt = e.UpdatedAt
 
 	default:
 		return errors.Errorf("unknown event type: %T", event)

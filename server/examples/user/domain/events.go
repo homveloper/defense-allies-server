@@ -8,10 +8,14 @@ import (
 
 // Event type constants
 const (
-	UserCreatedEventType     = "UserCreated"
-	EmailChangedEventType    = "EmailChanged"
-	UserDeactivatedEventType = "UserDeactivated"
-	UserActivatedEventType   = "UserActivated"
+	UserCreatedEventType            = "UserCreated"
+	EmailChangedEventType           = "EmailChanged"
+	UserDeactivatedEventType        = "UserDeactivated"
+	UserActivatedEventType          = "UserActivated"
+	RoleAssignedEventType           = "RoleAssigned"
+	RoleAssignedWithExpiryEventType = "RoleAssignedWithExpiry"
+	RoleRevokedEventType            = "RoleRevoked"
+	ProfileUpdatedEventType         = "ProfileUpdated"
 )
 
 // UserCreatedEvent represents a user creation event
@@ -135,6 +139,146 @@ func NewUserActivatedEvent(userID string, version int) *UserActivatedEvent {
 		),
 		UserID:      userID,
 		ActivatedAt: time.Now(),
+	}
+
+	event.SetCategory(cqrs.DomainEvent)
+	event.SetPriority(cqrs.Normal)
+	return event
+}
+
+// RoleAssignedEvent represents a role assignment event
+type RoleAssignedEvent struct {
+	*cqrs.BaseDomainEventMessage
+	UserID     string    `json:"user_id"`
+	RoleType   RoleType  `json:"role_type"`
+	AssignedBy string    `json:"assigned_by"`
+	AssignedAt time.Time `json:"assigned_at"`
+}
+
+// NewRoleAssignedEvent creates a new RoleAssignedEvent
+func NewRoleAssignedEvent(userID string, roleType RoleType, assignedBy string, version int) *RoleAssignedEvent {
+	event := &RoleAssignedEvent{
+		BaseDomainEventMessage: cqrs.NewBaseDomainEventMessage(
+			RoleAssignedEventType,
+			userID,
+			"User",
+			version,
+			map[string]interface{}{
+				"user_id":     userID,
+				"role_type":   roleType.String(),
+				"assigned_by": assignedBy,
+				"assigned_at": time.Now(),
+			},
+		),
+		UserID:     userID,
+		RoleType:   roleType,
+		AssignedBy: assignedBy,
+		AssignedAt: time.Now(),
+	}
+
+	event.SetCategory(cqrs.DomainEvent)
+	event.SetPriority(cqrs.Normal)
+	return event
+}
+
+// RoleAssignedWithExpiryEvent represents a role assignment with expiry event
+type RoleAssignedWithExpiryEvent struct {
+	*cqrs.BaseDomainEventMessage
+	UserID     string    `json:"user_id"`
+	RoleType   RoleType  `json:"role_type"`
+	AssignedBy string    `json:"assigned_by"`
+	AssignedAt time.Time `json:"assigned_at"`
+	ExpiresAt  time.Time `json:"expires_at"`
+}
+
+// NewRoleAssignedWithExpiryEvent creates a new RoleAssignedWithExpiryEvent
+func NewRoleAssignedWithExpiryEvent(userID string, roleType RoleType, assignedBy string, expiresAt time.Time, version int) *RoleAssignedWithExpiryEvent {
+	event := &RoleAssignedWithExpiryEvent{
+		BaseDomainEventMessage: cqrs.NewBaseDomainEventMessage(
+			RoleAssignedWithExpiryEventType,
+			userID,
+			"User",
+			version,
+			map[string]interface{}{
+				"user_id":     userID,
+				"role_type":   roleType.String(),
+				"assigned_by": assignedBy,
+				"assigned_at": time.Now(),
+				"expires_at":  expiresAt,
+			},
+		),
+		UserID:     userID,
+		RoleType:   roleType,
+		AssignedBy: assignedBy,
+		AssignedAt: time.Now(),
+		ExpiresAt:  expiresAt,
+	}
+
+	event.SetCategory(cqrs.DomainEvent)
+	event.SetPriority(cqrs.Normal)
+	return event
+}
+
+// RoleRevokedEvent represents a role revocation event
+type RoleRevokedEvent struct {
+	*cqrs.BaseDomainEventMessage
+	UserID    string    `json:"user_id"`
+	RoleType  RoleType  `json:"role_type"`
+	RevokedBy string    `json:"revoked_by"`
+	RevokedAt time.Time `json:"revoked_at"`
+}
+
+// NewRoleRevokedEvent creates a new RoleRevokedEvent
+func NewRoleRevokedEvent(userID string, roleType RoleType, revokedBy string, version int) *RoleRevokedEvent {
+	event := &RoleRevokedEvent{
+		BaseDomainEventMessage: cqrs.NewBaseDomainEventMessage(
+			RoleRevokedEventType,
+			userID,
+			"User",
+			version,
+			map[string]interface{}{
+				"user_id":    userID,
+				"role_type":  roleType.String(),
+				"revoked_by": revokedBy,
+				"revoked_at": time.Now(),
+			},
+		),
+		UserID:    userID,
+		RoleType:  roleType,
+		RevokedBy: revokedBy,
+		RevokedAt: time.Now(),
+	}
+
+	event.SetCategory(cqrs.DomainEvent)
+	event.SetPriority(cqrs.High)
+	return event
+}
+
+// ProfileUpdatedEvent represents a profile update event
+type ProfileUpdatedEvent struct {
+	*cqrs.BaseDomainEventMessage
+	UserID    string                 `json:"user_id"`
+	Changes   map[string]interface{} `json:"changes"`
+	UpdatedAt time.Time              `json:"updated_at"`
+}
+
+// NewProfileUpdatedEvent creates a new ProfileUpdatedEvent
+func NewProfileUpdatedEvent(userID string, changes map[string]interface{}, version int) *ProfileUpdatedEvent {
+	event := &ProfileUpdatedEvent{
+		BaseDomainEventMessage: cqrs.NewBaseDomainEventMessage(
+			ProfileUpdatedEventType,
+			userID,
+			"User",
+			version,
+			map[string]interface{}{
+				"user_id":    userID,
+				"changes":    changes,
+				"updated_at": time.Now(),
+			},
+		),
+		UserID:    userID,
+		Changes:   changes,
+		UpdatedAt: time.Now(),
 	}
 
 	event.SetCategory(cqrs.DomainEvent)

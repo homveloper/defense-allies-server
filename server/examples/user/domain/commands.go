@@ -10,10 +10,18 @@ import (
 
 // Command type constants
 const (
-	CreateUserCommandType     = "CreateUser"
-	ChangeEmailCommandType    = "ChangeEmail"
-	DeactivateUserCommandType = "DeactivateUser"
-	ActivateUserCommandType   = "ActivateUser"
+	CreateUserCommandType           = "CreateUser"
+	ChangeEmailCommandType          = "ChangeEmail"
+	DeactivateUserCommandType       = "DeactivateUser"
+	ActivateUserCommandType         = "ActivateUser"
+	AssignRoleCommandType           = "AssignRole"
+	AssignRoleWithExpiryCommandType = "AssignRoleWithExpiry"
+	RevokeRoleCommandType           = "RevokeRole"
+	UpdateProfileCommandType        = "UpdateProfile"
+	UpdateDisplayNameCommandType    = "UpdateDisplayName"
+	UpdateContactInfoCommandType    = "UpdateContactInfo"
+	SetAvatarCommandType            = "SetAvatar"
+	SetPreferenceCommandType        = "SetPreference"
 )
 
 // CreateUserCommand represents a command to create a new user

@@ -3,6 +3,7 @@ package projections
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"defense-allies-server/examples/user/domain"
@@ -21,6 +22,25 @@ type UserView struct {
 	LastLoginAt        *time.Time `json:"last_login_at,omitempty"`
 	DeactivatedAt      *time.Time `json:"deactivated_at,omitempty"`
 	DeactivationReason string     `json:"deactivation_reason,omitempty"`
+
+	// Profile information
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	DisplayName string `json:"display_name"`
+	Bio         string `json:"bio"`
+	Avatar      string `json:"avatar"`
+	PhoneNumber string `json:"phone_number,omitempty"`
+	Address     string `json:"address,omitempty"`
+	City        string `json:"city,omitempty"`
+	Country     string `json:"country,omitempty"`
+	PostalCode  string `json:"postal_code,omitempty"`
+
+	// Role information
+	Roles       []string `json:"roles"`
+	Permissions []string `json:"permissions"`
+
+	// Searchable fields
+	SearchableText string `json:"searchable_text"` // Combined text for full-text search
 }
 
 // NewUserView creates a new UserView
@@ -46,7 +66,95 @@ func (uv *UserView) GetData() interface{} {
 		"last_login_at":       uv.LastLoginAt,
 		"deactivated_at":      uv.DeactivatedAt,
 		"deactivation_reason": uv.DeactivationReason,
+		"first_name":          uv.FirstName,
+		"last_name":           uv.LastName,
+		"display_name":        uv.DisplayName,
+		"bio":                 uv.Bio,
+		"avatar":              uv.Avatar,
+		"phone_number":        uv.PhoneNumber,
+		"address":             uv.Address,
+		"city":                uv.City,
+		"country":             uv.Country,
+		"postal_code":         uv.PostalCode,
+		"roles":               uv.Roles,
+		"permissions":         uv.Permissions,
+		"searchable_text":     uv.SearchableText,
 	}
+}
+
+// UpdateSearchableText updates the searchable text field for full-text search
+func (uv *UserView) UpdateSearchableText() {
+	var parts []string
+
+	// Add basic information
+	if uv.Email != "" {
+		parts = append(parts, uv.Email)
+	}
+	if uv.Name != "" {
+		parts = append(parts, uv.Name)
+	}
+	if uv.FirstName != "" {
+		parts = append(parts, uv.FirstName)
+	}
+	if uv.LastName != "" {
+		parts = append(parts, uv.LastName)
+	}
+	if uv.DisplayName != "" {
+		parts = append(parts, uv.DisplayName)
+	}
+	if uv.Bio != "" {
+		parts = append(parts, uv.Bio)
+	}
+
+	// Add location information
+	if uv.City != "" {
+		parts = append(parts, uv.City)
+	}
+	if uv.Country != "" {
+		parts = append(parts, uv.Country)
+	}
+
+	// Add roles
+	for _, role := range uv.Roles {
+		parts = append(parts, role)
+	}
+
+	// Combine all parts with spaces
+	uv.SearchableText = strings.Join(parts, " ")
+}
+
+// HasRole checks if the user has a specific role
+func (uv *UserView) HasRole(role string) bool {
+	for _, r := range uv.Roles {
+		if r == role {
+			return true
+		}
+	}
+	return false
+}
+
+// HasPermission checks if the user has a specific permission
+func (uv *UserView) HasPermission(permission string) bool {
+	for _, p := range uv.Permissions {
+		if p == permission || p == "*" {
+			return true
+		}
+	}
+	return false
+}
+
+// GetFullName returns the full name
+func (uv *UserView) GetFullName() string {
+	if uv.FirstName != "" && uv.LastName != "" {
+		return uv.FirstName + " " + uv.LastName
+	}
+	if uv.FirstName != "" {
+		return uv.FirstName
+	}
+	if uv.LastName != "" {
+		return uv.LastName
+	}
+	return uv.Name
 }
 
 // UserViewProjection handles user events and updates the UserView read model
