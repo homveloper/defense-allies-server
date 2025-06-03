@@ -6,13 +6,26 @@ import (
 	"sync"
 )
 
-// InMemoryCommandDispatcher provides an in-memory implementation of CommandDispatcher
+// InMemoryCommandDispatcher provides an in-memory implementation of CommandDispatcher interface.
+// It manages command handlers and routes incoming commands to appropriate handlers based on command type.
+// This implementation is thread-safe and suitable for single-instance applications.
+//
+// Fields:
+//   - handlers: A map storing command handlers indexed by command type string
+//   - mutex: Read-write mutex for thread-safe access to handlers map
 type InMemoryCommandDispatcher struct {
-	handlers map[string]CommandHandler
-	mutex    sync.RWMutex
+	handlers map[string]CommandHandler // Map of command type -> handler
+	mutex    sync.RWMutex              // Protects concurrent access to handlers map
 }
 
-// NewInMemoryCommandDispatcher creates a new in-memory command dispatcher
+// NewInMemoryCommandDispatcher creates and initializes a new in-memory command dispatcher.
+//
+// Returns:
+//   - *InMemoryCommandDispatcher: A new dispatcher instance with empty handlers map
+//
+// Usage:
+//
+//	dispatcher := NewInMemoryCommandDispatcher()
 func NewInMemoryCommandDispatcher() *InMemoryCommandDispatcher {
 	return &InMemoryCommandDispatcher{
 		handlers: make(map[string]CommandHandler),
@@ -21,7 +34,27 @@ func NewInMemoryCommandDispatcher() *InMemoryCommandDispatcher {
 
 // CommandDispatcher interface implementation
 
+// Dispatch routes a command to the appropriate handler and executes it.
+// This method performs validation, handler lookup, and command execution in a thread-safe manner.
+// Commands typically modify system state and should be processed with proper error handling.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout control
+//   - command: The command to be executed (must implement Command interface)
+//
+// Returns:
+//   - *CommandResult: Result containing success status, data, error, and execution metadata
+//   - error: Always returns nil (errors are wrapped in CommandResult.Error)
+//
+// Error conditions:
+//   - Command is nil: Returns CommandResult with validation error
+//   - Command validation fails: Returns CommandResult with validation error
+//   - No handler found: Returns CommandResult with handler not found error
+//   - Handler execution fails: Returns CommandResult from handler (may contain error)
+//
+// Thread safety: This method is safe for concurrent use
 func (d *InMemoryCommandDispatcher) Dispatch(ctx context.Context, command Command) (*CommandResult, error) {
+	// Validate input parameters
 	if command == nil {
 		return &CommandResult{
 			Success: false,
@@ -29,7 +62,7 @@ func (d *InMemoryCommandDispatcher) Dispatch(ctx context.Context, command Comman
 		}, nil
 	}
 
-	// Validate command
+	// Validate command structure and business rules
 	if err := command.Validate(); err != nil {
 		return &CommandResult{
 			Success: false,
@@ -37,11 +70,12 @@ func (d *InMemoryCommandDispatcher) Dispatch(ctx context.Context, command Comman
 		}, nil
 	}
 
-	// Find handler
+	// Find appropriate handler using read lock for thread safety
 	d.mutex.RLock()
 	handler, exists := d.handlers[command.CommandType()]
 	d.mutex.RUnlock()
 
+	// Check if handler exists for this command type
 	if !exists {
 		return &CommandResult{
 			Success: false,
@@ -49,7 +83,7 @@ func (d *InMemoryCommandDispatcher) Dispatch(ctx context.Context, command Comman
 		}, nil
 	}
 
-	// Execute command
+	// Execute command using the found handler
 	return handler.Handle(ctx, command)
 }
 

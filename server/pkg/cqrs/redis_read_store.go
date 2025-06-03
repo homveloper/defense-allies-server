@@ -10,46 +10,140 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// RedisReadStore implements ReadStore using Redis
+// RedisReadStore implements ReadStore interface using Redis as the underlying storage.
+// This implementation provides high-performance read model storage with features like
+// indexing, batch operations, and query capabilities. It uses Redis's native data
+// structures for efficient storage and retrieval of read models.
+//
+// Key features:
+//   - JSON serialization with pluggable factory pattern
+//   - Automatic indexing for query optimization
+//   - Batch operations for high throughput scenarios
+//   - TTL support for automatic cleanup
+//   - Pipeline operations for reduced network overhead
+//
+// Fields:
+//   - client: Redis client manager for connection handling
+//   - keyBuilder: Utility for generating consistent Redis keys
+//   - serializer: Pluggable serializer for read model data
 type RedisReadStore struct {
-	client     *RedisClientManager
-	keyBuilder *RedisKeyBuilder
-	serializer ReadModelSerializer
+	client     *RedisClientManager // Manages Redis connections and operations
+	keyBuilder *RedisKeyBuilder    // Generates consistent Redis keys
+	serializer ReadModelSerializer // Handles read model serialization/deserialization
 }
 
-// ReadModelFactory interface for creating read models by type
+// ReadModelFactory interface defines the contract for creating read models by type.
+// This factory pattern allows the system to create specific read model types
+// during deserialization, enabling proper type casting and domain-specific behavior.
+//
+// Implementations should:
+//   - Support all read model types used in the application
+//   - Handle unknown types gracefully (fallback to base types)
+//   - Validate input parameters and return meaningful errors
 type ReadModelFactory interface {
+	// CreateReadModel creates a read model instance of the specified type.
+	//
+	// Parameters:
+	//   - modelType: The type of read model to create (e.g., "UserView", "OrderView")
+	//   - id: The unique identifier for the read model instance
+	//   - data: The raw data to populate the read model with
+	//
+	// Returns:
+	//   - ReadModel: The created read model instance
+	//   - error: nil on success, error if creation fails
 	CreateReadModel(modelType string, id string, data interface{}) (ReadModel, error)
 }
 
-// ReadModelSerializer interface for read model serialization
+// ReadModelSerializer interface defines the contract for read model serialization.
+// This abstraction allows different serialization formats (JSON, Protocol Buffers, etc.)
+// to be used without changing the core read store logic.
+//
+// Implementations should:
+//   - Preserve all read model data during serialization/deserialization
+//   - Handle version information and metadata correctly
+//   - Use the factory pattern for proper type reconstruction
 type ReadModelSerializer interface {
+	// SerializeReadModel converts a read model to bytes for storage.
+	//
+	// Parameters:
+	//   - model: The read model to serialize
+	//
+	// Returns:
+	//   - []byte: The serialized data
+	//   - error: nil on success, error if serialization fails
 	SerializeReadModel(model ReadModel) ([]byte, error)
+
+	// DeserializeReadModel reconstructs a read model from stored bytes.
+	//
+	// Parameters:
+	//   - data: The serialized read model data
+	//   - modelType: The type of read model to create
+	//
+	// Returns:
+	//   - ReadModel: The reconstructed read model
+	//   - error: nil on success, error if deserialization fails
 	DeserializeReadModel(data []byte, modelType string) (ReadModel, error)
 }
 
-// JSONReadModelSerializer implements JSON-based read model serialization
+// JSONReadModelSerializer implements ReadModelSerializer using JSON format.
+// This serializer provides human-readable storage format and good performance
+// for most use cases. It integrates with the factory pattern to ensure
+// proper type reconstruction during deserialization.
+//
+// Fields:
+//   - factory: Factory for creating typed read model instances
 type JSONReadModelSerializer struct {
-	factory ReadModelFactory
+	factory ReadModelFactory // Factory for creating specific read model types
 }
 
-// NewJSONReadModelSerializer creates a new JSONReadModelSerializer
+// NewJSONReadModelSerializer creates a new JSON-based read model serializer.
+//
+// Parameters:
+//   - factory: The factory to use for creating read model instances during deserialization
+//
+// Returns:
+//   - *JSONReadModelSerializer: A new serializer instance ready for use
 func NewJSONReadModelSerializer(factory ReadModelFactory) *JSONReadModelSerializer {
 	return &JSONReadModelSerializer{
 		factory: factory,
 	}
 }
 
-// ReadModelData represents serialized read model data
+// ReadModelData represents the structure used for JSON serialization of read models.
+// This structure captures all the essential metadata and data needed to reconstruct
+// a read model from storage.
+//
+// Fields:
+//   - ID: Unique identifier for the read model
+//   - Type: The read model type for factory-based reconstruction
+//   - Version: Version number for optimistic concurrency control
+//   - Data: The actual read model data (domain-specific)
+//   - LastUpdated: Timestamp of the last modification
 type ReadModelData struct {
-	ID          string      `json:"id"`
-	Type        string      `json:"type"`
-	Version     int         `json:"version"`
-	Data        interface{} `json:"data"`
-	LastUpdated time.Time   `json:"last_updated"`
+	ID          string      `json:"id"`           // Unique read model identifier
+	Type        string      `json:"type"`         // Read model type name
+	Version     int         `json:"version"`      // Version for concurrency control
+	Data        interface{} `json:"data"`         // Domain-specific read model data
+	LastUpdated time.Time   `json:"last_updated"` // Last modification timestamp
 }
 
-// NewRedisReadStore creates a new Redis read store
+// NewRedisReadStore creates and initializes a new Redis-based read store.
+// This constructor sets up the read store with dependency injection pattern,
+// allowing for flexible configuration and testing.
+//
+// Parameters:
+//   - client: Redis client manager for handling connections and operations
+//   - keyPrefix: Prefix for all Redis keys to avoid collisions (e.g., "app:prod")
+//   - serializer: Serializer implementation for read model data conversion
+//
+// Returns:
+//   - *RedisReadStore: A new read store instance ready for use
+//
+// Usage:
+//
+//	factory := NewUserReadModelFactory()
+//	serializer := NewJSONReadModelSerializer(factory)
+//	readStore := NewRedisReadStore(client, "myapp", serializer)
 func NewRedisReadStore(client *RedisClientManager, keyPrefix string, serializer ReadModelSerializer) *RedisReadStore {
 	return &RedisReadStore{
 		client:     client,
@@ -58,38 +152,83 @@ func NewRedisReadStore(client *RedisClientManager, keyPrefix string, serializer 
 	}
 }
 
-// Save saves a read model to Redis
+// Save persists a read model to Redis with automatic indexing and TTL.
+// This method handles serialization, storage, and index updates in a single transaction
+// to ensure data consistency. The read model is stored with a 24-hour TTL by default.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout control
+//   - readModel: The read model to save (must be non-nil and valid)
+//
+// Returns:
+//   - error: nil on success, CQRSError on validation or storage failure
+//
+// Error conditions:
+//   - readModel is nil: Returns repository error
+//   - readModel validation fails: Returns repository error with validation details
+//   - Serialization fails: Returns serialization error
+//   - Redis operation fails: Returns repository error with Redis details
+//   - Index update fails: Returns repository error
+//
+// Thread safety: This method is safe for concurrent use
 func (rs *RedisReadStore) Save(ctx context.Context, readModel ReadModel) error {
+	// Validate input parameters
 	if readModel == nil {
 		return NewCQRSError(ErrCodeRepositoryError.String(), "read model cannot be nil", nil)
 	}
 
+	// Validate read model business rules
 	if err := readModel.Validate(); err != nil {
 		return NewCQRSError(ErrCodeRepositoryError.String(), "read model validation failed", err)
 	}
 
+	// Generate consistent Redis key
 	modelKey := rs.keyBuilder.ReadModelKey(readModel.GetType(), readModel.GetID())
 
+	// Execute save operation with error handling
 	return rs.client.ExecuteCommand(ctx, func() error {
-		// Serialize read model
+		// Serialize read model to bytes
 		data, err := rs.serializer.SerializeReadModel(readModel)
 		if err != nil {
 			return NewCQRSError(ErrCodeSerializationError.String(), "failed to serialize read model", err)
 		}
 
-		// Save to Redis with expiration
+		// Save to Redis with TTL for automatic cleanup
 		err = rs.client.GetClient().Set(ctx, modelKey, data, 24*time.Hour).Err()
 		if err != nil {
 			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to save read model", err)
 		}
 
-		// Update indexes
+		// Update secondary indexes for query optimization
 		return rs.updateIndexes(ctx, readModel)
 	})
 }
 
-// GetByID retrieves a read model by ID
+// GetByID retrieves a read model by its unique identifier and type.
+// This method performs key-based lookup in Redis and deserializes the result
+// using the configured factory pattern to ensure proper type reconstruction.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout control
+//   - id: The unique identifier of the read model (must be non-empty)
+//   - modelType: The type of read model to retrieve (must be non-empty)
+//
+// Returns:
+//   - ReadModel: The retrieved read model with proper type casting
+//   - error: nil on success, CQRSError on validation or retrieval failure
+//
+// Error conditions:
+//   - id is empty: Returns repository error
+//   - modelType is empty: Returns repository error
+//   - Read model not found: Returns repository error with "not found" message
+//   - Redis operation fails: Returns repository error with Redis details
+//   - Deserialization fails: Returns serialization error
+//
+// Thread safety: This method is safe for concurrent use
+//
+// Performance: O(1) lookup time due to Redis key-based access
 func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType string) (ReadModel, error) {
+	// Validate input parameters
 	if id == "" {
 		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "id cannot be empty", nil)
 	}
@@ -97,13 +236,17 @@ func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType stri
 		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
 	}
 
+	// Generate consistent Redis key
 	modelKey := rs.keyBuilder.ReadModelKey(modelType, id)
 
 	var readModel ReadModel
 
+	// Execute retrieval operation with error handling
 	err := rs.client.ExecuteCommand(ctx, func() error {
+		// Retrieve data from Redis
 		data, err := rs.client.GetClient().Get(ctx, modelKey).Result()
 		if err != nil {
+			// Handle "key not found" case specifically
 			if err == redis.Nil {
 				return NewCQRSError(ErrCodeRepositoryError.String(),
 					fmt.Sprintf("read model not found: %s:%s", modelType, id), nil)
@@ -111,6 +254,7 @@ func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType stri
 			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to get read model", err)
 		}
 
+		// Deserialize data using factory pattern for proper type reconstruction
 		readModel, err = rs.serializer.DeserializeReadModel([]byte(data), modelType)
 		if err != nil {
 			return NewCQRSError(ErrCodeSerializationError.String(), "failed to deserialize read model", err)
