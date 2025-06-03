@@ -10,7 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func main() {
+// RunExtendedFeaturesTest runs the extended features test
+func RunExtendedFeaturesTest() {
 	fmt.Println("🚀 Testing Extended User Features")
 	fmt.Println("=================================")
 

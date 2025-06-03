@@ -1328,9 +1328,54 @@ require (
 - **zap**: 구조화된 로깅
 - **viper**: 설정 관리
 
+## 📊 현재 구현 현황 (2024년 12월 기준)
+
+### ✅ **완료된 핵심 구현체들**
+
+#### **1. 핵심 CQRS 인터페이스 및 구현체**
+- [x] `pkg/cqrs/aggregate_root.go` - 통합된 AggregateRoot 인터페이스 (go.cqrs 호환)
+- [x] `pkg/cqrs/base_aggregate.go` - BaseAggregate 구현체 + 테스트
+- [x] `pkg/cqrs/event_message.go` - EventMessage 인터페이스
+- [x] `pkg/cqrs/base_event_message.go` - BaseEventMessage 구현체 + 테스트
+- [x] `pkg/cqrs/command.go` - Command 인터페이스
+- [x] `pkg/cqrs/base_command.go` - BaseCommand 구현체
+- [x] `pkg/cqrs/query.go` - Query 인터페이스 (UserID 제거됨)
+- [x] `pkg/cqrs/base_query.go` - BaseQuery 구현체
+- [x] `pkg/cqrs/snapshot.go` - SnapshotData 인터페이스
+- [x] `pkg/cqrs/base_snapshot.go` - BaseSnapshot 구현체
+- [x] `pkg/cqrs/repository.go` - Repository 인터페이스
+- [x] `pkg/cqrs/storage_strategy.go` - 저장 전략 인터페이스
+
+#### **2. Event Bus 및 Handler 시스템**
+- [x] `pkg/cqrs/event_bus.go` - EventBus + EventHandler 인터페이스 (통합)
+- [x] `pkg/cqrs/in_memory_event_bus.go` - InMemory EventBus 완전 구현 + 테스트
+- [x] `pkg/cqrs/command_dispatcher.go` - CommandDispatcher + CommandHandler 인터페이스 (통합) + 테스트
+
+#### **3. Query Side 구현체들**
+- [x] `pkg/cqrs/query_dispatcher.go` - QueryDispatcher 인터페이스
+- [x] `pkg/cqrs/projection.go` - Projection + ProjectionManager 인터페이스 (통합)
+- [x] `pkg/cqrs/in_memory_projection_manager.go` - InMemory ProjectionManager 완전 구현 + 테스트
+- [x] `pkg/cqrs/base_read_model.go` - BaseReadModel 구현체
+- [x] `pkg/cqrs/in_memory_read_store.go` - InMemory ReadStore 완전 구현
+
+#### **4. Redis Infrastructure**
+- [x] `pkg/cqrs/redis_client.go` - Redis 클라이언트 관리자 (연결 풀, 메트릭) + 테스트
+- [x] `pkg/cqrs/redis_event_store.go` - Redis Streams 기반 이벤트 저장소 + 테스트
+- [x] `pkg/cqrs/redis_state_store.go` - Redis Hash 기반 상태 저장소
+- [x] `pkg/cqrs/redis_read_store.go` - Redis Hash/Sets 기반 읽기 저장소
+- [x] `pkg/cqrs/redis_repository.go` - Redis 기반 Repository 구현체
+
+#### **5. 에러 처리 및 유틸리티**
+- [x] `pkg/cqrs/errors.go` - CQRS 전용 에러 시스템
+
+### 🔄 **현재 진행 중인 개선사항**
+- [x] Query 인터페이스에서 UserID 제거 (유연성 증대)
+- [x] 다중 필드 정렬 시스템 설계 (SortingOptions)
+- [x] Apply vs ApplyEvent 메서드 일관성 개선
+
 ## 구현 TODO 리스트
 
-### Phase 1: 기반 인프라 구축 (2-3주)
+### Phase 1: 기반 인프라 구축 ✅ **대부분 완료됨**
 
 #### 1.1 Core CQRS Framework (go.cqrs 기반)
 - [x] **핵심 인터페이스 정의 (통합된 AggregateRoot)**
@@ -1365,31 +1410,28 @@ require (
     - ### 8. Storage Strategy Interface (저장 방식 선택)
 
 - [x] **Event Bus 및 핸들러**
-  - [x] `pkg/cqrs/event_bus.go` - EventBus 인터페이스
+  - [x] `pkg/cqrs/event_bus.go` - EventBus 인터페이스 + EventHandler 인터페이스 (통합 구현)
     - ### 7. Event Bus Interface (go.cqrs 확장)
-  - [ ] `pkg/cqrs/event_handler.go` - EventHandler 인터페이스
+  - ~~`pkg/cqrs/event_handler.go`~~ - ~~EventHandler 인터페이스 (event_bus.go로 통합됨)~~
+  - [x] `pkg/cqrs/event_stream.go` - EventStream 인터페이스 (event_bus.go 내부 구현)
     - ### 7. Event Bus Interface (go.cqrs 확장)
-  - [ ] `pkg/cqrs/event_stream.go` - EventStream 인터페이스
-    - ### 7. Event Bus Interface (go.cqrs 확장)
-  - [ ] `pkg/cqrs/command_handler.go` - CommandHandler 인터페이스
+  - [x] `pkg/cqrs/command_dispatcher.go` - CommandDispatcher + CommandHandler 인터페이스 (통합 구현)
     - ### 3. Command Interface (go.cqrs 확장)
-  - [x] `pkg/cqrs/command_dispatcher.go` - CommandDispatcher 인터페이스
-    - ### 3. Command Interface (go.cqrs 확장)
+  - ~~`pkg/cqrs/command_handler.go`~~ - ~~CommandHandler 인터페이스 (command_dispatcher.go로 통합됨)~~
 
 - [x] **Query Side 인터페이스**
   - [x] `pkg/cqrs/query.go` - Query 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/query_handler.go` - QueryHandler 인터페이스
+  - [ ] `pkg/cqrs/query_handler.go` - QueryHandler 인터페이스 (별도 파일로 분리 필요)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
   - [x] `pkg/cqrs/query_dispatcher.go` - QueryDispatcher 인터페이스
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/read_model.go` - ReadModel 인터페이스
+  - [ ] `pkg/cqrs/read_model.go` - ReadModel 인터페이스 (별도 파일로 분리 필요)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [x] `pkg/cqrs/projection.go` - Projection 인터페이스
+  - [x] `pkg/cqrs/projection.go` - Projection + ProjectionManager 인터페이스 (통합 구현)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/projection_manager.go` - ProjectionManager 인터페이스
-    - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [ ] `pkg/cqrs/read_store.go` - ReadStore 인터페이스
+  - ~~`pkg/cqrs/projection_manager.go`~~ - ~~ProjectionManager 인터페이스 (projection.go로 통합됨)~~
+  - [ ] `pkg/cqrs/read_store.go` - ReadStore 인터페이스 (별도 파일로 분리 필요)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
 
 - [x] **저장 전략 및 설정**
@@ -1400,7 +1442,7 @@ require (
   - [ ] `pkg/cqrs/repository_type.go` - Repository 타입 정의
     - ### 8. Storage Strategy Interface (저장 방식 선택)
 
-- [ ] **기본 구현체 작성 (go.cqrs 스타일)**
+- [x] **기본 구현체 작성 (go.cqrs 스타일)**
   - [x] `pkg/cqrs/base_aggregate.go` - BaseAggregate 구조체 (go.cqrs 호환)
     - ### 4. BaseAggregate Implementation (go.cqrs 스타일)
   - [x] `pkg/cqrs/base_event_message.go` - 기본 EventMessage 구현체
@@ -1413,13 +1455,15 @@ require (
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
   - [x] `pkg/cqrs/base_snapshot.go` - 기본 SnapshotData 구현체
     - ### 5. SnapshotData Interface
-  - [x] `pkg/cqrs/configurable_storage_strategy.go` - 설정 기반 저장 전략
+  - [x] `pkg/cqrs/storage_strategy.go` - 설정 기반 저장 전략 (ConfigurableStorageStrategy 포함)
     - ### 8. Storage Strategy Interface (저장 방식 선택)
-  - [x] `pkg/cqrs/in_memory_event_bus.go` - 인메모리 EventBus (테스트용)
+  - [x] `pkg/cqrs/in_memory_event_bus.go` - 인메모리 EventBus (완전한 기능 구현)
     - ### 7. Event Bus Interface (go.cqrs 확장)
-  - [x] `pkg/cqrs/in_memory_query_dispatcher.go` - 인메모리 QueryDispatcher (테스트용)
+  - [x] `pkg/cqrs/query_dispatcher.go` - 인메모리 QueryDispatcher (완전한 기능 구현)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
-  - [x] `pkg/cqrs/in_memory_projection_manager.go` - 인메모리 ProjectionManager (테스트용)
+  - [x] `pkg/cqrs/in_memory_projection_manager.go` - 인메모리 ProjectionManager (완전한 기능 구현)
+    - ### 10. Query & Projection Interfaces (CQRS Query Side)
+  - [x] `pkg/cqrs/in_memory_read_store.go` - 인메모리 ReadStore (완전한 기능 구현)
     - ### 10. Query & Projection Interfaces (CQRS Query Side)
 
 - [ ] **직렬화 인터페이스 및 구현체**
@@ -1440,65 +1484,55 @@ require (
   - [ ] `pkg/cqrs/serialization/serialization_config.go` - 직렬화 설정
     - ### 9. Serialization Interfaces (유연한 직렬화)
 
-#### 1.2 Redis Infrastructure
-- [ ] **Event Store 구현 (선택적 이벤트 소싱)**
-  - [ ] `pkg/infrastructure/eventstore/redis_event_store.go`
+#### 1.2 Redis Infrastructure ✅ **대부분 완료됨**
+- [x] **Redis 기본 인프라**
+  - [x] `pkg/cqrs/redis_client.go` - Redis 클라이언트 관리자 (연결 풀, 메트릭 포함)
+    - ### Redis 기반 구현 전략 (유연한 저장 방식)
+  - [x] `pkg/cqrs/errors.go` - CQRS 전용 에러 시스템
+    - ### 에러 처리 및 로깅
+
+- [x] **Event Store 구현 (이벤트 소싱)**
+  - [x] `pkg/cqrs/redis_event_store.go` - Redis Streams 기반 이벤트 저장소
     - ### Event Store 구조 (Redis Streams)
-  - [ ] `pkg/infrastructure/eventstore/stream_namer.go`
-    - ### Event Store 구조 (Redis Streams)
-  - [ ] `pkg/infrastructure/eventstore/event_compactor.go`
-    - ### Event Store 구조 (Redis Streams)
+  - [ ] ~~`pkg/infrastructure/eventstore/stream_namer.go`~~ - ~~(redis_event_store.go에 통합됨)~~
+  - [ ] ~~`pkg/infrastructure/eventstore/event_compactor.go`~~ - ~~(향후 확장 예정)~~
 
-- [ ] **State Store 구현 (일반적인 CRUD)**
-  - [ ] `pkg/infrastructure/statestore/redis_state_store.go`
+- [x] **State Store 구현 (일반적인 CRUD)**
+  - [x] `pkg/cqrs/redis_state_store.go` - Redis Hash 기반 상태 저장소
     - ### 2. State Store (Redis Hash) - 일반적인 CRUD
-  - [ ] `pkg/infrastructure/statestore/key_namer.go`
-    - ### 2. State Store (Redis Hash) - 일반적인 CRUD
-  - [ ] `pkg/infrastructure/statestore/state_cache.go`
-    - ### 2. State Store (Redis Hash) - 일반적인 CRUD
+  - [ ] ~~`pkg/infrastructure/statestore/key_namer.go`~~ - ~~(redis_state_store.go에 통합됨)~~
+  - [ ] ~~`pkg/infrastructure/statestore/state_cache.go`~~ - ~~(향후 확장 예정)~~
 
-- [ ] **Event Bus 구현**
-  - [ ] `pkg/infrastructure/eventbus/redis_event_bus.go`
-    - ### 4. Event Bus (Redis Pub/Sub)
-  - [ ] `pkg/infrastructure/eventbus/subscription_manager.go`
-    - ### 4. Event Bus (Redis Pub/Sub)
-  - [ ] `pkg/infrastructure/eventbus/message_handler.go`
-    - ### 4. Event Bus (Redis Pub/Sub)
-  - [ ] `pkg/infrastructure/eventbus/event_stream.go`
-    - ### 4. Event Bus (Redis Pub/Sub)
-
-- [ ] **Read Store 구현**
-  - [ ] `pkg/infrastructure/readstore/redis_read_store.go`
+- [x] **Read Store 구현**
+  - [x] `pkg/cqrs/redis_read_store.go` - Redis Hash/Sets 기반 읽기 저장소
     - ### 3. Read Models (Redis Hash/Sets)
-  - [ ] `pkg/infrastructure/readstore/projection_manager.go`
-    - ### 3. Read Models (Redis Hash/Sets)
-  - [ ] `pkg/infrastructure/readstore/index_manager.go`
-    - ### 3. Read Models (Redis Hash/Sets)
+  - [ ] ~~`pkg/infrastructure/readstore/projection_manager.go`~~ - ~~(in_memory_projection_manager.go로 구현됨)~~
+  - [ ] ~~`pkg/infrastructure/readstore/index_manager.go`~~ - ~~(redis_read_store.go에 통합됨)~~
 
-- [ ] **Repository 구현체들**
-  - [ ] `pkg/infrastructure/repositories/event_sourced_repository.go`
+- [x] **Repository 구현체들**
+  - [x] `pkg/cqrs/redis_repository.go` - Redis 기반 Repository 구현체
     - ### 6. Repository Interface (go.cqrs 확장)
-  - [ ] `pkg/infrastructure/repositories/state_based_repository.go`
-    - ### 6. Repository Interface (go.cqrs 확장)
-  - [ ] `pkg/infrastructure/repositories/hybrid_repository.go`
-    - ### 6. Repository Interface (go.cqrs 확장)
-  - [ ] `pkg/infrastructure/repositories/repository_factory_impl.go`
-    - ### 8. Storage Strategy Interface (저장 방식 선택)
+  - [ ] ~~`pkg/infrastructure/repositories/event_sourced_repository.go`~~ - ~~(향후 확장 예정)~~
+  - [ ] ~~`pkg/infrastructure/repositories/state_based_repository.go`~~ - ~~(향후 확장 예정)~~
+  - [ ] ~~`pkg/infrastructure/repositories/hybrid_repository.go`~~ - ~~(향후 확장 예정)~~
+  - [ ] ~~`pkg/infrastructure/repositories/repository_factory_impl.go`~~ - ~~(향후 확장 예정)~~
 
-- [ ] **직렬화 구현체들 (다양한 포맷 지원)**
-  - [ ] `pkg/infrastructure/serialization/json_serializer.go` - JSON 직렬화
+**📝 참고**: 원래 `pkg/infrastructure/` 구조로 계획되었으나, 실용성을 위해 `pkg/cqrs/` 직접 구현으로 변경됨
+
+- [ ] **직렬화 구현체들 (다양한 포맷 지원)** - 향후 확장 예정
+  - [ ] `pkg/cqrs/serialization/json_serializer.go` - JSON 직렬화
     - ### 9. Serialization Interfaces (유연한 직렬화)
-  - [ ] `pkg/infrastructure/serialization/bson_serializer.go` - BSON 직렬화
+  - [ ] `pkg/cqrs/serialization/bson_serializer.go` - BSON 직렬화
     - ### 9. Serialization Interfaces (유연한 직렬화)
-  - [ ] `pkg/infrastructure/serialization/protobuf_serializer.go` - Protobuf 직렬화
+  - [ ] `pkg/cqrs/serialization/protobuf_serializer.go` - Protobuf 직렬화
     - ### 9. Serialization Interfaces (유연한 직렬화)
-  - [ ] `pkg/infrastructure/serialization/messagepack_serializer.go` - MessagePack 직렬화
+  - [ ] `pkg/cqrs/serialization/messagepack_serializer.go` - MessagePack 직렬화
     - ### 9. Serialization Interfaces (유연한 직렬화)
-  - [ ] `pkg/infrastructure/serialization/compressed_serializer.go` - 압축 지원
+  - [ ] `pkg/cqrs/serialization/compressed_serializer.go` - 압축 지원
     - ### 9. Serialization Interfaces (유연한 직렬화)
-  - [ ] `pkg/infrastructure/serialization/schema_validator.go` - 스키마 검증
+  - [ ] `pkg/cqrs/serialization/schema_validator.go` - 스키마 검증
     - ### 9. Serialization Interfaces (유연한 직렬화)
-  - [ ] `pkg/infrastructure/serialization/serializer_factory_impl.go` - 팩토리 구현체
+  - [ ] `pkg/cqrs/serialization/serializer_factory_impl.go` - 팩토리 구현체
     - ### 9. Serialization Interfaces (유연한 직렬화)
 
 #### 1.3 Configuration & Utilities
@@ -1601,7 +1635,28 @@ performance:
   max_concurrent_ops: 50       # 최대 동시 작업 수
 ```
 
-### Phase 2: Domain Layer 구현 (3-4주)
+## 🎯 **다음 우선순위 작업 (업데이트된 로드맵)**
+
+### **즉시 시작 가능한 작업 (1-2주)**
+
+#### **1. 핵심 인터페이스 확장**
+- [ ] `pkg/cqrs/domain_event.go` - DomainEvent 확장 인터페이스 (EventMessage 확장)
+- [ ] `pkg/cqrs/read_model.go` - ReadModel 인터페이스 (별도 파일로 분리)
+- [ ] `pkg/cqrs/query_handler.go` - QueryHandler 인터페이스 (별도 파일로 분리)
+- [ ] `pkg/cqrs/read_store.go` - ReadStore 인터페이스 (별도 파일로 분리)
+
+#### **2. Repository 확장 시스템**
+- [ ] `pkg/cqrs/event_sourced_repository.go` - 이벤트 소싱 Repository
+- [ ] `pkg/cqrs/state_based_repository.go` - 상태 기반 Repository
+- [ ] `pkg/cqrs/hybrid_repository.go` - 하이브리드 Repository
+- [ ] `pkg/cqrs/repository_factory.go` - Repository 팩토리
+
+#### **3. 기본 직렬화 시스템**
+- [ ] `pkg/cqrs/serialization/serializer.go` - 기본 Serializer 인터페이스
+- [ ] `pkg/cqrs/serialization/json_serializer.go` - JSON 구현체
+- [ ] `pkg/cqrs/serialization/serializer_factory.go` - 직렬화 팩토리
+
+### **Phase 2: Domain Layer 구현 (2-3주)**
 
 #### 2.1 Authentication Domain
 - [ ] **Aggregates**
@@ -1742,14 +1797,26 @@ performance:
   - [ ] 복잡한 시나리오 예제
   - [ ] 성능 최적화 예제
 
-## 예상 일정 및 리소스
+## 📅 **업데이트된 예상 일정 및 리소스**
 
-### 총 개발 기간: 10-15주
-- **Phase 1**: 2-3주 (기반 인프라)
-- **Phase 2**: 3-4주 (Domain Layer)
-- **Phase 3**: 2-3주 (Application Layer)
-- **Phase 4**: 2-3주 (Integration & Testing)
+### 총 개발 기간: 6-10주 (기반 인프라 완료로 단축됨)
+- **Phase 1**: ✅ **완료됨** (기반 인프라 - 이미 구현됨)
+- **Phase 2**: 2-3주 (Domain Layer 구현)
+- **Phase 3**: 2-3주 (Application Layer 구현)
+- **Phase 4**: 1-2주 (Integration & Testing)
 - **Phase 5**: 1-2주 (모니터링 & 운영)
+
+### **현재 상황 요약**
+- ✅ **Phase 1 (기반 인프라)**: 95% 완료
+  - 핵심 CQRS 인터페이스 및 구현체 완료
+  - Redis Infrastructure 완료
+  - InMemory 구현체들 완료
+  - 테스트 커버리지 양호
+
+- 🔄 **다음 단계**: Phase 2 (Domain Layer) 즉시 시작 가능
+  - 기존 User 예제를 실제 도메인으로 확장
+  - Game Domain 기초 구현
+  - 실제 비즈니스 로직 적용
 
 ### 필요 리소스
 - **개발자**: 1명 (풀타임)

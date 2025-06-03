@@ -100,10 +100,10 @@ func TestNewBaseDomainEvent(t *testing.T) {
 	// Domain event specific fields
 	assert.Equal(t, DomainEvent, event.GetEventCategory())
 	assert.Equal(t, Normal, event.GetPriority())
-	assert.False(t, event.IsSystemEvent())
+	assert.Equal(t, UserIssuer, event.IssuerType()) // Default issuer type
 	assert.Empty(t, event.CausationID())
 	assert.Empty(t, event.CorrelationID())
-	assert.Empty(t, event.UserID())
+	assert.Empty(t, event.IssuerID())
 }
 
 func TestBaseDomainEvent_SetFields(t *testing.T) {
@@ -113,18 +113,18 @@ func TestBaseDomainEvent_SetFields(t *testing.T) {
 	// Act
 	event.SetCausationID("causation-123")
 	event.SetCorrelationID("correlation-456")
-	event.SetUserID("user-789")
+	event.SetIssuerID("issuer-789")
+	event.SetIssuerType(SystemIssuer)
 	event.SetCategory(SystemEvent)
 	event.SetPriority(High)
-	event.SetIsSystem(true)
 
 	// Assert
 	assert.Equal(t, "causation-123", event.CausationID())
 	assert.Equal(t, "correlation-456", event.CorrelationID())
-	assert.Equal(t, "user-789", event.UserID())
+	assert.Equal(t, "issuer-789", event.IssuerID())
+	assert.Equal(t, SystemIssuer, event.IssuerType())
 	assert.Equal(t, SystemEvent, event.GetEventCategory())
 	assert.Equal(t, High, event.GetPriority())
-	assert.True(t, event.IsSystemEvent())
 }
 
 func TestBaseDomainEvent_ValidateEvent(t *testing.T) {
@@ -242,6 +242,106 @@ func TestEventPriority_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.expected, func(t *testing.T) {
 			assert.Equal(t, tt.expected, tt.priority.String())
+		})
+	}
+}
+
+func TestIssuerType_String(t *testing.T) {
+	tests := []struct {
+		issuerType IssuerType
+		expected   string
+	}{
+		{UserIssuer, "user"},
+		{SystemIssuer, "system"},
+		{AdminIssuer, "admin"},
+		{ServiceIssuer, "service"},
+		{SchedulerIssuer, "scheduler"},
+		{IssuerType(999), "unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.expected, func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.issuerType.String())
+		})
+	}
+}
+
+func TestNewBaseDomainEventMessageWithIssuer(t *testing.T) {
+	// Arrange
+	eventType := "TestDomainEvent"
+	aggregateID := "test-id"
+	aggregateType := "TestAggregate"
+	version := 1
+	eventData := "test data"
+	issuerID := "system-engine"
+	issuerType := SystemIssuer
+
+	// Act
+	event := NewBaseDomainEventMessageWithIssuer(
+		eventType, aggregateID, aggregateType, version, eventData,
+		issuerID, issuerType,
+	)
+
+	// Assert
+	assert.NotNil(t, event)
+	assert.NotEmpty(t, event.EventID())
+	assert.Equal(t, eventType, event.EventType())
+	assert.Equal(t, aggregateID, event.AggregateID())
+	assert.Equal(t, aggregateType, event.AggregateType())
+	assert.Equal(t, version, event.Version())
+	assert.Equal(t, eventData, event.EventData())
+
+	// Domain event specific fields
+	assert.Equal(t, issuerID, event.IssuerID())
+	assert.Equal(t, issuerType, event.IssuerType())
+	assert.Equal(t, DomainEvent, event.GetEventCategory())
+	assert.Equal(t, Normal, event.GetPriority())
+}
+
+func TestBaseDomainEvent_IssuerTypes(t *testing.T) {
+	tests := []struct {
+		name       string
+		issuerType IssuerType
+		issuerID   string
+	}{
+		{
+			name:       "User issuer",
+			issuerType: UserIssuer,
+			issuerID:   "player123",
+		},
+		{
+			name:       "System issuer",
+			issuerType: SystemIssuer,
+			issuerID:   "game-engine",
+		},
+		{
+			name:       "Admin issuer",
+			issuerType: AdminIssuer,
+			issuerID:   "admin456",
+		},
+		{
+			name:       "Service issuer",
+			issuerType: ServiceIssuer,
+			issuerID:   "external-api",
+		},
+		{
+			name:       "Scheduler issuer",
+			issuerType: SchedulerIssuer,
+			issuerID:   "cron-job",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange & Act
+			event := NewBaseDomainEventMessageWithIssuer(
+				"TestEvent", "test-id", "TestAggregate", 1, "test data",
+				tt.issuerID, tt.issuerType,
+			)
+
+			// Assert
+			assert.Equal(t, tt.issuerID, event.IssuerID())
+			assert.Equal(t, tt.issuerType, event.IssuerType())
 		})
 	}
 }

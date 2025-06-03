@@ -38,6 +38,20 @@ func main() {
 	}
 
 	fmt.Println("\n✅ All examples completed successfully!")
+
+	// Run additional test scenarios
+	fmt.Println("\n🧪 Running Additional Test Scenarios...")
+	fmt.Println("======================================")
+
+	// Run extended features test
+	fmt.Println("\n📋 Extended Features Test:")
+	RunExtendedFeaturesTest()
+
+	// Run search features test
+	fmt.Println("\n🔍 Search Features Test:")
+	RunSearchFeaturesTest()
+
+	fmt.Println("\n🎉 All tests completed successfully!")
 }
 
 // runInMemoryExample demonstrates CQRS with InMemory implementations

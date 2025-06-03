@@ -100,21 +100,38 @@ func (e *BaseEventMessage) GetMetadata(key string) (interface{}, bool) {
 // BaseDomainEventMessage extends BaseEventMessage with DomainEventMessage features
 type BaseDomainEventMessage struct {
 	*BaseEventMessage
+	issuerID      string
+	issuerType    IssuerType
 	causationID   string
 	correlationID string
-	userID        string
 	category      EventCategory
 	priority      EventPriority
-	isSystem      bool
 }
 
 // NewBaseDomainEventMessage creates a new BaseDomainEventMessage
 func NewBaseDomainEventMessage(eventType, aggregateID, aggregateType string, version int, eventData interface{}) *BaseDomainEventMessage {
 	return &BaseDomainEventMessage{
 		BaseEventMessage: NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData),
+		issuerType:       UserIssuer, // Default to user issuer
 		category:         DomainEvent,
 		priority:         Normal,
-		isSystem:         false,
+	}
+}
+
+// NewBaseDomainEventMessageWithIssuer creates a new BaseDomainEventMessage with specific issuer
+func NewBaseDomainEventMessageWithIssuer(
+	eventType, aggregateID, aggregateType string,
+	version int,
+	eventData interface{},
+	issuerID string,
+	issuerType IssuerType,
+) *BaseDomainEventMessage {
+	return &BaseDomainEventMessage{
+		BaseEventMessage: NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData),
+		issuerID:         issuerID,
+		issuerType:       issuerType,
+		category:         DomainEvent,
+		priority:         Normal,
 	}
 }
 
@@ -128,12 +145,12 @@ func (e *BaseDomainEventMessage) CorrelationID() string {
 	return e.correlationID
 }
 
-func (e *BaseDomainEventMessage) UserID() string {
-	return e.userID
+func (e *BaseDomainEventMessage) IssuerID() string {
+	return e.issuerID
 }
 
-func (e *BaseDomainEventMessage) IsSystemEvent() bool {
-	return e.isSystem
+func (e *BaseDomainEventMessage) IssuerType() IssuerType {
+	return e.issuerType
 }
 
 func (e *BaseDomainEventMessage) GetEventCategory() EventCategory {
@@ -174,8 +191,12 @@ func (e *BaseDomainEventMessage) SetCorrelationID(correlationID string) {
 	e.correlationID = correlationID
 }
 
-func (e *BaseDomainEventMessage) SetUserID(userID string) {
-	e.userID = userID
+func (e *BaseDomainEventMessage) SetIssuerID(issuerID string) {
+	e.issuerID = issuerID
+}
+
+func (e *BaseDomainEventMessage) SetIssuerType(issuerType IssuerType) {
+	e.issuerType = issuerType
 }
 
 func (e *BaseDomainEventMessage) SetCategory(category EventCategory) {
@@ -184,8 +205,4 @@ func (e *BaseDomainEventMessage) SetCategory(category EventCategory) {
 
 func (e *BaseDomainEventMessage) SetPriority(priority EventPriority) {
 	e.priority = priority
-}
-
-func (e *BaseDomainEventMessage) SetIsSystem(isSystem bool) {
-	e.isSystem = isSystem
 }

@@ -46,8 +46,6 @@ func NewSearchUsersQuery() *SearchUsersQuery {
 		SortBy:    "created_at",
 		SortOrder: "desc",
 	}
-	// Set the user ID for the query context (who is making the query)
-	query.SetUserID("system") // or pass the actual user making the query
 	return query
 }
 
@@ -159,8 +157,7 @@ func NewGetUserByIDQuery(userID string) *GetUserByIDQuery {
 		),
 		TargetUserID: userID,
 	}
-	// Set the user ID for the query context (who is making the query)
-	query.SetUserID("system") // or pass the actual user making the query
+
 	return query
 }
 
@@ -207,8 +204,6 @@ func NewGetUsersByRoleQuery(role string) *GetUsersByRoleQuery {
 		SortBy:    "created_at",
 		SortOrder: "desc",
 	}
-	// Set the user ID for the query context (who is making the query)
-	query.SetUserID("system") // or pass the actual user making the query
 	return query
 }
 

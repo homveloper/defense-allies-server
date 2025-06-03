@@ -69,17 +69,47 @@ func (ep EventPriority) String() string {
 	}
 }
 
+// IssuerType represents the type of entity that issued the event
+type IssuerType int
+
+const (
+	UserIssuer      IssuerType = iota // Regular user/player
+	SystemIssuer                      // System/AI/Game engine
+	AdminIssuer                       // Administrator
+	ServiceIssuer                     // External service
+	SchedulerIssuer                   // Scheduler/Cron job
+)
+
+func (it IssuerType) String() string {
+	switch it {
+	case UserIssuer:
+		return "user"
+	case SystemIssuer:
+		return "system"
+	case AdminIssuer:
+		return "admin"
+	case ServiceIssuer:
+		return "service"
+	case SchedulerIssuer:
+		return "scheduler"
+	default:
+		return "unknown"
+	}
+}
+
 // DomainEventMessage extends EventMessage with Defense Allies specific features
 type DomainEventMessage interface {
 	EventMessage
 
+	// Event issuer information (improved from UserID)
+	IssuerID() string       // ID of the entity that issued this event
+	IssuerType() IssuerType // Type of the issuer (user, system, admin, etc.)
+
 	// Additional domain information
 	CausationID() string   // ID of the command that caused this event
 	CorrelationID() string // Correlation tracking ID
-	UserID() string        // User who triggered the event
 
 	// Event classification
-	IsSystemEvent() bool             // Whether this is a system event
 	GetEventCategory() EventCategory // Event category
 	GetPriority() EventPriority      // Event priority
 

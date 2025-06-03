@@ -14,7 +14,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func main() {
+// RunSearchFeaturesTest runs the search features test
+func RunSearchFeaturesTest() {
 	fmt.Println("🔍 Testing User Search and Filtering Features")
 	fmt.Println("==============================================")
 
