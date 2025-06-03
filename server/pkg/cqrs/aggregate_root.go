@@ -148,8 +148,9 @@ type EventSourcedAggregate interface {
 	//   - error: nil on success, error if event replay fails
 	LoadFromHistory(events []EventMessage) error
 
-	// ApplyEvent applies a single event to the aggregate state.
-	// This is used during event replay and should update the aggregate state
+	// ApplyEvent applies a single event to the aggregate state with error handling.
+	// This method is specifically designed for event replay scenarios where
+	// detailed error information is needed. It should update the aggregate state
 	// without tracking the event as a new change.
 	//
 	// Parameters:
@@ -157,6 +158,8 @@ type EventSourcedAggregate interface {
 	//
 	// Returns:
 	//   - error: nil on success, error if event application fails
+	//
+	// Note: This method should call Apply(event, false) internally for consistency
 	ApplyEvent(event EventMessage) error
 
 	// Snapshot support

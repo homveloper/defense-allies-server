@@ -53,10 +53,16 @@ func (a *BaseAggregate) IncrementVersion() {
 }
 
 func (a *BaseAggregate) Apply(event EventMessage, isNew bool) {
-	// Apply event to aggregate
+	// Note: This is a base implementation that handles common aggregate concerns.
+	// Domain-specific aggregates should override this method to apply business logic
+	// and then call this base implementation for infrastructure concerns.
+
+	// Track new events for persistence
 	if isNew {
 		a.TrackChange(event)
 	}
+
+	// Update version and timestamp for all event applications
 	a.IncrementVersion()
 }
 
@@ -70,6 +76,20 @@ func (a *BaseAggregate) GetChanges() []EventMessage {
 
 func (a *BaseAggregate) ClearChanges() {
 	a.changes = nil
+}
+
+// ApplyEvent applies an event during replay with error handling
+// This method implements EventSourcedAggregate interface
+func (a *BaseAggregate) ApplyEvent(event EventMessage) error {
+	// Validate event before applying
+	if event == nil {
+		return errors.New("event cannot be nil")
+	}
+
+	// Apply event without tracking as new change (replay scenario)
+	a.Apply(event, false)
+
+	return nil
 }
 
 // Defense Allies Aggregate interface implementation
