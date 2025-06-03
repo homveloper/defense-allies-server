@@ -25,11 +25,27 @@ type UserView struct {
 
 // NewUserView creates a new UserView
 func NewUserView(userID string) *UserView {
-	return &UserView{
-		BaseReadModel: cqrs.NewBaseReadModel(userID, "UserView", 0),
+	userView := &UserView{
+		BaseReadModel: cqrs.NewBaseReadModel(userID, "UserView", map[string]interface{}{}), // Initialize with empty map
 		UserID:        userID,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
+	}
+	return userView
+}
+
+// GetData returns the UserView data as a map for serialization
+func (uv *UserView) GetData() interface{} {
+	return map[string]interface{}{
+		"user_id":             uv.UserID,
+		"email":               uv.Email,
+		"name":                uv.Name,
+		"status":              uv.Status,
+		"created_at":          uv.CreatedAt,
+		"updated_at":          uv.UpdatedAt,
+		"last_login_at":       uv.LastLoginAt,
+		"deactivated_at":      uv.DeactivatedAt,
+		"deactivation_reason": uv.DeactivationReason,
 	}
 }
 
@@ -275,6 +291,7 @@ func (f *UserReadModelFactory) createUserView(id string, data interface{}) (*Use
 
 	// If data is a map, extract the fields
 	if dataMap, ok := data.(map[string]interface{}); ok {
+		// Extract fields from the map
 		if email, exists := dataMap["email"]; exists {
 			if emailStr, ok := email.(string); ok {
 				userView.Email = emailStr
@@ -290,8 +307,43 @@ func (f *UserReadModelFactory) createUserView(id string, data interface{}) (*Use
 				userView.Status = statusStr
 			}
 		}
-		// Add more field mappings as needed
-	}
 
+		// Handle time fields
+		if createdAt, exists := dataMap["created_at"]; exists {
+			if createdAtStr, ok := createdAt.(string); ok {
+				if parsedTime, err := time.Parse(time.RFC3339, createdAtStr); err == nil {
+					userView.CreatedAt = parsedTime
+				}
+			}
+		}
+		if updatedAt, exists := dataMap["updated_at"]; exists {
+			if updatedAtStr, ok := updatedAt.(string); ok {
+				if parsedTime, err := time.Parse(time.RFC3339, updatedAtStr); err == nil {
+					userView.UpdatedAt = parsedTime
+				}
+			}
+		}
+
+		// Handle optional time fields
+		if lastLoginAt, exists := dataMap["last_login_at"]; exists && lastLoginAt != nil {
+			if lastLoginAtStr, ok := lastLoginAt.(string); ok {
+				if parsedTime, err := time.Parse(time.RFC3339, lastLoginAtStr); err == nil {
+					userView.LastLoginAt = &parsedTime
+				}
+			}
+		}
+		if deactivatedAt, exists := dataMap["deactivated_at"]; exists && deactivatedAt != nil {
+			if deactivatedAtStr, ok := deactivatedAt.(string); ok {
+				if parsedTime, err := time.Parse(time.RFC3339, deactivatedAtStr); err == nil {
+					userView.DeactivatedAt = &parsedTime
+				}
+			}
+		}
+		if deactivationReason, exists := dataMap["deactivation_reason"]; exists {
+			if reasonStr, ok := deactivationReason.(string); ok {
+				userView.DeactivationReason = reasonStr
+			}
+		}
+	}
 	return userView, nil
 }
