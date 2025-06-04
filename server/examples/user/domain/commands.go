@@ -27,8 +27,9 @@ const (
 // CreateUserCommand represents a command to create a new user
 type CreateUserCommand struct {
 	*cqrs.BaseCommand
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	UserId string `json:"user_id"`
+	Email  string `json:"email"`
+	Name   string `json:"name"`
 }
 
 // NewCreateUserCommand creates a new CreateUserCommand
