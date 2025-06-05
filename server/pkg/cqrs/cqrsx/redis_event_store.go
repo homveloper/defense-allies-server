@@ -1,7 +1,8 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -19,8 +20,8 @@ type RedisEventStore struct {
 
 // EventSerializer interface for event serialization
 type EventSerializer interface {
-	Serialize(event EventMessage) ([]byte, error)
-	Deserialize(data []byte) (EventMessage, error)
+	Serialize(event cqrs.EventMessage) ([]byte, error)
+	Deserialize(data []byte) (cqrs.EventMessage, error)
 }
 
 // JSONEventSerializer implements JSON-based event serialization
@@ -48,13 +49,13 @@ func NewRedisEventStore(client *RedisClientManager, keyPrefix string) *RedisEven
 }
 
 // SaveEvents saves events to Redis
-func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, events []EventMessage, expectedVersion int) error {
+func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, events []cqrs.EventMessage, expectedVersion int) error {
 	if len(events) == 0 {
 		return nil
 	}
 
 	if aggregateID == "" {
-		return NewCQRSError(ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
 
 	// Get aggregate type from first event
@@ -71,24 +72,24 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 		// Execute pipeline to get current version
 		_, err := pipe.Exec(ctx)
 		if err != nil && err != redis.Nil {
-			return NewCQRSError(ErrCodeEventStoreError.String(), "failed to get current version", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "failed to get current version", err)
 		}
 
 		// Verify expected version
 		if currentVersionCmd.Val() != "" {
 			currentVersion, err := strconv.Atoi(currentVersionCmd.Val())
 			if err != nil {
-				return NewCQRSError(ErrCodeEventStoreError.String(), "invalid current version", err)
+				return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "invalid current version", err)
 			}
 			if currentVersion != expectedVersion {
-				return NewCQRSError(ErrCodeConcurrencyConflict.String(),
+				return cqrs.NewCQRSError(cqrs.ErrCodeConcurrencyConflict.String(),
 					fmt.Sprintf("expected version %d, but current version is %d", expectedVersion, currentVersion),
-					ErrConcurrencyConflict)
+					cqrs.ErrConcurrencyConflict)
 			}
 		} else if expectedVersion != 0 {
-			return NewCQRSError(ErrCodeConcurrencyConflict.String(),
+			return cqrs.NewCQRSError(cqrs.ErrCodeConcurrencyConflict.String(),
 				fmt.Sprintf("expected version %d, but aggregate does not exist", expectedVersion),
-				ErrConcurrencyConflict)
+				cqrs.ErrConcurrencyConflict)
 		}
 
 		// Create new pipeline for saving events
@@ -98,7 +99,7 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 		for _, event := range events {
 			eventData, err := es.serializer.Serialize(event)
 			if err != nil {
-				return NewCQRSError(ErrCodeSerializationError.String(), "failed to serialize event", err)
+				return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to serialize event", err)
 			}
 
 			// Add event to list
@@ -119,7 +120,7 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 		// Execute pipeline
 		_, err = pipe.Exec(ctx)
 		if err != nil {
-			return NewCQRSError(ErrCodeEventStoreError.String(), "failed to save events", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "failed to save events", err)
 		}
 
 		return nil
@@ -127,17 +128,17 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 }
 
 // GetEventHistory retrieves event history for an aggregate
-func (es *RedisEventStore) GetEventHistory(ctx context.Context, aggregateID string, aggregateType string, fromVersion int) ([]EventMessage, error) {
+func (es *RedisEventStore) GetEventHistory(ctx context.Context, aggregateID string, aggregateType string, fromVersion int) ([]cqrs.EventMessage, error) {
 	if aggregateID == "" {
-		return nil, NewCQRSError(ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
 	if aggregateType == "" {
-		return nil, NewCQRSError(ErrCodeEventStoreError.String(), "aggregate type cannot be empty", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate type cannot be empty", nil)
 	}
 
 	eventKey := es.keyBuilder.EventKey(aggregateType, aggregateID)
 
-	var events []EventMessage
+	var events []cqrs.EventMessage
 
 	err := es.client.ExecuteCommand(ctx, func() error {
 		// Get all events from Redis list
@@ -146,14 +147,14 @@ func (es *RedisEventStore) GetEventHistory(ctx context.Context, aggregateID stri
 			if err == redis.Nil {
 				return nil // No events found
 			}
-			return NewCQRSError(ErrCodeEventStoreError.String(), "failed to get events", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "failed to get events", err)
 		}
 
 		// Deserialize events
 		for _, data := range eventData {
 			event, err := es.serializer.Deserialize([]byte(data))
 			if err != nil {
-				return NewCQRSError(ErrCodeSerializationError.String(), "failed to deserialize event", err)
+				return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to deserialize event", err)
 			}
 
 			// Filter by version if specified
@@ -177,10 +178,10 @@ func (es *RedisEventStore) GetEventHistory(ctx context.Context, aggregateID stri
 // GetLastEventVersion gets the last event version for an aggregate
 func (es *RedisEventStore) GetLastEventVersion(ctx context.Context, aggregateID string, aggregateType string) (int, error) {
 	if aggregateID == "" {
-		return 0, NewCQRSError(ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
+		return 0, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
 	if aggregateType == "" {
-		return 0, NewCQRSError(ErrCodeEventStoreError.String(), "aggregate type cannot be empty", nil)
+		return 0, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate type cannot be empty", nil)
 	}
 
 	metadataKey := es.keyBuilder.MetadataKey(aggregateType, aggregateID)
@@ -194,12 +195,12 @@ func (es *RedisEventStore) GetLastEventVersion(ctx context.Context, aggregateID 
 				version = 0
 				return nil
 			}
-			return NewCQRSError(ErrCodeEventStoreError.String(), "failed to get version", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "failed to get version", err)
 		}
 
 		version, err = strconv.Atoi(versionStr)
 		if err != nil {
-			return NewCQRSError(ErrCodeEventStoreError.String(), "invalid version format", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "invalid version format", err)
 		}
 
 		return nil
@@ -215,10 +216,10 @@ func (es *RedisEventStore) GetLastEventVersion(ctx context.Context, aggregateID 
 // CompactEvents removes old events before a specific version
 func (es *RedisEventStore) CompactEvents(ctx context.Context, aggregateID string, aggregateType string, beforeVersion int) error {
 	if aggregateID == "" {
-		return NewCQRSError(ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
 	if aggregateType == "" {
-		return NewCQRSError(ErrCodeEventStoreError.String(), "aggregate type cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate type cannot be empty", nil)
 	}
 
 	eventKey := es.keyBuilder.EventKey(aggregateType, aggregateID)
@@ -227,7 +228,7 @@ func (es *RedisEventStore) CompactEvents(ctx context.Context, aggregateID string
 		// Get all events
 		eventData, err := es.client.GetClient().LRange(ctx, eventKey, 0, -1).Result()
 		if err != nil {
-			return NewCQRSError(ErrCodeEventStoreError.String(), "failed to get events for compaction", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "failed to get events for compaction", err)
 		}
 
 		// Find events to keep
@@ -257,7 +258,7 @@ func (es *RedisEventStore) CompactEvents(ctx context.Context, aggregateID string
 
 		_, err = pipe.Exec(ctx)
 		if err != nil {
-			return NewCQRSError(ErrCodeEventStoreError.String(), "failed to compact events", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "failed to compact events", err)
 		}
 
 		return nil
@@ -266,7 +267,7 @@ func (es *RedisEventStore) CompactEvents(ctx context.Context, aggregateID string
 
 // JSONEventSerializer implementation
 
-func (s *JSONEventSerializer) Serialize(event EventMessage) ([]byte, error) {
+func (s *JSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error) {
 	eventData := EventData{
 		EventID:       event.EventID(),
 		EventType:     event.EventType(),
@@ -281,13 +282,13 @@ func (s *JSONEventSerializer) Serialize(event EventMessage) ([]byte, error) {
 	return json.Marshal(eventData)
 }
 
-func (s *JSONEventSerializer) Deserialize(data []byte) (EventMessage, error) {
+func (s *JSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error) {
 	var eventData EventData
 	if err := json.Unmarshal(data, &eventData); err != nil {
 		return nil, err
 	}
 
-	event := NewBaseEventMessage(
+	event := cqrs.NewBaseEventMessage(
 		eventData.EventType,
 		eventData.AggregateID,
 		eventData.AggregateType,

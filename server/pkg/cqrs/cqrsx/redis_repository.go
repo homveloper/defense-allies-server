@@ -1,14 +1,15 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"fmt"
 )
 
 // RedisEventSourcedRepository implements EventSourcedRepository using Redis
 type RedisEventSourcedRepository struct {
 	eventStore    *RedisEventStore
-	snapshotStore SnapshotStore
+	snapshotStore cqrs.SnapshotStore
 	aggregateType string
 }
 
@@ -22,12 +23,12 @@ type RedisStateBasedRepository struct {
 type RedisHybridRepository struct {
 	eventStore    *RedisEventStore
 	stateStore    *RedisStateStore
-	snapshotStore SnapshotStore
+	snapshotStore cqrs.SnapshotStore
 	aggregateType string
 }
 
 // NewRedisEventSourcedRepository creates a new Redis event sourced repository
-func NewRedisEventSourcedRepository(eventStore *RedisEventStore, snapshotStore SnapshotStore, aggregateType string) *RedisEventSourcedRepository {
+func NewRedisEventSourcedRepository(eventStore *RedisEventStore, snapshotStore cqrs.SnapshotStore, aggregateType string) *RedisEventSourcedRepository {
 	return &RedisEventSourcedRepository{
 		eventStore:    eventStore,
 		snapshotStore: snapshotStore,
@@ -44,7 +45,7 @@ func NewRedisStateBasedRepository(stateStore *RedisStateStore, aggregateType str
 }
 
 // NewRedisHybridRepository creates a new Redis hybrid repository
-func NewRedisHybridRepository(eventStore *RedisEventStore, stateStore *RedisStateStore, snapshotStore SnapshotStore, aggregateType string) *RedisHybridRepository {
+func NewRedisHybridRepository(eventStore *RedisEventStore, stateStore *RedisStateStore, snapshotStore cqrs.SnapshotStore, aggregateType string) *RedisHybridRepository {
 	return &RedisHybridRepository{
 		eventStore:    eventStore,
 		stateStore:    stateStore,
@@ -55,9 +56,9 @@ func NewRedisHybridRepository(eventStore *RedisEventStore, stateStore *RedisStat
 
 // RedisEventSourcedRepository implementation
 
-func (r *RedisEventSourcedRepository) Save(ctx context.Context, aggregate AggregateRoot, expectedVersion int) error {
+func (r *RedisEventSourcedRepository) Save(ctx context.Context, aggregate cqrs.AggregateRoot, expectedVersion int) error {
 	if aggregate.AggregateType() != r.aggregateType {
-		return NewCQRSError(ErrCodeRepositoryError.String(),
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(),
 			fmt.Sprintf("aggregate type mismatch: expected %s, got %s", r.aggregateType, aggregate.AggregateType()), nil)
 	}
 
@@ -79,16 +80,16 @@ func (r *RedisEventSourcedRepository) Save(ctx context.Context, aggregate Aggreg
 	return nil
 }
 
-func (r *RedisEventSourcedRepository) GetByID(ctx context.Context, id string) (AggregateRoot, error) {
+func (r *RedisEventSourcedRepository) GetByID(ctx context.Context, id string) (cqrs.AggregateRoot, error) {
 	// Try to load from snapshot first
-	var aggregate AggregateRoot
+	var aggregate cqrs.AggregateRoot
 	var fromVersion int = 0
 
 	if r.snapshotStore != nil {
 		snapshot, err := r.snapshotStore.Load(ctx, id)
 		if err == nil && snapshot != nil {
 			// Create aggregate from snapshot
-			aggregate = NewBaseAggregate(id, r.aggregateType)
+			aggregate = cqrs.NewBaseAggregate(id, r.aggregateType)
 			// Note: In real implementation, you'd need to restore aggregate state from snapshot
 			fromVersion = snapshot.Version() + 1
 		}
@@ -96,7 +97,7 @@ func (r *RedisEventSourcedRepository) GetByID(ctx context.Context, id string) (A
 
 	// If no snapshot, create new aggregate
 	if aggregate == nil {
-		aggregate = NewBaseAggregate(id, r.aggregateType)
+		aggregate = cqrs.NewBaseAggregate(id, r.aggregateType)
 	}
 
 	// Load events from event store
@@ -127,36 +128,36 @@ func (r *RedisEventSourcedRepository) Exists(ctx context.Context, id string) boo
 
 // EventSourcedRepository specific methods
 
-func (r *RedisEventSourcedRepository) SaveEvents(ctx context.Context, aggregateID string, events []EventMessage, expectedVersion int) error {
+func (r *RedisEventSourcedRepository) SaveEvents(ctx context.Context, aggregateID string, events []cqrs.EventMessage, expectedVersion int) error {
 	return r.eventStore.SaveEvents(ctx, aggregateID, events, expectedVersion)
 }
 
-func (r *RedisEventSourcedRepository) GetEventHistory(ctx context.Context, aggregateID string, fromVersion int) ([]EventMessage, error) {
+func (r *RedisEventSourcedRepository) GetEventHistory(ctx context.Context, aggregateID string, fromVersion int) ([]cqrs.EventMessage, error) {
 	return r.eventStore.GetEventHistory(ctx, aggregateID, r.aggregateType, fromVersion)
 }
 
-func (r *RedisEventSourcedRepository) GetEventStream(ctx context.Context, aggregateID string) (<-chan EventMessage, error) {
+func (r *RedisEventSourcedRepository) GetEventStream(ctx context.Context, aggregateID string) (<-chan cqrs.EventMessage, error) {
 	// Note: This would require Redis Streams implementation
-	return nil, NewCQRSError(ErrCodeRepositoryError.String(), "event streaming not implemented yet", nil)
+	return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "event streaming not implemented yet", nil)
 }
 
-func (r *RedisEventSourcedRepository) SaveSnapshot(ctx context.Context, snapshot SnapshotData) error {
+func (r *RedisEventSourcedRepository) SaveSnapshot(ctx context.Context, snapshot cqrs.SnapshotData) error {
 	if r.snapshotStore == nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "snapshot store not configured", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "snapshot store not configured", nil)
 	}
 	return r.snapshotStore.Save(ctx, snapshot)
 }
 
-func (r *RedisEventSourcedRepository) GetSnapshot(ctx context.Context, aggregateID string) (SnapshotData, error) {
+func (r *RedisEventSourcedRepository) GetSnapshot(ctx context.Context, aggregateID string) (cqrs.SnapshotData, error) {
 	if r.snapshotStore == nil {
-		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "snapshot store not configured", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "snapshot store not configured", nil)
 	}
 	return r.snapshotStore.Load(ctx, aggregateID)
 }
 
 func (r *RedisEventSourcedRepository) DeleteSnapshot(ctx context.Context, aggregateID string) error {
 	if r.snapshotStore == nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "snapshot store not configured", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "snapshot store not configured", nil)
 	}
 	return r.snapshotStore.Delete(ctx, aggregateID)
 }
@@ -171,11 +172,11 @@ func (r *RedisEventSourcedRepository) CompactEvents(ctx context.Context, aggrega
 
 // RedisStateBasedRepository implementation
 
-func (r *RedisStateBasedRepository) Save(ctx context.Context, aggregate AggregateRoot, expectedVersion int) error {
+func (r *RedisStateBasedRepository) Save(ctx context.Context, aggregate cqrs.AggregateRoot, expectedVersion int) error {
 	return r.stateStore.Save(ctx, aggregate, expectedVersion)
 }
 
-func (r *RedisStateBasedRepository) GetByID(ctx context.Context, id string) (AggregateRoot, error) {
+func (r *RedisStateBasedRepository) GetByID(ctx context.Context, id string) (cqrs.AggregateRoot, error) {
 	return r.stateStore.GetByID(ctx, r.aggregateType, id)
 }
 
@@ -189,11 +190,11 @@ func (r *RedisStateBasedRepository) Exists(ctx context.Context, id string) bool 
 
 // StateBasedRepository specific methods
 
-func (r *RedisStateBasedRepository) Create(ctx context.Context, aggregate AggregateRoot) error {
+func (r *RedisStateBasedRepository) Create(ctx context.Context, aggregate cqrs.AggregateRoot) error {
 	return r.Save(ctx, aggregate, 0) // Expected version 0 for new aggregates
 }
 
-func (r *RedisStateBasedRepository) Update(ctx context.Context, aggregate AggregateRoot) error {
+func (r *RedisStateBasedRepository) Update(ctx context.Context, aggregate cqrs.AggregateRoot) error {
 	return r.Save(ctx, aggregate, aggregate.OriginalVersion())
 }
 
@@ -201,22 +202,22 @@ func (r *RedisStateBasedRepository) Delete(ctx context.Context, id string) error
 	return r.stateStore.Delete(ctx, r.aggregateType, id)
 }
 
-func (r *RedisStateBasedRepository) FindBy(ctx context.Context, criteria QueryCriteria) ([]AggregateRoot, error) {
+func (r *RedisStateBasedRepository) FindBy(ctx context.Context, criteria cqrs.QueryCriteria) ([]cqrs.AggregateRoot, error) {
 	// Note: This would require implementing query functionality in Redis
-	return nil, NewCQRSError(ErrCodeRepositoryError.String(), "query functionality not implemented yet", nil)
+	return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "query functionality not implemented yet", nil)
 }
 
-func (r *RedisStateBasedRepository) Count(ctx context.Context, criteria QueryCriteria) (int64, error) {
+func (r *RedisStateBasedRepository) Count(ctx context.Context, criteria cqrs.QueryCriteria) (int64, error) {
 	// Note: This would require implementing query functionality in Redis
-	return 0, NewCQRSError(ErrCodeRepositoryError.String(), "query functionality not implemented yet", nil)
+	return 0, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "query functionality not implemented yet", nil)
 }
 
-func (r *RedisStateBasedRepository) SaveBatch(ctx context.Context, aggregates []AggregateRoot) error {
+func (r *RedisStateBasedRepository) SaveBatch(ctx context.Context, aggregates []cqrs.AggregateRoot) error {
 	// Note: This would require implementing batch operations
-	return NewCQRSError(ErrCodeRepositoryError.String(), "batch operations not implemented yet", nil)
+	return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "batch operations not implemented yet", nil)
 }
 
 func (r *RedisStateBasedRepository) DeleteBatch(ctx context.Context, ids []string) error {
 	// Note: This would require implementing batch operations
-	return NewCQRSError(ErrCodeRepositoryError.String(), "batch operations not implemented yet", nil)
+	return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "batch operations not implemented yet", nil)
 }

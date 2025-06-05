@@ -5,17 +5,18 @@ import (
 
 	"defense-allies-server/examples/user/domain"
 	"defense-allies-server/pkg/cqrs"
+	"defense-allies-server/pkg/cqrs/cqrsx"
 
 	"github.com/pkg/errors"
 )
 
 // UserRedisRepository implements Repository interface for User aggregates using Redis
 type UserRedisRepository struct {
-	stateStore *cqrs.RedisStateStore
+	stateStore *cqrsx.RedisStateStore
 }
 
 // NewUserRedisRepository creates a new UserRedisRepository
-func NewUserRedisRepository(stateStore *cqrs.RedisStateStore) *UserRedisRepository {
+func NewUserRedisRepository(stateStore *cqrsx.RedisStateStore) *UserRedisRepository {
 	return &UserRedisRepository{
 		stateStore: stateStore,
 	}

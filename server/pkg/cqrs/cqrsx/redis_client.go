@@ -1,7 +1,8 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"fmt"
 	"time"
 
@@ -11,24 +12,24 @@ import (
 // RedisClientManager manages Redis connections for CQRS infrastructure
 type RedisClientManager struct {
 	client  *redis.Client
-	config  *RedisConfig
+	config  *cqrs.RedisConfig
 	metrics *RedisMetrics
 }
 
 // RedisMetrics represents Redis performance metrics
 type RedisMetrics struct {
-	ConnectionCount   int64
-	CommandCount      int64
-	ErrorCount        int64
-	AverageLatency    time.Duration
-	LastCommandTime   time.Time
-	PoolStats         *redis.PoolStats
+	ConnectionCount int64
+	CommandCount    int64
+	ErrorCount      int64
+	AverageLatency  time.Duration
+	LastCommandTime time.Time
+	PoolStats       *redis.PoolStats
 }
 
 // NewRedisClientManager creates a new Redis client manager
-func NewRedisClientManager(config *RedisConfig) (*RedisClientManager, error) {
+func NewRedisClientManager(config *cqrs.RedisConfig) (*RedisClientManager, error) {
 	if config == nil {
-		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "Redis config cannot be nil", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis config cannot be nil", nil)
 	}
 
 	if err := validateRedisConfig(config); err != nil {
@@ -68,22 +69,22 @@ func (rm *RedisClientManager) GetClient() *redis.Client {
 }
 
 // GetConfig returns the Redis configuration
-func (rm *RedisClientManager) GetConfig() *RedisConfig {
+func (rm *RedisClientManager) GetConfig() *cqrs.RedisConfig {
 	return rm.config
 }
 
 // Ping tests the Redis connection
 func (rm *RedisClientManager) Ping(ctx context.Context) error {
 	start := time.Now()
-	
+
 	err := rm.client.Ping(ctx).Err()
-	
+
 	rm.updateMetrics(time.Since(start), err)
-	
+
 	if err != nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "Redis ping failed", err)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis ping failed", err)
 	}
-	
+
 	return nil
 }
 
@@ -116,11 +117,11 @@ func (rm *RedisClientManager) GetMetrics() *RedisMetrics {
 // ExecuteCommand executes a Redis command with metrics tracking
 func (rm *RedisClientManager) ExecuteCommand(ctx context.Context, cmd func() error) error {
 	start := time.Now()
-	
+
 	err := cmd()
-	
+
 	rm.updateMetrics(time.Since(start), err)
-	
+
 	return err
 }
 
@@ -129,11 +130,11 @@ func (rm *RedisClientManager) ExecuteCommand(ctx context.Context, cmd func() err
 func (rm *RedisClientManager) updateMetrics(latency time.Duration, err error) {
 	rm.metrics.CommandCount++
 	rm.metrics.LastCommandTime = time.Now()
-	
+
 	if err != nil {
 		rm.metrics.ErrorCount++
 	}
-	
+
 	// Update average latency
 	if rm.metrics.CommandCount == 1 {
 		rm.metrics.AverageLatency = latency
@@ -142,39 +143,39 @@ func (rm *RedisClientManager) updateMetrics(latency time.Duration, err error) {
 	}
 }
 
-func validateRedisConfig(config *RedisConfig) error {
+func validateRedisConfig(config *cqrs.RedisConfig) error {
 	if config.Host == "" {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "Redis host cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis host cannot be empty", nil)
 	}
-	
+
 	if config.Port <= 0 || config.Port > 65535 {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "Redis port must be between 1 and 65535", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis port must be between 1 and 65535", nil)
 	}
-	
+
 	if config.Database < 0 || config.Database > 15 {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "Redis database must be between 0 and 15", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis database must be between 0 and 15", nil)
 	}
-	
+
 	if config.PoolSize <= 0 {
 		config.PoolSize = 10 // Default pool size
 	}
-	
+
 	if config.MaxRetries < 0 {
 		config.MaxRetries = 3 // Default max retries
 	}
-	
+
 	if config.DialTimeout <= 0 {
 		config.DialTimeout = 5 * time.Second // Default dial timeout
 	}
-	
+
 	if config.ReadTimeout <= 0 {
 		config.ReadTimeout = 3 * time.Second // Default read timeout
 	}
-	
+
 	if config.WriteTimeout <= 0 {
 		config.WriteTimeout = 3 * time.Second // Default write timeout
 	}
-	
+
 	return nil
 }
 

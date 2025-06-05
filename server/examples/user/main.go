@@ -10,6 +10,7 @@ import (
 	"defense-allies-server/examples/user/handlers"
 	"defense-allies-server/examples/user/projections"
 	"defense-allies-server/pkg/cqrs"
+	"defense-allies-server/pkg/cqrs/cqrsx"
 
 	"github.com/google/uuid"
 
@@ -113,7 +114,7 @@ func runRedisExample(ctx context.Context) error {
 		Database: 0,
 	}
 
-	client, err := cqrs.NewRedisClientManager(config)
+	client, err := cqrsx.NewRedisClientManager(config)
 	if err != nil {
 		return fmt.Errorf("failed to create Redis client: %w", err)
 	}
@@ -125,12 +126,12 @@ func runRedisExample(ctx context.Context) error {
 	}
 
 	// Create Redis-based implementations
-	stateStore := cqrs.NewRedisStateStore(client, "user_example")
+	stateStore := cqrsx.NewRedisStateStore(client, "user_example")
 
 	// Create factory and serializer for UserView read models
 	factory := projections.NewUserReadModelFactory()
-	serializer := cqrs.NewJSONReadModelSerializer(factory)
-	readStore := cqrs.NewRedisReadStore(client, "user_example", serializer)
+	serializer := cqrsx.NewJSONReadModelSerializer(factory)
+	readStore := cqrsx.NewRedisReadStore(client, "user_example", serializer)
 
 	// Create User-specific repository
 	repository := &UserRedisRepository{stateStore: stateStore}
@@ -535,7 +536,7 @@ func (h *ProjectionEventHandler) GetHandlerType() cqrs.HandlerType {
 
 // UserRedisRepository implements Repository interface for User aggregates using Redis
 type UserRedisRepository struct {
-	stateStore *cqrs.RedisStateStore
+	stateStore *cqrsx.RedisStateStore
 }
 
 // Save saves a User aggregate

@@ -1,7 +1,8 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"testing"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 
 func TestNewRedisClientManager(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host:         "localhost",
 		Port:         6379,
 		Database:     0,
@@ -48,12 +49,12 @@ func TestNewRedisClientManager_NilConfig(t *testing.T) {
 func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 	tests := []struct {
 		name   string
-		config *RedisConfig
+		config *cqrs.RedisConfig
 		errMsg string
 	}{
 		{
 			name: "Empty host",
-			config: &RedisConfig{
+			config: &cqrs.RedisConfig{
 				Host: "",
 				Port: 6379,
 			},
@@ -61,7 +62,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid port - zero",
-			config: &RedisConfig{
+			config: &cqrs.RedisConfig{
 				Host: "localhost",
 				Port: 0,
 			},
@@ -69,7 +70,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid port - too high",
-			config: &RedisConfig{
+			config: &cqrs.RedisConfig{
 				Host: "localhost",
 				Port: 70000,
 			},
@@ -77,7 +78,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid database - negative",
-			config: &RedisConfig{
+			config: &cqrs.RedisConfig{
 				Host:     "localhost",
 				Port:     6379,
 				Database: -1,
@@ -86,7 +87,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid database - too high",
-			config: &RedisConfig{
+			config: &cqrs.RedisConfig{
 				Host:     "localhost",
 				Port:     6379,
 				Database: 16,
@@ -110,7 +111,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 
 func TestRedisClientManager_ConfigDefaults(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 		// Other fields left empty to test defaults
@@ -137,7 +138,7 @@ func TestRedisClientManager_ConfigDefaults(t *testing.T) {
 
 func TestRedisClientManager_GetMetrics(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -157,7 +158,7 @@ func TestRedisClientManager_GetMetrics(t *testing.T) {
 
 func TestRedisClientManager_ExecuteCommand(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -180,7 +181,7 @@ func TestRedisClientManager_ExecuteCommand(t *testing.T) {
 
 func TestRedisClientManager_ExecuteCommand_WithError(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -188,7 +189,7 @@ func TestRedisClientManager_ExecuteCommand_WithError(t *testing.T) {
 	assert.NoError(t, err)
 	defer manager.Close()
 
-	expectedError := NewCQRSError(ErrCodeRepositoryError.String(), "test error", nil)
+	expectedError := cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "test error", nil)
 
 	// Act
 	err = manager.ExecuteCommand(context.Background(), func() error {

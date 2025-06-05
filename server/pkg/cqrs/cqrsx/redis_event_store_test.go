@@ -1,7 +1,8 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"testing"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 func TestJSONEventSerializer_Serialize(t *testing.T) {
 	// Arrange
 	serializer := &JSONEventSerializer{}
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := cqrs.NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
 	event.AddMetadata("key1", "value1")
 
 	// Act
@@ -25,7 +26,7 @@ func TestJSONEventSerializer_Serialize(t *testing.T) {
 func TestJSONEventSerializer_Deserialize(t *testing.T) {
 	// Arrange
 	serializer := &JSONEventSerializer{}
-	originalEvent := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	originalEvent := cqrs.NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
 	originalEvent.AddMetadata("key1", "value1")
 
 	// Serialize first
@@ -52,7 +53,7 @@ func TestJSONEventSerializer_Deserialize(t *testing.T) {
 func TestJSONEventSerializer_SerializeDeserialize_RoundTrip(t *testing.T) {
 	// Arrange
 	serializer := &JSONEventSerializer{}
-	originalEvent := NewBaseEventMessage("UserCreated", "user-123", "User", 1, map[string]interface{}{
+	originalEvent := cqrs.NewBaseEventMessage("UserCreated", "user-123", "User", 1, map[string]interface{}{
 		"name":  "John Doe",
 		"email": "john@example.com",
 	})
@@ -101,7 +102,7 @@ func TestJSONEventSerializer_Deserialize_InvalidJSON(t *testing.T) {
 
 func TestNewRedisEventStore(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -129,7 +130,7 @@ func TestNewRedisEventStore(t *testing.T) {
 
 func TestRedisEventStore_SaveEvents_EmptyEvents(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -140,7 +141,7 @@ func TestRedisEventStore_SaveEvents_EmptyEvents(t *testing.T) {
 	eventStore := NewRedisEventStore(client, "test")
 
 	// Act
-	err = eventStore.SaveEvents(context.Background(), "test-id", []EventMessage{}, 0)
+	err = eventStore.SaveEvents(context.Background(), "test-id", []cqrs.EventMessage{}, 0)
 
 	// Assert
 	assert.NoError(t, err) // Should not error for empty events
@@ -148,7 +149,7 @@ func TestRedisEventStore_SaveEvents_EmptyEvents(t *testing.T) {
 
 func TestRedisEventStore_SaveEvents_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -157,10 +158,10 @@ func TestRedisEventStore_SaveEvents_EmptyAggregateID(t *testing.T) {
 	defer client.Close()
 
 	eventStore := NewRedisEventStore(client, "test")
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := cqrs.NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
 
 	// Act
-	err = eventStore.SaveEvents(context.Background(), "", []EventMessage{event}, 0)
+	err = eventStore.SaveEvents(context.Background(), "", []cqrs.EventMessage{event}, 0)
 
 	// Assert
 	assert.Error(t, err)
@@ -169,7 +170,7 @@ func TestRedisEventStore_SaveEvents_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_GetEventHistory_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -190,7 +191,7 @@ func TestRedisEventStore_GetEventHistory_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_GetEventHistory_EmptyAggregateType(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -211,7 +212,7 @@ func TestRedisEventStore_GetEventHistory_EmptyAggregateType(t *testing.T) {
 
 func TestRedisEventStore_GetLastEventVersion_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -232,7 +233,7 @@ func TestRedisEventStore_GetLastEventVersion_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_GetLastEventVersion_EmptyAggregateType(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -253,7 +254,7 @@ func TestRedisEventStore_GetLastEventVersion_EmptyAggregateType(t *testing.T) {
 
 func TestRedisEventStore_CompactEvents_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -273,7 +274,7 @@ func TestRedisEventStore_CompactEvents_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_CompactEvents_EmptyAggregateType(t *testing.T) {
 	// Arrange
-	config := &RedisConfig{
+	config := &cqrs.RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}

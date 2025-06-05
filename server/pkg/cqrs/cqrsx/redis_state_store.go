@@ -1,7 +1,8 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -18,8 +19,8 @@ type RedisStateStore struct {
 
 // StateSerializer interface for aggregate state serialization
 type StateSerializer interface {
-	SerializeAggregate(aggregate AggregateRoot) ([]byte, error)
-	DeserializeAggregate(data []byte, aggregateType string) (AggregateRoot, error)
+	SerializeAggregate(aggregate cqrs.AggregateRoot) ([]byte, error)
+	DeserializeAggregate(data []byte, aggregateType string) (cqrs.AggregateRoot, error)
 }
 
 // JSONStateSerializer implements JSON-based state serialization
@@ -48,13 +49,13 @@ func NewRedisStateStore(client *RedisClientManager, keyPrefix string) *RedisStat
 }
 
 // Save saves an aggregate to Redis
-func (ss *RedisStateStore) Save(ctx context.Context, aggregate AggregateRoot, expectedVersion int) error {
+func (ss *RedisStateStore) Save(ctx context.Context, aggregate cqrs.AggregateRoot, expectedVersion int) error {
 	if aggregate == nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate cannot be nil", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate cannot be nil", nil)
 	}
 
 	if err := aggregate.Validate(); err != nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate validation failed", err)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate validation failed", err)
 	}
 
 	aggregateKey := ss.keyBuilder.AggregateKey(aggregate.AggregateType(), aggregate.AggregateID())
@@ -67,7 +68,7 @@ func (ss *RedisStateStore) Save(ctx context.Context, aggregate AggregateRoot, ex
 			return err
 		}
 		if !lockAcquired {
-			return NewCQRSError(ErrCodeConcurrencyConflict.String(), "failed to acquire lock", nil)
+			return cqrs.NewCQRSError(cqrs.ErrCodeConcurrencyConflict.String(), "failed to acquire lock", nil)
 		}
 
 		defer ss.releaseLock(ctx, lockKey)
@@ -79,21 +80,21 @@ func (ss *RedisStateStore) Save(ctx context.Context, aggregate AggregateRoot, ex
 		}
 
 		if currentVersion != expectedVersion {
-			return NewCQRSError(ErrCodeConcurrencyConflict.String(),
+			return cqrs.NewCQRSError(cqrs.ErrCodeConcurrencyConflict.String(),
 				fmt.Sprintf("expected version %d, but current version is %d", expectedVersion, currentVersion),
-				ErrConcurrencyConflict)
+				cqrs.ErrConcurrencyConflict)
 		}
 
 		// Serialize aggregate
 		data, err := ss.serializer.SerializeAggregate(aggregate)
 		if err != nil {
-			return NewCQRSError(ErrCodeSerializationError.String(), "failed to serialize aggregate", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to serialize aggregate", err)
 		}
 
 		// Save to Redis with expiration
 		err = ss.client.GetClient().Set(ctx, aggregateKey, data, 24*time.Hour).Err()
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to save aggregate", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to save aggregate", err)
 		}
 
 		return nil
@@ -101,32 +102,32 @@ func (ss *RedisStateStore) Save(ctx context.Context, aggregate AggregateRoot, ex
 }
 
 // GetByID retrieves an aggregate by ID
-func (ss *RedisStateStore) GetByID(ctx context.Context, aggregateType, aggregateID string) (AggregateRoot, error) {
+func (ss *RedisStateStore) GetByID(ctx context.Context, aggregateType, aggregateID string) (cqrs.AggregateRoot, error) {
 	if aggregateID == "" {
-		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "aggregate ID cannot be empty", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate ID cannot be empty", nil)
 	}
 	if aggregateType == "" {
-		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "aggregate type cannot be empty", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate type cannot be empty", nil)
 	}
 
 	aggregateKey := ss.keyBuilder.AggregateKey(aggregateType, aggregateID)
 
-	var aggregate AggregateRoot
+	var aggregate cqrs.AggregateRoot
 
 	err := ss.client.ExecuteCommand(ctx, func() error {
 		data, err := ss.client.GetClient().Get(ctx, aggregateKey).Result()
 		if err != nil {
 			if err == redis.Nil {
-				return NewCQRSError(ErrCodeAggregateNotFound.String(),
+				return cqrs.NewCQRSError(cqrs.ErrCodeAggregateNotFound.String(),
 					fmt.Sprintf("aggregate not found: %s:%s", aggregateType, aggregateID),
-					ErrAggregateNotFound)
+					cqrs.ErrAggregateNotFound)
 			}
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to get aggregate", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to get aggregate", err)
 		}
 
 		aggregate, err = ss.serializer.DeserializeAggregate([]byte(data), aggregateType)
 		if err != nil {
-			return NewCQRSError(ErrCodeSerializationError.String(), "failed to deserialize aggregate", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to deserialize aggregate", err)
 		}
 
 		return nil
@@ -142,10 +143,10 @@ func (ss *RedisStateStore) GetByID(ctx context.Context, aggregateType, aggregate
 // GetVersion gets the current version of an aggregate
 func (ss *RedisStateStore) GetVersion(ctx context.Context, aggregateType, aggregateID string) (int, error) {
 	if aggregateID == "" {
-		return 0, NewCQRSError(ErrCodeRepositoryError.String(), "aggregate ID cannot be empty", nil)
+		return 0, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate ID cannot be empty", nil)
 	}
 	if aggregateType == "" {
-		return 0, NewCQRSError(ErrCodeRepositoryError.String(), "aggregate type cannot be empty", nil)
+		return 0, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate type cannot be empty", nil)
 	}
 
 	aggregateKey := ss.keyBuilder.AggregateKey(aggregateType, aggregateID)
@@ -176,10 +177,10 @@ func (ss *RedisStateStore) Exists(ctx context.Context, aggregateType, aggregateI
 // Delete removes an aggregate
 func (ss *RedisStateStore) Delete(ctx context.Context, aggregateType, aggregateID string) error {
 	if aggregateID == "" {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate ID cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate ID cannot be empty", nil)
 	}
 	if aggregateType == "" {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "aggregate type cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "aggregate type cannot be empty", nil)
 	}
 
 	aggregateKey := ss.keyBuilder.AggregateKey(aggregateType, aggregateID)
@@ -192,7 +193,7 @@ func (ss *RedisStateStore) Delete(ctx context.Context, aggregateType, aggregateI
 			return err
 		}
 		if !lockAcquired {
-			return NewCQRSError(ErrCodeConcurrencyConflict.String(), "failed to acquire lock", nil)
+			return cqrs.NewCQRSError(cqrs.ErrCodeConcurrencyConflict.String(), "failed to acquire lock", nil)
 		}
 
 		defer ss.releaseLock(ctx, lockKey)
@@ -200,7 +201,7 @@ func (ss *RedisStateStore) Delete(ctx context.Context, aggregateType, aggregateI
 		// Delete aggregate
 		err = ss.client.GetClient().Del(ctx, aggregateKey).Err()
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to delete aggregate", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to delete aggregate", err)
 		}
 
 		return nil
@@ -215,13 +216,13 @@ func (ss *RedisStateStore) getCurrentVersion(ctx context.Context, aggregateKey s
 		if err == redis.Nil {
 			return 0, nil // Aggregate doesn't exist, version is 0
 		}
-		return 0, NewCQRSError(ErrCodeRepositoryError.String(), "failed to get aggregate for version check", err)
+		return 0, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to get aggregate for version check", err)
 	}
 
 	// Parse version from serialized data
 	var aggregateData AggregateData
 	if err := json.Unmarshal([]byte(data), &aggregateData); err != nil {
-		return 0, NewCQRSError(ErrCodeSerializationError.String(), "failed to parse aggregate data", err)
+		return 0, cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to parse aggregate data", err)
 	}
 
 	return aggregateData.Version, nil
@@ -230,7 +231,7 @@ func (ss *RedisStateStore) getCurrentVersion(ctx context.Context, aggregateKey s
 func (ss *RedisStateStore) acquireLock(ctx context.Context, lockKey string, expiration time.Duration) (bool, error) {
 	result, err := ss.client.GetClient().SetNX(ctx, lockKey, "locked", expiration).Result()
 	if err != nil {
-		return false, NewCQRSError(ErrCodeRepositoryError.String(), "failed to acquire lock", err)
+		return false, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to acquire lock", err)
 	}
 	return result, nil
 }
@@ -241,7 +242,7 @@ func (ss *RedisStateStore) releaseLock(ctx context.Context, lockKey string) erro
 
 // JSONStateSerializer implementation
 
-func (s *JSONStateSerializer) SerializeAggregate(aggregate AggregateRoot) ([]byte, error) {
+func (s *JSONStateSerializer) SerializeAggregate(aggregate cqrs.AggregateRoot) ([]byte, error) {
 	// Note: In a real implementation, you would need to handle different aggregate types
 	// For now, we'll create a generic representation
 	aggregateData := AggregateData{
@@ -259,7 +260,7 @@ func (s *JSONStateSerializer) SerializeAggregate(aggregate AggregateRoot) ([]byt
 	return json.Marshal(aggregateData)
 }
 
-func (s *JSONStateSerializer) DeserializeAggregate(data []byte, aggregateType string) (AggregateRoot, error) {
+func (s *JSONStateSerializer) DeserializeAggregate(data []byte, aggregateType string) (cqrs.AggregateRoot, error) {
 	var aggregateData AggregateData
 	if err := json.Unmarshal(data, &aggregateData); err != nil {
 		return nil, err
@@ -267,7 +268,7 @@ func (s *JSONStateSerializer) DeserializeAggregate(data []byte, aggregateType st
 
 	// Note: In a real implementation, you would need a factory to create specific aggregate types
 	// For now, we'll create a BaseAggregate
-	aggregate := NewBaseAggregate(aggregateData.ID, aggregateData.Type)
+	aggregate := cqrs.NewBaseAggregate(aggregateData.ID, aggregateData.Type)
 	aggregate.SetOriginalVersion(aggregateData.OriginalVersion)
 	aggregate.SetCreatedAt(aggregateData.CreatedAt)
 	aggregate.SetUpdatedAt(aggregateData.UpdatedAt)

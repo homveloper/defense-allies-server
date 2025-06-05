@@ -1,7 +1,8 @@
-package cqrs
+package cqrsx
 
 import (
 	"context"
+	"defense-allies-server/pkg/cqrs"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -49,9 +50,9 @@ type ReadModelFactory interface {
 	//   - data: The raw data to populate the read model with
 	//
 	// Returns:
-	//   - ReadModel: The created read model instance
+	//   - cqrs.ReadModel: The created read model instance
 	//   - error: nil on success, error if creation fails
-	CreateReadModel(modelType string, id string, data interface{}) (ReadModel, error)
+	CreateReadModel(modelType string, id string, data interface{}) (cqrs.ReadModel, error)
 }
 
 // ReadModelSerializer interface defines the contract for read model serialization.
@@ -71,7 +72,7 @@ type ReadModelSerializer interface {
 	// Returns:
 	//   - []byte: The serialized data
 	//   - error: nil on success, error if serialization fails
-	SerializeReadModel(model ReadModel) ([]byte, error)
+	SerializeReadModel(model cqrs.ReadModel) ([]byte, error)
 
 	// DeserializeReadModel reconstructs a read model from stored bytes.
 	//
@@ -80,9 +81,9 @@ type ReadModelSerializer interface {
 	//   - modelType: The type of read model to create
 	//
 	// Returns:
-	//   - ReadModel: The reconstructed read model
+	//   - cqrs.ReadModel: The reconstructed read model
 	//   - error: nil on success, error if deserialization fails
-	DeserializeReadModel(data []byte, modelType string) (ReadModel, error)
+	DeserializeReadModel(data []byte, modelType string) (cqrs.ReadModel, error)
 }
 
 // JSONReadModelSerializer implements ReadModelSerializer using JSON format.
@@ -171,15 +172,15 @@ func NewRedisReadStore(client *RedisClientManager, keyPrefix string, serializer 
 //   - Index update fails: Returns repository error
 //
 // Thread safety: This method is safe for concurrent use
-func (rs *RedisReadStore) Save(ctx context.Context, readModel ReadModel) error {
+func (rs *RedisReadStore) Save(ctx context.Context, readModel cqrs.ReadModel) error {
 	// Validate input parameters
 	if readModel == nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "read model cannot be nil", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "read model cannot be nil", nil)
 	}
 
 	// Validate read model business rules
 	if err := readModel.Validate(); err != nil {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "read model validation failed", err)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "read model validation failed", err)
 	}
 
 	// Generate consistent Redis key
@@ -190,13 +191,13 @@ func (rs *RedisReadStore) Save(ctx context.Context, readModel ReadModel) error {
 		// Serialize read model to bytes
 		data, err := rs.serializer.SerializeReadModel(readModel)
 		if err != nil {
-			return NewCQRSError(ErrCodeSerializationError.String(), "failed to serialize read model", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to serialize read model", err)
 		}
 
 		// Save to Redis with TTL for automatic cleanup
 		err = rs.client.GetClient().Set(ctx, modelKey, data, 24*time.Hour).Err()
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to save read model", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to save read model", err)
 		}
 
 		// Update secondary indexes for query optimization
@@ -214,7 +215,7 @@ func (rs *RedisReadStore) Save(ctx context.Context, readModel ReadModel) error {
 //   - modelType: The type of read model to retrieve (must be non-empty)
 //
 // Returns:
-//   - ReadModel: The retrieved read model with proper type casting
+//   - cqrs.ReadModel: The retrieved read model with proper type casting
 //   - error: nil on success, CQRSError on validation or retrieval failure
 //
 // Error conditions:
@@ -227,19 +228,19 @@ func (rs *RedisReadStore) Save(ctx context.Context, readModel ReadModel) error {
 // Thread safety: This method is safe for concurrent use
 //
 // Performance: O(1) lookup time due to Redis key-based access
-func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType string) (ReadModel, error) {
+func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType string) (cqrs.ReadModel, error) {
 	// Validate input parameters
 	if id == "" {
-		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "id cannot be empty", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "id cannot be empty", nil)
 	}
 	if modelType == "" {
-		return nil, NewCQRSError(ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
+		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
 	}
 
 	// Generate consistent Redis key
 	modelKey := rs.keyBuilder.ReadModelKey(modelType, id)
 
-	var readModel ReadModel
+	var readModel cqrs.ReadModel
 
 	// Execute retrieval operation with error handling
 	err := rs.client.ExecuteCommand(ctx, func() error {
@@ -248,16 +249,16 @@ func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType stri
 		if err != nil {
 			// Handle "key not found" case specifically
 			if err == redis.Nil {
-				return NewCQRSError(ErrCodeRepositoryError.String(),
+				return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(),
 					fmt.Sprintf("read model not found: %s:%s", modelType, id), nil)
 			}
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to get read model", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to get read model", err)
 		}
 
 		// Deserialize data using factory pattern for proper type reconstruction
 		readModel, err = rs.serializer.DeserializeReadModel([]byte(data), modelType)
 		if err != nil {
-			return NewCQRSError(ErrCodeSerializationError.String(), "failed to deserialize read model", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to deserialize read model", err)
 		}
 
 		return nil
@@ -273,10 +274,10 @@ func (rs *RedisReadStore) GetByID(ctx context.Context, id string, modelType stri
 // Delete removes a read model
 func (rs *RedisReadStore) Delete(ctx context.Context, id string, modelType string) error {
 	if id == "" {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "id cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "id cannot be empty", nil)
 	}
 	if modelType == "" {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
 	}
 
 	modelKey := rs.keyBuilder.ReadModelKey(modelType, id)
@@ -298,7 +299,7 @@ func (rs *RedisReadStore) Delete(ctx context.Context, id string, modelType strin
 		// Delete the model
 		err = rs.client.GetClient().Del(ctx, modelKey).Err()
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to delete read model", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to delete read model", err)
 		}
 
 		return nil
@@ -306,8 +307,8 @@ func (rs *RedisReadStore) Delete(ctx context.Context, id string, modelType strin
 }
 
 // Query performs a query on read models
-func (rs *RedisReadStore) Query(ctx context.Context, criteria QueryCriteria) ([]ReadModel, error) {
-	var results []ReadModel
+func (rs *RedisReadStore) Query(ctx context.Context, criteria cqrs.QueryCriteria) ([]cqrs.ReadModel, error) {
+	var results []cqrs.ReadModel
 
 	err := rs.client.ExecuteCommand(ctx, func() error {
 		// Simple implementation using pattern matching
@@ -316,7 +317,7 @@ func (rs *RedisReadStore) Query(ctx context.Context, criteria QueryCriteria) ([]
 		pattern := rs.keyBuilder.ReadModelKey("*", "*")
 		keys, err := rs.client.GetClient().Keys(ctx, pattern).Result()
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to get keys", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to get keys", err)
 		}
 
 		for _, key := range keys {
@@ -357,7 +358,7 @@ func (rs *RedisReadStore) Query(ctx context.Context, criteria QueryCriteria) ([]
 }
 
 // Count returns the count of read models matching criteria
-func (rs *RedisReadStore) Count(ctx context.Context, criteria QueryCriteria) (int64, error) {
+func (rs *RedisReadStore) Count(ctx context.Context, criteria cqrs.QueryCriteria) (int64, error) {
 	results, err := rs.Query(ctx, criteria)
 	if err != nil {
 		return 0, err
@@ -366,7 +367,7 @@ func (rs *RedisReadStore) Count(ctx context.Context, criteria QueryCriteria) (in
 }
 
 // SaveBatch saves multiple read models
-func (rs *RedisReadStore) SaveBatch(ctx context.Context, readModels []ReadModel) error {
+func (rs *RedisReadStore) SaveBatch(ctx context.Context, readModels []cqrs.ReadModel) error {
 	if len(readModels) == 0 {
 		return nil
 	}
@@ -380,14 +381,14 @@ func (rs *RedisReadStore) SaveBatch(ctx context.Context, readModels []ReadModel)
 			}
 
 			if err := readModel.Validate(); err != nil {
-				return NewCQRSError(ErrCodeRepositoryError.String(), "read model validation failed", err)
+				return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "read model validation failed", err)
 			}
 
 			modelKey := rs.keyBuilder.ReadModelKey(readModel.GetType(), readModel.GetID())
 
 			data, err := rs.serializer.SerializeReadModel(readModel)
 			if err != nil {
-				return NewCQRSError(ErrCodeSerializationError.String(), "failed to serialize read model", err)
+				return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to serialize read model", err)
 			}
 
 			pipe.Set(ctx, modelKey, data, 24*time.Hour)
@@ -395,7 +396,7 @@ func (rs *RedisReadStore) SaveBatch(ctx context.Context, readModels []ReadModel)
 
 		_, err := pipe.Exec(ctx)
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to save read models batch", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to save read models batch", err)
 		}
 
 		// Update indexes for all models
@@ -415,7 +416,7 @@ func (rs *RedisReadStore) DeleteBatch(ctx context.Context, ids []string, modelTy
 		return nil
 	}
 	if modelType == "" {
-		return NewCQRSError(ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
+		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "model type cannot be empty", nil)
 	}
 
 	return rs.client.ExecuteCommand(ctx, func() error {
@@ -432,7 +433,7 @@ func (rs *RedisReadStore) DeleteBatch(ctx context.Context, ids []string, modelTy
 
 		_, err := pipe.Exec(ctx)
 		if err != nil {
-			return NewCQRSError(ErrCodeRepositoryError.String(), "failed to delete read models batch", err)
+			return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "failed to delete read models batch", err)
 		}
 
 		return nil
@@ -454,19 +455,19 @@ func (rs *RedisReadStore) DropIndex(ctx context.Context, modelType string, index
 
 // Helper methods
 
-func (rs *RedisReadStore) updateIndexes(ctx context.Context, readModel ReadModel) error {
+func (rs *RedisReadStore) updateIndexes(ctx context.Context, readModel cqrs.ReadModel) error {
 	// Simple indexing by type
 	typeIndexKey := rs.keyBuilder.IndexKey(readModel.GetType(), "all")
 	return rs.client.GetClient().SAdd(ctx, typeIndexKey, readModel.GetID()).Err()
 }
 
-func (rs *RedisReadStore) removeFromIndexes(ctx context.Context, readModel ReadModel) error {
+func (rs *RedisReadStore) removeFromIndexes(ctx context.Context, readModel cqrs.ReadModel) error {
 	// Remove from type index
 	typeIndexKey := rs.keyBuilder.IndexKey(readModel.GetType(), "all")
 	return rs.client.GetClient().SRem(ctx, typeIndexKey, readModel.GetID()).Err()
 }
 
-func (rs *RedisReadStore) matchesCriteria(readModel ReadModel, criteria QueryCriteria) bool {
+func (rs *RedisReadStore) matchesCriteria(readModel cqrs.ReadModel, criteria cqrs.QueryCriteria) bool {
 	// Simple criteria matching - in real implementation, this would be more sophisticated
 	if len(criteria.Filters) == 0 {
 		return true
@@ -484,14 +485,14 @@ func (rs *RedisReadStore) matchesCriteria(readModel ReadModel, criteria QueryCri
 	return true
 }
 
-func (rs *RedisReadStore) applySortingAndPagination(results []ReadModel, criteria QueryCriteria) []ReadModel {
+func (rs *RedisReadStore) applySortingAndPagination(results []cqrs.ReadModel, criteria cqrs.QueryCriteria) []cqrs.ReadModel {
 	// Simple pagination implementation
 	if criteria.Limit > 0 {
 		start := criteria.Offset
 		end := start + criteria.Limit
 
 		if start >= len(results) {
-			return []ReadModel{}
+			return []cqrs.ReadModel{}
 		}
 
 		if end > len(results) {
@@ -506,7 +507,7 @@ func (rs *RedisReadStore) applySortingAndPagination(results []ReadModel, criteri
 
 // JSONReadModelSerializer implementation
 
-func (s *JSONReadModelSerializer) SerializeReadModel(model ReadModel) ([]byte, error) {
+func (s *JSONReadModelSerializer) SerializeReadModel(model cqrs.ReadModel) ([]byte, error) {
 	modelData := ReadModelData{
 		ID:          model.GetID(),
 		Type:        model.GetType(),
@@ -518,7 +519,7 @@ func (s *JSONReadModelSerializer) SerializeReadModel(model ReadModel) ([]byte, e
 	return json.Marshal(modelData)
 }
 
-func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string) (ReadModel, error) {
+func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string) (cqrs.ReadModel, error) {
 	var modelData ReadModelData
 	if err := json.Unmarshal(data, &modelData); err != nil {
 		return nil, err
@@ -528,20 +529,20 @@ func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType st
 	if s.factory != nil {
 		readModel, err := s.factory.CreateReadModel(modelType, modelData.ID, modelData.Data)
 		if err != nil {
-			// Fallback to BaseReadModel if factory fails
-			readModel = NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
+			// Fallback to cqrs.BaseReadModel if factory fails
+			readModel = cqrs.NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
 		}
 
-		// Set version and last updated if it's a BaseReadModel
-		if baseModel, ok := readModel.(*BaseReadModel); ok {
+		// Set version and last updated if it's a cqrs.BaseReadModel
+		if baseModel, ok := readModel.(*cqrs.BaseReadModel); ok {
 			baseModel.SetVersion(modelData.Version)
 			baseModel.SetLastUpdated(modelData.LastUpdated)
 		}
 		return readModel, nil
 	}
 
-	// Fallback to BaseReadModel
-	readModel := NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
+	// Fallback to cqrs.BaseReadModel
+	readModel := cqrs.NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
 	readModel.SetVersion(modelData.Version)
 	readModel.SetLastUpdated(modelData.LastUpdated)
 
