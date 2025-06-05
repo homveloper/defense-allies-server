@@ -102,7 +102,7 @@ func TestJSONEventSerializer_Deserialize_InvalidJSON(t *testing.T) {
 
 func TestNewRedisEventStore(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -130,7 +130,7 @@ func TestNewRedisEventStore(t *testing.T) {
 
 func TestRedisEventStore_SaveEvents_EmptyEvents(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -149,7 +149,7 @@ func TestRedisEventStore_SaveEvents_EmptyEvents(t *testing.T) {
 
 func TestRedisEventStore_SaveEvents_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -170,7 +170,7 @@ func TestRedisEventStore_SaveEvents_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_GetEventHistory_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -191,7 +191,7 @@ func TestRedisEventStore_GetEventHistory_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_GetEventHistory_EmptyAggregateType(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -212,7 +212,7 @@ func TestRedisEventStore_GetEventHistory_EmptyAggregateType(t *testing.T) {
 
 func TestRedisEventStore_GetLastEventVersion_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -233,7 +233,7 @@ func TestRedisEventStore_GetLastEventVersion_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_GetLastEventVersion_EmptyAggregateType(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -254,7 +254,7 @@ func TestRedisEventStore_GetLastEventVersion_EmptyAggregateType(t *testing.T) {
 
 func TestRedisEventStore_CompactEvents_EmptyAggregateID(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -274,7 +274,7 @@ func TestRedisEventStore_CompactEvents_EmptyAggregateID(t *testing.T) {
 
 func TestRedisEventStore_CompactEvents_EmptyAggregateType(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}

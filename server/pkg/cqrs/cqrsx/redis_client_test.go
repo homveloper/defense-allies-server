@@ -11,7 +11,7 @@ import (
 
 func TestNewRedisClientManager(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host:         "localhost",
 		Port:         6379,
 		Database:     0,
@@ -49,12 +49,12 @@ func TestNewRedisClientManager_NilConfig(t *testing.T) {
 func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 	tests := []struct {
 		name   string
-		config *cqrs.RedisConfig
+		config *RedisConfig
 		errMsg string
 	}{
 		{
 			name: "Empty host",
-			config: &cqrs.RedisConfig{
+			config: &RedisConfig{
 				Host: "",
 				Port: 6379,
 			},
@@ -62,7 +62,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid port - zero",
-			config: &cqrs.RedisConfig{
+			config: &RedisConfig{
 				Host: "localhost",
 				Port: 0,
 			},
@@ -70,7 +70,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid port - too high",
-			config: &cqrs.RedisConfig{
+			config: &RedisConfig{
 				Host: "localhost",
 				Port: 70000,
 			},
@@ -78,7 +78,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid database - negative",
-			config: &cqrs.RedisConfig{
+			config: &RedisConfig{
 				Host:     "localhost",
 				Port:     6379,
 				Database: -1,
@@ -87,7 +87,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 		},
 		{
 			name: "Invalid database - too high",
-			config: &cqrs.RedisConfig{
+			config: &RedisConfig{
 				Host:     "localhost",
 				Port:     6379,
 				Database: 16,
@@ -111,7 +111,7 @@ func TestNewRedisClientManager_InvalidConfig(t *testing.T) {
 
 func TestRedisClientManager_ConfigDefaults(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 		// Other fields left empty to test defaults
@@ -138,7 +138,7 @@ func TestRedisClientManager_ConfigDefaults(t *testing.T) {
 
 func TestRedisClientManager_GetMetrics(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -158,7 +158,7 @@ func TestRedisClientManager_GetMetrics(t *testing.T) {
 
 func TestRedisClientManager_ExecuteCommand(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}
@@ -181,7 +181,7 @@ func TestRedisClientManager_ExecuteCommand(t *testing.T) {
 
 func TestRedisClientManager_ExecuteCommand_WithError(t *testing.T) {
 	// Arrange
-	config := &cqrs.RedisConfig{
+	config := &RedisConfig{
 		Host: "localhost",
 		Port: 6379,
 	}

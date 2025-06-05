@@ -109,6 +109,11 @@ const (
 	ErrCodeEventStoreError
 	ErrCodeEventBusError
 	ErrCodeSnapshotValidationFailed
+	ErrCodeStateStoreError
+	ErrCodeSnapshotStoreError
+	ErrCodeReadStoreError
+	ErrCodeSnapshotNotFound
+	ErrCodeReadModelNotFound
 )
 
 func (ec ErrorCode) String() string {
@@ -135,9 +140,43 @@ func (ec ErrorCode) String() string {
 		return "EVENT_BUS_ERROR"
 	case ErrCodeSnapshotValidationFailed:
 		return "SNAPSHOT_VALIDATION_FAILED"
+	case ErrCodeStateStoreError:
+		return "STATE_STORE_ERROR"
+	case ErrCodeSnapshotStoreError:
+		return "SNAPSHOT_STORE_ERROR"
+	case ErrCodeReadStoreError:
+		return "READ_STORE_ERROR"
+	case ErrCodeSnapshotNotFound:
+		return "SNAPSHOT_NOT_FOUND"
+	case ErrCodeReadModelNotFound:
+		return "READ_MODEL_NOT_FOUND"
 	default:
 		return "UNKNOWN_ERROR"
 	}
+}
+
+// IsNotFoundError checks if an error is a "not found" type error
+func IsNotFoundError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	// Check for CQRS error codes
+	if cqrsErr, ok := err.(*CQRSError); ok {
+		switch cqrsErr.Code {
+		case ErrCodeAggregateNotFound.String(),
+			ErrCodeSnapshotNotFound.String(),
+			ErrCodeReadModelNotFound.String():
+			return true
+		}
+	}
+
+	// Check for standard errors
+	if errors.Is(err, ErrAggregateNotFound) {
+		return true
+	}
+
+	return false
 }
 
 // Helper function for checksum calculation

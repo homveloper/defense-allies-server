@@ -3,7 +3,6 @@ package cqrsx
 import (
 	"context"
 	"defense-allies-server/pkg/cqrs"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -18,26 +17,7 @@ type RedisEventStore struct {
 	serializer EventSerializer
 }
 
-// EventSerializer interface for event serialization
-type EventSerializer interface {
-	Serialize(event cqrs.EventMessage) ([]byte, error)
-	Deserialize(data []byte) (cqrs.EventMessage, error)
-}
-
-// JSONEventSerializer implements JSON-based event serialization
-type JSONEventSerializer struct{}
-
-// EventData represents serialized event data
-type EventData struct {
-	EventID       string                 `json:"event_id"`
-	EventType     string                 `json:"event_type"`
-	AggregateID   string                 `json:"aggregate_id"`
-	AggregateType string                 `json:"aggregate_type"`
-	Version       int                    `json:"version"`
-	Data          interface{}            `json:"data"`
-	Metadata      map[string]interface{} `json:"metadata"`
-	Timestamp     time.Time              `json:"timestamp"`
-}
+// Note: EventSerializer interface and implementations are now in event_serializer.go
 
 // NewRedisEventStore creates a new Redis event store
 func NewRedisEventStore(client *RedisClientManager, keyPrefix string) *RedisEventStore {
@@ -265,44 +245,4 @@ func (es *RedisEventStore) CompactEvents(ctx context.Context, aggregateID string
 	})
 }
 
-// JSONEventSerializer implementation
-
-func (s *JSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error) {
-	eventData := EventData{
-		EventID:       event.EventID(),
-		EventType:     event.EventType(),
-		AggregateID:   event.AggregateID(),
-		AggregateType: event.AggregateType(),
-		Version:       event.Version(),
-		Data:          event.EventData(),
-		Metadata:      event.Metadata(),
-		Timestamp:     event.Timestamp(),
-	}
-
-	return json.Marshal(eventData)
-}
-
-func (s *JSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error) {
-	var eventData EventData
-	if err := json.Unmarshal(data, &eventData); err != nil {
-		return nil, err
-	}
-
-	event := cqrs.NewBaseEventMessage(
-		eventData.EventType,
-		eventData.AggregateID,
-		eventData.AggregateType,
-		eventData.Version,
-		eventData.Data,
-	)
-
-	event.SetEventID(eventData.EventID)
-	event.SetTimestamp(eventData.Timestamp)
-
-	// Set metadata
-	for key, value := range eventData.Metadata {
-		event.AddMetadata(key, value)
-	}
-
-	return event, nil
-}
+// Note: JSONEventSerializer implementation is now in event_serializer.go

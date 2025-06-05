@@ -108,7 +108,7 @@ func runRedisExample(ctx context.Context) error {
 	fmt.Println("Setting up Redis CQRS infrastructure...")
 
 	// Create Redis client
-	config := &cqrs.RedisConfig{
+	config := &cqrsx.RedisConfig{
 		Host:     "localhost",
 		Port:     6379,
 		Database: 0,

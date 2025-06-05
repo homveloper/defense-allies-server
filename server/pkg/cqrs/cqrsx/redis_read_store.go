@@ -3,7 +3,6 @@ package cqrsx
 import (
 	"context"
 	"defense-allies-server/pkg/cqrs"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -55,60 +54,9 @@ type ReadModelFactory interface {
 	CreateReadModel(modelType string, id string, data interface{}) (cqrs.ReadModel, error)
 }
 
-// ReadModelSerializer interface defines the contract for read model serialization.
-// This abstraction allows different serialization formats (JSON, Protocol Buffers, etc.)
-// to be used without changing the core read store logic.
-//
-// Implementations should:
-//   - Preserve all read model data during serialization/deserialization
-//   - Handle version information and metadata correctly
-//   - Use the factory pattern for proper type reconstruction
-type ReadModelSerializer interface {
-	// SerializeReadModel converts a read model to bytes for storage.
-	//
-	// Parameters:
-	//   - model: The read model to serialize
-	//
-	// Returns:
-	//   - []byte: The serialized data
-	//   - error: nil on success, error if serialization fails
-	SerializeReadModel(model cqrs.ReadModel) ([]byte, error)
+// Note: ReadModelSerializer and JSONReadModelSerializer are defined in mongo_read_store.go to avoid duplication
 
-	// DeserializeReadModel reconstructs a read model from stored bytes.
-	//
-	// Parameters:
-	//   - data: The serialized read model data
-	//   - modelType: The type of read model to create
-	//
-	// Returns:
-	//   - cqrs.ReadModel: The reconstructed read model
-	//   - error: nil on success, error if deserialization fails
-	DeserializeReadModel(data []byte, modelType string) (cqrs.ReadModel, error)
-}
-
-// JSONReadModelSerializer implements ReadModelSerializer using JSON format.
-// This serializer provides human-readable storage format and good performance
-// for most use cases. It integrates with the factory pattern to ensure
-// proper type reconstruction during deserialization.
-//
-// Fields:
-//   - factory: Factory for creating typed read model instances
-type JSONReadModelSerializer struct {
-	factory ReadModelFactory // Factory for creating specific read model types
-}
-
-// NewJSONReadModelSerializer creates a new JSON-based read model serializer.
-//
-// Parameters:
-//   - factory: The factory to use for creating read model instances during deserialization
-//
-// Returns:
-//   - *JSONReadModelSerializer: A new serializer instance ready for use
-func NewJSONReadModelSerializer(factory ReadModelFactory) *JSONReadModelSerializer {
-	return &JSONReadModelSerializer{
-		factory: factory,
-	}
-}
+// Note: NewJSONReadModelSerializer is defined in mongo_read_store.go
 
 // ReadModelData represents the structure used for JSON serialization of read models.
 // This structure captures all the essential metadata and data needed to reconstruct
@@ -505,46 +453,4 @@ func (rs *RedisReadStore) applySortingAndPagination(results []cqrs.ReadModel, cr
 	return results
 }
 
-// JSONReadModelSerializer implementation
-
-func (s *JSONReadModelSerializer) SerializeReadModel(model cqrs.ReadModel) ([]byte, error) {
-	modelData := ReadModelData{
-		ID:          model.GetID(),
-		Type:        model.GetType(),
-		Version:     model.GetVersion(),
-		Data:        model.GetData(),
-		LastUpdated: model.GetLastUpdated(),
-	}
-
-	return json.Marshal(modelData)
-}
-
-func (s *JSONReadModelSerializer) DeserializeReadModel(data []byte, modelType string) (cqrs.ReadModel, error) {
-	var modelData ReadModelData
-	if err := json.Unmarshal(data, &modelData); err != nil {
-		return nil, err
-	}
-
-	// Use factory to create the correct type
-	if s.factory != nil {
-		readModel, err := s.factory.CreateReadModel(modelType, modelData.ID, modelData.Data)
-		if err != nil {
-			// Fallback to cqrs.BaseReadModel if factory fails
-			readModel = cqrs.NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
-		}
-
-		// Set version and last updated if it's a cqrs.BaseReadModel
-		if baseModel, ok := readModel.(*cqrs.BaseReadModel); ok {
-			baseModel.SetVersion(modelData.Version)
-			baseModel.SetLastUpdated(modelData.LastUpdated)
-		}
-		return readModel, nil
-	}
-
-	// Fallback to cqrs.BaseReadModel
-	readModel := cqrs.NewBaseReadModel(modelData.ID, modelData.Type, modelData.Data)
-	readModel.SetVersion(modelData.Version)
-	readModel.SetLastUpdated(modelData.LastUpdated)
-
-	return readModel, nil
-}
+// Note: JSONReadModelSerializer implementation is in mongo_read_store.go

@@ -12,7 +12,7 @@ import (
 // RedisClientManager manages Redis connections for CQRS infrastructure
 type RedisClientManager struct {
 	client  *redis.Client
-	config  *cqrs.RedisConfig
+	config  *RedisConfig
 	metrics *RedisMetrics
 }
 
@@ -27,7 +27,7 @@ type RedisMetrics struct {
 }
 
 // NewRedisClientManager creates a new Redis client manager
-func NewRedisClientManager(config *cqrs.RedisConfig) (*RedisClientManager, error) {
+func NewRedisClientManager(config *RedisConfig) (*RedisClientManager, error) {
 	if config == nil {
 		return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis config cannot be nil", nil)
 	}
@@ -69,7 +69,7 @@ func (rm *RedisClientManager) GetClient() *redis.Client {
 }
 
 // GetConfig returns the Redis configuration
-func (rm *RedisClientManager) GetConfig() *cqrs.RedisConfig {
+func (rm *RedisClientManager) GetConfig() *RedisConfig {
 	return rm.config
 }
 
@@ -143,7 +143,7 @@ func (rm *RedisClientManager) updateMetrics(latency time.Duration, err error) {
 	}
 }
 
-func validateRedisConfig(config *cqrs.RedisConfig) error {
+func validateRedisConfig(config *RedisConfig) error {
 	if config.Host == "" {
 		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "Redis host cannot be empty", nil)
 	}
