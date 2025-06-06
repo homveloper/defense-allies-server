@@ -73,7 +73,7 @@ func (s *UserSerializer) SerializeUser(user *domain.User) (*UserAggregateData, e
 
 	baseAggregate.SetCreatedAt(user.CreatedAt())
 	baseAggregate.SetUpdatedAt(user.UpdatedAt())
-	baseAggregate.SetDeleted(user.IsDeleted())
+	baseAggregate.SetDeleted(user.Deleted())
 
 	return &UserAggregateData{
 		BaseAggregate:      baseAggregate,

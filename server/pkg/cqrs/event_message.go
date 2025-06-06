@@ -17,6 +17,8 @@ type EventMessage interface {
 	// Metadata
 	Metadata() map[string]interface{}
 	Timestamp() time.Time
+
+	Clone() EventMessage
 }
 
 // EventCategory represents different types of events

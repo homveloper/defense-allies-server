@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+var _ AggregateRoot = (*BaseAggregate)(nil)
+
 // BaseAggregate provides a base implementation of the AggregateRoot interface
 // Optimized for Defense Allies with clean and simple API
 type BaseAggregate struct {
@@ -92,10 +94,14 @@ func (a *BaseAggregate) OriginalVersion() int {
 	return a.originalVersion
 }
 
-// incrementVersion increases the current version by 1 (private method)
-func (a *BaseAggregate) incrementVersion() {
-	a.currentVersion++
+func (a *BaseAggregate) SetOriginalVersion(version int) {
+	a.originalVersion = version
+}
+
+func (a *BaseAggregate) nextVersion() int {
 	a.updatedAt = time.Now()
+	a.currentVersion++
+	return a.currentVersion
 }
 
 // ApplyEvent applies a newly generated event and tracks it as an uncommitted change
@@ -105,11 +111,24 @@ func (a *BaseAggregate) ApplyEvent(event EventMessage) error {
 		return errors.New("event cannot be nil")
 	}
 
+	// Update version and timestamp first
+	// Auto-populate aggregate metadata in the event
+	if baseEvent, ok := event.(*BaseEventMessage); ok {
+		version := a.nextVersion()
+		timestamp := time.Now()
+
+		event = baseEvent.CloneWithOptions(
+			&BaseEventMessageOptions{
+				AggregateID:   &a.id,
+				AggregateType: &a.aggregateType,
+				Version:       &version,
+				Timestamp:     &timestamp,
+			},
+		)
+	}
+
 	// Track new events for persistence
 	a.changes = append(a.changes, event)
-
-	// Update version and timestamp
-	a.incrementVersion()
 
 	return nil
 }
@@ -122,7 +141,7 @@ func (a *BaseAggregate) ReplayEvent(event EventMessage) error {
 	}
 
 	// Update version and timestamp (but don't track as new change)
-	a.incrementVersion()
+	a.nextVersion()
 
 	return nil
 }

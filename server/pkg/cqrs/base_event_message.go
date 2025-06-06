@@ -8,6 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var _ EventMessage = (*BaseEventMessage)(nil)
+
 // BaseEventMessage provides a base implementation of EventMessage interface
 type BaseEventMessage struct {
 	eventID       string
@@ -20,18 +22,141 @@ type BaseEventMessage struct {
 	timestamp     time.Time
 }
 
-// NewBaseEventMessage creates a new BaseEventMessage
-func NewBaseEventMessage(eventType, aggregateID, aggregateType string, version int, eventData interface{}) *BaseEventMessage {
-	return &BaseEventMessage{
+func Options() *BaseEventMessageOptions {
+	return &BaseEventMessageOptions{}
+}
+
+// BaseEventMessageOptions defines options for creating BaseEventMessage
+type BaseEventMessageOptions struct {
+	EventID       *string                `json:"event_id,omitempty"`
+	Timestamp     *time.Time             `json:"timestamp,omitempty"`
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	AggregateID   *string                `json:"aggregate_id,omitempty"`
+	AggregateType *string                `json:"aggregate_type,omitempty"`
+	Version       *int                   `json:"version,omitempty"`
+}
+
+func (opts *BaseEventMessageOptions) WithLoad(
+	eventID string,
+	timestamp time.Time,
+	metadata map[string]interface{},
+	aggregateID string,
+	aggregateType string,
+	version int,
+) *BaseEventMessageOptions {
+	opts.EventID = &eventID
+	opts.Timestamp = &timestamp
+	opts.Metadata = metadata
+	opts.AggregateID = &aggregateID
+	opts.AggregateType = &aggregateType
+	opts.Version = &version
+	return opts
+}
+
+func (opts *BaseEventMessageOptions) WithEventID(eventID string) *BaseEventMessageOptions {
+	opts.EventID = &eventID
+	return opts
+}
+
+func (opts *BaseEventMessageOptions) WithTimestamp(timestamp time.Time) *BaseEventMessageOptions {
+	opts.Timestamp = &timestamp
+	return opts
+}
+
+func (opts *BaseEventMessageOptions) WithMetadata(metadata map[string]interface{}) *BaseEventMessageOptions {
+	opts.Metadata = metadata
+	return opts
+}
+
+func (opts *BaseEventMessageOptions) WithAggregateID(aggregateID string) *BaseEventMessageOptions {
+	opts.AggregateID = &aggregateID
+	return opts
+}
+
+func (opts *BaseEventMessageOptions) WithAggregateType(aggregateType string) *BaseEventMessageOptions {
+	opts.AggregateType = &aggregateType
+	return opts
+}
+
+func (opts *BaseEventMessageOptions) WithVersion(version int) *BaseEventMessageOptions {
+	opts.Version = &version
+	return opts
+}
+
+// Merge combines multiple options, with later options overriding earlier ones
+func mergeOptions(options ...*BaseEventMessageOptions) *BaseEventMessageOptions {
+
+	merged := &BaseEventMessageOptions{}
+
+	for _, opt := range options {
+		if opt.EventID != nil {
+			merged.EventID = opt.EventID
+		}
+		if opt.Timestamp != nil {
+			merged.Timestamp = opt.Timestamp
+		}
+		if opt.Metadata != nil {
+			merged.Metadata = opt.Metadata
+		}
+		if opt.AggregateID != nil {
+			merged.AggregateID = opt.AggregateID
+		}
+		if opt.AggregateType != nil {
+			merged.AggregateType = opt.AggregateType
+		}
+		if opt.Version != nil {
+			merged.Version = opt.Version
+		}
+	}
+
+	return merged
+}
+
+func applyOptions(event *BaseEventMessage, opts *BaseEventMessageOptions) {
+	if opts == nil {
+		return
+	}
+
+	if opts.EventID != nil {
+		event.eventID = *opts.EventID
+	}
+	if opts.Timestamp != nil {
+		event.timestamp = *opts.Timestamp
+	}
+	if opts.Metadata != nil {
+		event.metadata = opts.Metadata
+	}
+	if opts.AggregateID != nil {
+		event.aggregateID = *opts.AggregateID
+	}
+	if opts.AggregateType != nil {
+		event.aggregateType = *opts.AggregateType
+	}
+	if opts.Version != nil {
+		event.version = *opts.Version
+	}
+}
+
+// NewBaseEventMessage creates a new BaseEventMessage with optional configuration
+// Note: aggregateID, aggregateType, version, and timestamp will be auto-populated by BaseAggregate.ApplyEvent unless specified
+func NewBaseEventMessage(eventType string, eventData interface{}, options ...*BaseEventMessageOptions) *BaseEventMessage {
+
+	opt := mergeOptions(options...)
+
+	event := &BaseEventMessage{
 		eventID:       uuid.New().String(),
 		eventType:     eventType,
-		aggregateID:   aggregateID,
-		aggregateType: aggregateType,
-		version:       version,
+		aggregateID:   "", // Will be set by ApplyEvent unless overridden
+		aggregateType: "", // Will be set by ApplyEvent unless overridden
+		version:       0,  // Will be set by ApplyEvent unless overridden
 		eventData:     eventData,
 		metadata:      make(map[string]interface{}),
-		timestamp:     time.Now(),
+		timestamp:     time.Time{}, // Will be set by ApplyEvent unless overridden
 	}
+
+	applyOptions(event, opt)
+
+	return event
 }
 
 // EventMessage interface implementation
@@ -66,6 +191,29 @@ func (e *BaseEventMessage) Metadata() map[string]interface{} {
 
 func (e *BaseEventMessage) Timestamp() time.Time {
 	return e.timestamp
+}
+
+func (e *BaseEventMessage) Clone() EventMessage {
+	clone := *e
+	clone.metadata = make(map[string]interface{})
+	for k, v := range e.metadata {
+		clone.metadata[k] = v
+	}
+	return &clone
+}
+
+// CloneWithOptions creates a clone with optional modifications
+func (e *BaseEventMessage) CloneWithOptions(options ...*BaseEventMessageOptions) EventMessage {
+	clone := *e
+	clone.metadata = make(map[string]interface{})
+	for k, v := range e.metadata {
+		clone.metadata[k] = v
+	}
+
+	opt := mergeOptions(options...)
+	applyOptions(&clone, opt)
+
+	return &clone
 }
 
 // Helper methods
@@ -108,31 +256,113 @@ type BaseDomainEventMessage struct {
 	priority      EventPriority
 }
 
-// NewBaseDomainEventMessage creates a new BaseDomainEventMessage
-func NewBaseDomainEventMessage(eventType, aggregateID, aggregateType string, version int, eventData interface{}) *BaseDomainEventMessage {
-	return &BaseDomainEventMessage{
-		BaseEventMessage: NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData),
+// BaseDomainEventMessageOptions defines options for creating BaseDomainEventMessage
+type BaseDomainEventMessageOptions struct {
+	IssuerID      *string        `json:"issuer_id,omitempty"`
+	IssuerType    *IssuerType    `json:"issuer_type,omitempty"`
+	CausationID   *string        `json:"causation_id,omitempty"`
+	CorrelationID *string        `json:"correlation_id,omitempty"`
+	Category      *EventCategory `json:"category,omitempty"`
+	Priority      *EventPriority `json:"priority,omitempty"`
+}
+
+// Merge combines multiple domain options, with later options overriding earlier ones
+func (opts *BaseDomainEventMessageOptions) Merge(other *BaseDomainEventMessageOptions) *BaseDomainEventMessageOptions {
+	if other == nil {
+		return opts
+	}
+
+	merged := &BaseDomainEventMessageOptions{}
+
+	// Copy from current options
+	if opts != nil {
+		if opts.IssuerID != nil {
+			merged.IssuerID = opts.IssuerID
+		}
+		if opts.IssuerType != nil {
+			merged.IssuerType = opts.IssuerType
+		}
+		if opts.CausationID != nil {
+			merged.CausationID = opts.CausationID
+		}
+		if opts.CorrelationID != nil {
+			merged.CorrelationID = opts.CorrelationID
+		}
+		if opts.Category != nil {
+			merged.Category = opts.Category
+		}
+		if opts.Priority != nil {
+			merged.Priority = opts.Priority
+		}
+	}
+
+	// Override with other options
+	if other.IssuerID != nil {
+		merged.IssuerID = other.IssuerID
+	}
+	if other.IssuerType != nil {
+		merged.IssuerType = other.IssuerType
+	}
+	if other.CausationID != nil {
+		merged.CausationID = other.CausationID
+	}
+	if other.CorrelationID != nil {
+		merged.CorrelationID = other.CorrelationID
+	}
+	if other.Category != nil {
+		merged.Category = other.Category
+	}
+	if other.Priority != nil {
+		merged.Priority = other.Priority
+	}
+
+	return merged
+}
+
+// Apply applies the options to a BaseDomainEventMessage
+func (opts *BaseDomainEventMessageOptions) Apply(event *BaseDomainEventMessage) {
+	if opts == nil {
+		return
+	}
+
+	if opts.IssuerID != nil {
+		event.issuerID = *opts.IssuerID
+	}
+	if opts.IssuerType != nil {
+		event.issuerType = *opts.IssuerType
+	}
+	if opts.CausationID != nil {
+		event.causationID = *opts.CausationID
+	}
+	if opts.CorrelationID != nil {
+		event.correlationID = *opts.CorrelationID
+	}
+	if opts.Category != nil {
+		event.category = *opts.Category
+	}
+	if opts.Priority != nil {
+		event.priority = *opts.Priority
+	}
+}
+
+// NewBaseDomainEventMessage creates a new BaseDomainEventMessage with optional configuration
+// Note: aggregateID, aggregateType, version will be auto-populated by BaseAggregate.ApplyEvent unless specified
+func NewBaseDomainEventMessage(eventType string, eventData interface{}, baseOptions []*BaseEventMessageOptions, domainOptions ...*BaseDomainEventMessageOptions) *BaseDomainEventMessage {
+	domainEvent := &BaseDomainEventMessage{
+		BaseEventMessage: NewBaseEventMessage(eventType, eventData, baseOptions...),
 		issuerType:       UserIssuer, // Default to user issuer
 		category:         DomainEvent,
 		priority:         Normal,
 	}
-}
 
-// NewBaseDomainEventMessageWithIssuer creates a new BaseDomainEventMessage with specific issuer
-func NewBaseDomainEventMessageWithIssuer(
-	eventType, aggregateID, aggregateType string,
-	version int,
-	eventData interface{},
-	issuerID string,
-	issuerType IssuerType,
-) *BaseDomainEventMessage {
-	return &BaseDomainEventMessage{
-		BaseEventMessage: NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData),
-		issuerID:         issuerID,
-		issuerType:       issuerType,
-		category:         DomainEvent,
-		priority:         Normal,
+	// Merge and apply domain-specific options
+	var mergedDomainOptions *BaseDomainEventMessageOptions
+	for _, option := range domainOptions {
+		mergedDomainOptions = mergedDomainOptions.Merge(option)
 	}
+	mergedDomainOptions.Apply(domainEvent)
+
+	return domainEvent
 }
 
 // DomainEventMessage interface implementation

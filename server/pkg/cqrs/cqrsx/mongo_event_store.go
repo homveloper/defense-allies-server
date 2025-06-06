@@ -192,10 +192,15 @@ func (es *MongoEventStore) LoadEvents(ctx context.Context, aggregateID, aggregat
 			// Reconstruct the event message
 			event := cqrs.NewBaseEventMessage(
 				doc.EventType,
-				doc.AggregateID,
-				doc.AggregateType,
-				doc.EventVersion,
 				eventData,
+				cqrs.Options().WithLoad(
+					doc.EventID,
+					doc.Timestamp,
+					doc.Metadata,
+					doc.AggregateID,
+					doc.AggregateType,
+					doc.EventVersion,
+				),
 			)
 
 			event.SetEventID(doc.EventID)
@@ -343,10 +348,15 @@ func (es *MongoEventStore) GetEventsByType(ctx context.Context, eventType string
 			// Reconstruct the event message
 			event := cqrs.NewBaseEventMessage(
 				doc.EventType,
-				doc.AggregateID,
-				doc.AggregateType,
-				doc.EventVersion,
 				eventData,
+				cqrs.Options().WithLoad(
+					doc.EventID,
+					doc.Timestamp,
+					doc.Metadata,
+					doc.AggregateID,
+					doc.AggregateType,
+					doc.EventVersion,
+				),
 			)
 
 			event.SetEventID(doc.EventID)

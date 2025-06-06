@@ -99,13 +99,8 @@ func (o *Order) CreateOrder(orderID, customerID string, shippingCost decimal.Dec
 	event := CreateOrderCreatedEvent(orderID, customerID, shippingCost)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		orderID,
-		"Order",
-		1,
 		event,
 	)
-
-	o.TrackChange(eventMessage)
 
 	// 이벤트 즉시 적용
 	if err := o.ApplyEvent(eventMessage); err != nil {
@@ -129,13 +124,8 @@ func (o *Order) AddItem(productID, productName string, quantity int, unitPrice d
 	event := CreateItemAddedEvent(o.ID(), productID, productName, quantity, unitPrice)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
-
-	o.TrackChange(eventMessage)
 
 	// 이벤트 즉시 적용
 	if err := o.ApplyEvent(eventMessage); err != nil {
@@ -168,13 +158,14 @@ func (o *Order) RemoveItem(productID string) error {
 	event := CreateItemRemovedEvent(o.ID(), productID)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
 
-	o.TrackChange(eventMessage)
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply ItemRemoved event: %w", err)
+	}
+
 	return nil
 }
 
@@ -192,13 +183,14 @@ func (o *Order) ChangeItemQuantity(productID string, newQuantity int) error {
 	event := CreateItemQuantityChangedEvent(o.ID(), productID, newQuantity)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
 
-	o.TrackChange(eventMessage)
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply ItemQuantityChanged event: %w", err)
+	}
+
 	return nil
 }
 
@@ -216,13 +208,8 @@ func (o *Order) ApplyDiscount(discountRate decimal.Decimal, reason string) error
 	event := CreateDiscountAppliedEvent(o.ID(), discountRate, reason)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
-
-	o.TrackChange(eventMessage)
 
 	// 이벤트 즉시 적용
 	if err := o.ApplyEvent(eventMessage); err != nil {
@@ -246,13 +233,8 @@ func (o *Order) ConfirmOrder() error {
 	event := CreateOrderConfirmedEvent(o.ID())
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
-
-	o.TrackChange(eventMessage)
 
 	// 이벤트 즉시 적용
 	if err := o.ApplyEvent(eventMessage); err != nil {
@@ -272,13 +254,14 @@ func (o *Order) ShipOrder(trackingNumber string) error {
 	event := CreateOrderShippedEvent(o.ID(), trackingNumber)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
 
-	o.TrackChange(eventMessage)
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply OrderShipped event: %w", err)
+	}
+
 	return nil
 }
 
@@ -292,13 +275,14 @@ func (o *Order) DeliverOrder() error {
 	event := CreateOrderDeliveredEvent(o.ID())
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
 
-	o.TrackChange(eventMessage)
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply OrderDelivered event: %w", err)
+	}
+
 	return nil
 }
 
@@ -316,13 +300,14 @@ func (o *Order) CancelOrder(reason string) error {
 	event := CreateOrderCancelledEvent(o.ID(), reason)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		o.ID(),
-		"Order",
-		o.Version()+1,
 		event,
 	)
 
-	o.TrackChange(eventMessage)
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply OrderCancelled event: %w", err)
+	}
+
 	return nil
 }
 
@@ -396,20 +381,8 @@ func (o *Order) Metadata() map[string]interface{} {
 }
 
 // 편의 메서드들
-func (o *Order) Version() int {
-	return o.Version()
-}
-
-func (o *Order) ID() string {
-	return o.ID()
-}
-
-func (o *Order) Type() string {
-	return o.Type()
-}
-
 func (o *Order) GetUncommittedChanges() []cqrs.EventMessage {
-	return o.GetChanges()
+	return o.Changes()
 }
 
 func (o *Order) ItemCount() int {

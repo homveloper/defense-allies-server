@@ -103,7 +103,7 @@ func LoadUserFromHistory(userID string, events []cqrs.EventMessage) (*User, erro
 
 // ChangeEmail changes the user's email address
 func (u *User) ChangeEmail(newEmail string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot change email of deleted user")
 	}
 
@@ -127,7 +127,7 @@ func (u *User) ChangeEmail(newEmail string) error {
 
 // Deactivate deactivates the user
 func (u *User) Deactivate(reason string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot deactivate deleted user")
 	}
 
@@ -147,7 +147,7 @@ func (u *User) Deactivate(reason string) error {
 
 // Activate activates the user
 func (u *User) Activate() error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot activate deleted user")
 	}
 
@@ -163,7 +163,7 @@ func (u *User) Activate() error {
 
 // RecordLogin records a user login
 func (u *User) RecordLogin() error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot record login for deleted user")
 	}
 
@@ -213,14 +213,14 @@ func (u *User) DeactivationReason() string {
 
 // IsActive returns true if the user is active
 func (u *User) IsActive() bool {
-	return u.status == UserStatusActive && !u.IsDeleted()
+	return u.status == UserStatusActive && !u.Deleted
 }
 
 // Role management methods
 
 // AssignRole assigns a role to the user
 func (u *User) AssignRole(roleType RoleType, assignedBy string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot assign role to deleted user")
 	}
 
@@ -239,7 +239,7 @@ func (u *User) AssignRole(roleType RoleType, assignedBy string) error {
 
 // AssignRoleWithExpiry assigns a role with expiration to the user
 func (u *User) AssignRoleWithExpiry(roleType RoleType, assignedBy string, expiresAt time.Time) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot assign role to deleted user")
 	}
 
@@ -262,7 +262,7 @@ func (u *User) AssignRoleWithExpiry(roleType RoleType, assignedBy string, expire
 
 // RevokeRole revokes a role from the user
 func (u *User) RevokeRole(roleType RoleType, revokedBy string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot revoke role from deleted user")
 	}
 
@@ -307,7 +307,7 @@ func (u *User) GetPermissions() []string {
 
 // UpdateProfile updates the user's profile information
 func (u *User) UpdateProfile(firstName, lastName, bio string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot update profile of deleted user")
 	}
 
@@ -332,7 +332,7 @@ func (u *User) UpdateProfile(firstName, lastName, bio string) error {
 
 // UpdateDisplayName updates the user's display name
 func (u *User) UpdateDisplayName(displayName string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot update display name of deleted user")
 	}
 
@@ -356,7 +356,7 @@ func (u *User) UpdateDisplayName(displayName string) error {
 
 // UpdateContactInfo updates the user's contact information
 func (u *User) UpdateContactInfo(phoneNumber, address, city, country, postalCode string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot update contact info of deleted user")
 	}
 
@@ -382,7 +382,7 @@ func (u *User) UpdateContactInfo(phoneNumber, address, city, country, postalCode
 
 // SetAvatar sets the user's avatar
 func (u *User) SetAvatar(avatarURL string) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot set avatar of deleted user")
 	}
 
@@ -404,7 +404,7 @@ func (u *User) SetAvatar(avatarURL string) error {
 
 // SetPreference sets a user preference
 func (u *User) SetPreference(key string, value interface{}) error {
-	if u.IsDeleted() {
+	if u.Deleted {
 		return errors.New("cannot set preference of deleted user")
 	}
 

@@ -7,6 +7,8 @@ import (
 	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
 	"fmt"
 	"log"
+
+	"github.com/pkg/errors"
 )
 
 // UserRepository 사용자 저장소 - Event Store를 사용한 구현
@@ -45,7 +47,7 @@ func (r *UserRepository) Save(ctx context.Context, user *domain.User) error {
 
 	err := r.eventStore.SaveEvents(ctx, user.ID(), uncommittedChanges, expectedVersion)
 	if err != nil {
-		return fmt.Errorf("failed to save events for user %s: %w", user.ID(), err)
+		return errors.Wrapf(err, "failed to save events for user %s", user.ID())
 	}
 
 	// 변경사항 클리어
@@ -199,7 +201,7 @@ func (r *UserRepository) GetUserStats(ctx context.Context) (map[string]interface
 	}
 
 	for _, user := range users {
-		if user.IsDeleted() {
+		if user.Deleted() {
 			stats["deleted_users"] = stats["deleted_users"].(int) + 1
 		} else if user.IsActive() {
 			stats["active_users"] = stats["active_users"].(int) + 1

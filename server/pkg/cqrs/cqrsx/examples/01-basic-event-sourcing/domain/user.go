@@ -2,12 +2,13 @@ package domain
 
 import (
 	"defense-allies-server/pkg/cqrs"
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -25,7 +26,7 @@ type User struct {
 // NewUser 새로운 User Aggregate 생성
 func NewUser() *User {
 	return &User{
-		BaseAggregate: cqrs.NewBaseAggregate("", "User"),
+		BaseAggregate: cqrs.NewBaseAggregate(uuid.New().String(), "User"),
 		isActive:      false,
 	}
 }
@@ -39,10 +40,13 @@ func NewUserWithID(id string) *User {
 }
 
 // CreateUser 새 사용자 생성 - 비즈니스 로직
-func (u *User) CreateUser(id, name, email string) error {
+func (u *User) CreateUser(name, email string) error {
+
+	id := u.ID()
+
 	// 비즈니스 규칙 검증
 	if err := u.validateUserCreation(id, name, email); err != nil {
-		return err
+		return errors.Wrap(err, "user creation validation failed")
 	}
 
 	// 이미 생성된 사용자인지 확인
@@ -50,20 +54,17 @@ func (u *User) CreateUser(id, name, email string) error {
 		return errors.New("user already exists")
 	}
 
-	// Aggregate ID 설정 (BaseAggregate의 id 필드 직접 설정)
-	u.BaseAggregate = cqrs.NewBaseAggregate(id, "User")
-
 	// 이벤트 생성 및 추적
 	event := CreateUserCreatedEvent(id, name, email)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		id,
-		"User",
-		1,
 		event,
 	)
 
-	u.TrackChange(eventMessage)
+	if err := u.ApplyEvent(eventMessage); err != nil {
+		return errors.Wrap(err, "failed to apply UserCreated event")
+	}
+
 	return nil
 }
 
@@ -75,7 +76,7 @@ func (u *User) UpdateUser(newName, newEmail string) error {
 	}
 
 	// 삭제된 사용자인지 확인
-	if u.IsDeleted() {
+	if u.Deleted() {
 		return errors.New("cannot update deleted user")
 	}
 
@@ -93,13 +94,13 @@ func (u *User) UpdateUser(newName, newEmail string) error {
 	event := CreateUserUpdatedEvent(u.ID(), u.name, newName, u.email, newEmail)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		u.ID(),
-		"User",
-		u.Version()+1,
 		event,
 	)
 
-	u.TrackChange(eventMessage)
+	if err := u.ApplyEvent(eventMessage); err != nil {
+		return errors.Wrap(err, "failed to apply UserUpdated event")
+	}
+
 	return nil
 }
 
@@ -111,7 +112,7 @@ func (u *User) DeleteUser(reason string) error {
 	}
 
 	// 이미 삭제된 사용자인지 확인
-	if u.IsDeleted() {
+	if u.Deleted() {
 		return errors.New("user already deleted")
 	}
 
@@ -119,13 +120,13 @@ func (u *User) DeleteUser(reason string) error {
 	event := CreateUserDeletedEvent(u.ID(), u.name, u.email, reason)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		u.ID(),
-		"User",
-		u.Version()+1,
 		event,
 	)
 
-	u.TrackChange(eventMessage)
+	if err := u.ApplyEvent(eventMessage); err != nil {
+		return errors.Wrap(err, "failed to apply UserDeleted event")
+	}
+
 	return nil
 }
 
@@ -135,7 +136,7 @@ func (u *User) ActivateUser(activatedBy string) error {
 		return errors.New("user does not exist")
 	}
 
-	if u.IsDeleted() {
+	if u.Deleted() {
 		return errors.New("cannot activate deleted user")
 	}
 
@@ -147,13 +148,13 @@ func (u *User) ActivateUser(activatedBy string) error {
 	event := CreateUserActivatedEvent(u.ID(), activatedBy)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		u.ID(),
-		"User",
-		u.Version()+1,
 		event,
 	)
 
-	u.TrackChange(eventMessage)
+	if err := u.ApplyEvent(eventMessage); err != nil {
+		return errors.Wrap(err, "failed to apply UserActivated event")
+	}
+
 	return nil
 }
 
@@ -163,7 +164,7 @@ func (u *User) DeactivateUser(deactivatedBy, reason string) error {
 		return errors.New("user does not exist")
 	}
 
-	if u.IsDeleted() {
+	if u.Deleted() {
 		return errors.New("cannot deactivate deleted user")
 	}
 
@@ -175,13 +176,13 @@ func (u *User) DeactivateUser(deactivatedBy, reason string) error {
 	event := CreateUserDeactivatedEvent(u.ID(), deactivatedBy, reason)
 	eventMessage := cqrs.NewBaseEventMessage(
 		event.EventType(),
-		u.ID(),
-		"User",
-		u.Version()+1,
 		event,
 	)
 
-	u.TrackChange(eventMessage)
+	if err := u.ApplyEvent(eventMessage); err != nil {
+		return errors.Wrap(err, "failed to apply UserDeactivated event")
+	}
+
 	return nil
 }
 
@@ -237,7 +238,7 @@ func (u *User) applyUserDeleted(event *UserDeleted) error {
 	now := event.DeletedAt
 	u.deletedAt = &now
 	u.updatedAt = event.DeletedAt
-	u.MarkAsDeleted()
+	u.Deleted(true)
 	return nil
 }
 
@@ -278,33 +279,9 @@ func (u *User) DeletedAt() *time.Time {
 	return u.deletedAt
 }
 
-// Version returns the current version (convenience method)
-func (u *User) Version() int {
-	return u.Version()
-}
-
-// ID returns the aggregate ID (convenience method)
-func (u *User) ID() string {
-	return u.ID()
-}
-
-// Type returns the aggregate type (convenience method)
-func (u *User) Type() string {
-	return u.Type()
-}
-
 // GetUncommittedChanges returns uncommitted changes (convenience method)
 func (u *User) GetUncommittedChanges() []cqrs.EventMessage {
-	return u.GetChanges()
-}
-
-// SetID sets the aggregate ID (convenience method)
-func (u *User) SetID(id string) {
-	// For this example, we'll use reflection or direct field access
-	// In a real implementation, BaseAggregate should provide this method
-	if u.BaseAggregate != nil {
-		// We'll set it during event application
-	}
+	return u.Changes()
 }
 
 // 검증 메서드들
@@ -368,7 +345,7 @@ func (u *User) String() string {
 	if u.isActive {
 		status = "active"
 	}
-	if u.IsDeleted() {
+	if u.Deleted() {
 		status = "deleted"
 	}
 
@@ -424,4 +401,17 @@ func (u *User) convertEventData(eventType string, data interface{}) (interface{}
 	default:
 		return nil, fmt.Errorf("unknown event type: %s", eventType)
 	}
+}
+
+func (u *User) Deleted(deleted ...bool) bool {
+	if len(deleted) > 0 {
+		if deleted[0] {
+			var now time.Time = time.Now()
+			u.deletedAt = &now
+		} else {
+			u.deletedAt = nil
+		}
+	}
+
+	return u.deletedAt != nil
 }

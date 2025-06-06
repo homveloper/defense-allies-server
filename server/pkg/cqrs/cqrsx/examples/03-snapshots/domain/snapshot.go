@@ -12,7 +12,7 @@ import (
 
 // OrderSnapshot Order Aggregate의 스냅샷 구조체
 type OrderSnapshot struct {
-	ID           string                 `json:"aggregate_id" bson:"aggregate_id"`
+	AggregateID  string                 `json:"aggregate_id" bson:"aggregate_id"`
 	Ver          int                    `json:"version" bson:"version"`
 	CustomerID   string                 `json:"customer_id" bson:"customer_id"`
 	Items        []OrderItem            `json:"items" bson:"items"`
@@ -35,7 +35,7 @@ type OrderSnapshot struct {
 // CreateSnapshot Order에서 스냅샷을 생성하는 메서드
 func (o *Order) CreateSnapshot() (cqrs.SnapshotData, error) {
 	return &OrderSnapshot{
-		ID:           o.ID(),
+		AggregateID:  o.ID(),
 		Ver:          o.Version(),
 		CustomerID:   o.CustomerID(),
 		Items:        o.Items(),
@@ -85,7 +85,7 @@ func RestoreFromSnapshot(snapshot *OrderSnapshot) (*Order, error) {
 	}
 
 	// Order 인스턴스 생성
-	baseAggregate := cqrs.NewBaseAggregate(snapshot.ID, "Order")
+	baseAggregate := cqrs.NewBaseAggregate(snapshot.ID(), "Order")
 	baseAggregate.SetOriginalVersion(snapshot.Ver)
 
 	order := &Order{
@@ -112,7 +112,7 @@ func RestoreFromSnapshot(snapshot *OrderSnapshot) (*Order, error) {
 
 // SnapshotData 인터페이스 구현
 func (s *OrderSnapshot) ID() string {
-	return s.ID
+	return s.AggregateID
 }
 
 func (s *OrderSnapshot) Type() string {
@@ -160,7 +160,7 @@ func (s *OrderSnapshot) GetSize() int64 {
 // Clone 스냅샷 복사본 생성
 func (s *OrderSnapshot) Clone() *OrderSnapshot {
 	clone := &OrderSnapshot{
-		ID:           s.ID,
+		AggregateID:  s.ID(),
 		Ver:          s.Ver,
 		CustomerID:   s.CustomerID,
 		Items:        make([]OrderItem, len(s.Items)),
@@ -193,7 +193,7 @@ func (s *OrderSnapshot) Clone() *OrderSnapshot {
 
 // Validate 스냅샷 유효성 검증
 func (s *OrderSnapshot) Validate() error {
-	if s.ID == "" {
+	if s.ID() == "" {
 		return cqrs.ErrInvalidSnapshotData
 	}
 	if s.Ver < 0 {

@@ -146,7 +146,7 @@ func handleCreateUser(ctx context.Context, args []string, infra *infrastructure.
 	userID := uuid.New().String()
 
 	user := domain.NewUserWithID(userID)
-	err := user.CreateUser(userID, name, email)
+	err := user.CreateUser(name, email)
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
@@ -299,7 +299,7 @@ func handleGetUser(ctx context.Context, args []string, infra *infrastructure.Inf
 	fmt.Printf("   Name: %s\n", user.Name())
 	fmt.Printf("   Email: %s\n", user.Email())
 	fmt.Printf("   Active: %t\n", user.IsActive())
-	fmt.Printf("   Deleted: %t\n", user.IsDeleted())
+	fmt.Printf("   Deleted: %t\n", user.Deleted())
 	fmt.Printf("   Version: %d\n", user.Version())
 	fmt.Printf("   Created: %s\n", user.CreatedAt().Format(time.RFC3339))
 	fmt.Printf("   Updated: %s\n", user.UpdatedAt().Format(time.RFC3339))
@@ -342,7 +342,7 @@ func handleListUsers(ctx context.Context, infra *infrastructure.Infrastructure) 
 	fmt.Printf("👥 All Users (%d total):\n", len(users))
 	for i, user := range users {
 		status := "inactive"
-		if user.IsDeleted() {
+		if user.Deleted() {
 			status = "deleted"
 		} else if user.IsActive() {
 			status = "active"

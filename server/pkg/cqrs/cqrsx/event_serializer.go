@@ -59,14 +59,16 @@ func (s *JSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error
 
 	event := cqrs.NewBaseEventMessage(
 		eventData.EventType,
-		eventData.AggregateID,
-		eventData.AggregateType,
-		eventData.Version,
 		eventData.Data,
+		cqrs.Options().WithLoad(
+			eventData.EventID,
+			eventData.Timestamp,
+			eventData.Metadata,
+			eventData.AggregateID,
+			eventData.AggregateType,
+			eventData.Version,
+		),
 	)
-
-	event.SetEventID(eventData.EventID)
-	event.SetTimestamp(eventData.Timestamp)
 
 	// Set metadata
 	for key, value := range eventData.Metadata {
@@ -119,10 +121,15 @@ func (s *CompactEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, er
 
 	event := cqrs.NewBaseEventMessage(
 		eventData.T,
-		eventData.AID,
-		eventData.AT,
-		eventData.V,
 		eventData.D,
+		cqrs.Options().WithLoad(
+			eventData.ID,
+			eventData.TS,
+			eventData.M,
+			eventData.AID,
+			eventData.AT,
+			eventData.V,
+		),
 	)
 
 	event.SetEventID(eventData.ID)
@@ -215,10 +222,15 @@ func (s *BSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error
 
 	event := cqrs.NewBaseEventMessage(
 		eventData.EventType,
-		eventData.AggregateID,
-		eventData.AggregateType,
-		eventData.Version,
 		eventData.Data,
+		cqrs.Options().WithLoad(
+			eventData.EventID,
+			eventData.Timestamp,
+			eventData.Metadata,
+			eventData.AggregateID,
+			eventData.AggregateType,
+			eventData.Version,
+		),
 	)
 
 	event.SetEventID(eventData.EventID)

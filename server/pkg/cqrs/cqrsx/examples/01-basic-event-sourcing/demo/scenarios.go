@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 // DemoScenarios 데모 시나리오 실행기
@@ -28,10 +29,10 @@ func (d *DemoScenarios) RunBasicCRUDScenario(ctx context.Context) error {
 	fmt.Println("\n=== Running Basic CRUD Scenario ===")
 
 	// 1. 사용자 생성
-	userID := uuid.New().String()
 	user := domain.NewUser()
+	userID := user.ID()
 
-	err := user.CreateUser(userID, "John Doe", "john.doe@example.com")
+	err := user.CreateUser("John Doe", "john.doe@example.com")
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
@@ -59,7 +60,7 @@ func (d *DemoScenarios) RunBasicCRUDScenario(ctx context.Context) error {
 
 	err = d.infra.UserRepo.Save(ctx, loadedUser)
 	if err != nil {
-		return fmt.Errorf("failed to save activated user: %w", err)
+		return errors.Wrap(err, "failed to save activated user: %w")
 	}
 
 	fmt.Printf("✓ Activated user: %s\n", loadedUser.String())
@@ -96,11 +97,11 @@ func (d *DemoScenarios) RunEventRestorationScenario(ctx context.Context) error {
 	fmt.Println("\n=== Running Event Restoration Scenario ===")
 
 	// 1. 여러 이벤트가 있는 사용자 생성
-	userID := uuid.New().String()
 	user := domain.NewUser()
+	userID := user.ID()
 
 	// 사용자 생성
-	err := user.CreateUser(userID, "Alice Johnson", "alice@example.com")
+	err := user.CreateUser("Alice Johnson", "alice@example.com")
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
@@ -205,10 +206,10 @@ func (d *DemoScenarios) RunConcurrencyScenario(ctx context.Context) error {
 	fmt.Println("\n=== Running Concurrency Scenario ===")
 
 	// 1. 사용자 생성
-	userID := uuid.New().String()
 	user := domain.NewUser()
+	userID := user.ID()
 
-	err := user.CreateUser(userID, "Bob Wilson", "bob@example.com")
+	err := user.CreateUser("Bob Wilson", "bob@example.com")
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
@@ -297,8 +298,8 @@ func (d *DemoScenarios) RunPerformanceScenario(ctx context.Context) error {
 		userID := uuid.New().String()
 		userIDs[i] = userID
 
-		user := domain.NewUser()
-		err := user.CreateUser(userID, fmt.Sprintf("User %d", i+1), fmt.Sprintf("user%d@example.com", i+1))
+		user := domain.NewUserWithID(uuid.New().String())
+		err := user.CreateUser(fmt.Sprintf("User %d", i+1), fmt.Sprintf("user%d@example.com", i+1))
 		if err != nil {
 			return fmt.Errorf("failed to create user %d: %w", i+1, err)
 		}

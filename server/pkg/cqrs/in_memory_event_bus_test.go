@@ -163,7 +163,13 @@ func TestEventBus_Publish_Success(t *testing.T) {
 	// Arrange
 	bus := NewInMemoryEventBus()
 	handler := NewTestEventHandler("TestHandler", []string{"TestEvent"})
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+
+	eventdata := map[string]interface{}{
+		"field1": "value1",
+		"field2": 42,
+	}
+
+	event := NewBaseEventMessage("TestEvent", eventdata)
 
 	bus.Subscribe("TestEvent", handler)
 

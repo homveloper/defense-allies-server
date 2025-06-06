@@ -13,42 +13,10 @@ type RedisEventSourcedRepository struct {
 	aggregateType string
 }
 
-// RedisStateBasedRepository implements StateBasedRepository using Redis
-type RedisStateBasedRepository struct {
-	stateStore    *RedisStateStore
-	aggregateType string
-}
-
-// RedisHybridRepository implements HybridRepository using Redis
-type RedisHybridRepository struct {
-	eventStore    *RedisEventStore
-	stateStore    *RedisStateStore
-	snapshotStore cqrs.SnapshotStore
-	aggregateType string
-}
-
 // NewRedisEventSourcedRepository creates a new Redis event sourced repository
 func NewRedisEventSourcedRepository(eventStore *RedisEventStore, snapshotStore cqrs.SnapshotStore, aggregateType string) *RedisEventSourcedRepository {
 	return &RedisEventSourcedRepository{
 		eventStore:    eventStore,
-		snapshotStore: snapshotStore,
-		aggregateType: aggregateType,
-	}
-}
-
-// NewRedisStateBasedRepository creates a new Redis state based repository
-func NewRedisStateBasedRepository(stateStore *RedisStateStore, aggregateType string) *RedisStateBasedRepository {
-	return &RedisStateBasedRepository{
-		stateStore:    stateStore,
-		aggregateType: aggregateType,
-	}
-}
-
-// NewRedisHybridRepository creates a new Redis hybrid repository
-func NewRedisHybridRepository(eventStore *RedisEventStore, stateStore *RedisStateStore, snapshotStore cqrs.SnapshotStore, aggregateType string) *RedisHybridRepository {
-	return &RedisHybridRepository{
-		eventStore:    eventStore,
-		stateStore:    stateStore,
 		snapshotStore: snapshotStore,
 		aggregateType: aggregateType,
 	}
@@ -165,56 +133,4 @@ func (r *RedisEventSourcedRepository) GetLastEventVersion(ctx context.Context, a
 
 func (r *RedisEventSourcedRepository) CompactEvents(ctx context.Context, aggregateID string, beforeVersion int) error {
 	return r.eventStore.CompactEvents(ctx, aggregateID, r.aggregateType, beforeVersion)
-}
-
-// RedisStateBasedRepository implementation
-
-func (r *RedisStateBasedRepository) Save(ctx context.Context, aggregate cqrs.AggregateRoot, expectedVersion int) error {
-	return r.stateStore.Save(ctx, aggregate, expectedVersion)
-}
-
-func (r *RedisStateBasedRepository) GetByID(ctx context.Context, id string) (cqrs.AggregateRoot, error) {
-	return r.stateStore.GetByID(ctx, r.aggregateType, id)
-}
-
-func (r *RedisStateBasedRepository) GetVersion(ctx context.Context, id string) (int, error) {
-	return r.stateStore.GetVersion(ctx, r.aggregateType, id)
-}
-
-func (r *RedisStateBasedRepository) Exists(ctx context.Context, id string) bool {
-	return r.stateStore.Exists(ctx, r.aggregateType, id)
-}
-
-// StateBasedRepository specific methods
-
-func (r *RedisStateBasedRepository) Create(ctx context.Context, aggregate cqrs.AggregateRoot) error {
-	return r.Save(ctx, aggregate, 0) // Expected version 0 for new aggregates
-}
-
-func (r *RedisStateBasedRepository) Update(ctx context.Context, aggregate cqrs.AggregateRoot) error {
-	return r.Save(ctx, aggregate, aggregate.OriginalVersion())
-}
-
-func (r *RedisStateBasedRepository) Delete(ctx context.Context, id string) error {
-	return r.stateStore.Delete(ctx, r.aggregateType, id)
-}
-
-func (r *RedisStateBasedRepository) FindBy(ctx context.Context, criteria cqrs.QueryCriteria) ([]cqrs.AggregateRoot, error) {
-	// Note: This would require implementing query functionality in Redis
-	return nil, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "query functionality not implemented yet", nil)
-}
-
-func (r *RedisStateBasedRepository) Count(ctx context.Context, criteria cqrs.QueryCriteria) (int64, error) {
-	// Note: This would require implementing query functionality in Redis
-	return 0, cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "query functionality not implemented yet", nil)
-}
-
-func (r *RedisStateBasedRepository) SaveBatch(ctx context.Context, aggregates []cqrs.AggregateRoot) error {
-	// Note: This would require implementing batch operations
-	return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "batch operations not implemented yet", nil)
-}
-
-func (r *RedisStateBasedRepository) DeleteBatch(ctx context.Context, ids []string) error {
-	// Note: This would require implementing batch operations
-	return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(), "batch operations not implemented yet", nil)
 }
