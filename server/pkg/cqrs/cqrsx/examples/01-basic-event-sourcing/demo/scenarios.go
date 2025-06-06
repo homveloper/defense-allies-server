@@ -180,7 +180,7 @@ func (d *DemoScenarios) RunEventRestorationScenario(ctx context.Context) error {
 	restoredUser := domain.NewUserWithID(userID)
 
 	for _, event := range events {
-		err := restoredUser.Apply(event)
+		err := restoredUser.ApplyEvent(event)
 		if err != nil {
 			return fmt.Errorf("failed to apply event %s: %w", event.EventType(), err)
 		}

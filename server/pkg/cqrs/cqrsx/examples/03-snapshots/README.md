@@ -52,6 +52,31 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
 
 ### 2. 예제 실행
+
+#### 🆕 새로운 고급 스냅샷 데모들
+```bash
+# 기본 스냅샷 데모
+cd cmd/basic
+go run .
+
+# 고급 스냅샷 데모 (압축, 정책)
+cd cmd/advanced
+go run .
+
+# 스냅샷 정책 비교 데모
+cd cmd/policies
+go run .
+
+# 직렬화 방식 비교 데모
+cd cmd/serializers
+go run .
+
+# 성능 측정 데모
+cd cmd/performance
+go run .
+```
+
+#### 기존 대화형 데모
 ```bash
 cd 03-snapshots
 go run main.go

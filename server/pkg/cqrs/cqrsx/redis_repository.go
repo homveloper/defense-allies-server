@@ -108,7 +108,7 @@ func (r *RedisEventSourcedRepository) GetByID(ctx context.Context, id string) (c
 
 	// Apply events to aggregate
 	for _, event := range events {
-		aggregate.Apply(event, false) // false = existing event, don't track as change
+		aggregate.ReplayEvent(event) // false = existing event, don't track as change
 	}
 
 	// Set original version

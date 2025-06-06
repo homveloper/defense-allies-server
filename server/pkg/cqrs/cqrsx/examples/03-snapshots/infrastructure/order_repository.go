@@ -40,10 +40,10 @@ func (r *OrderRepository) Save(ctx context.Context, order *domain.Order) error {
 
 	// Event Store에 이벤트들 저장
 	expectedVersion := order.OriginalVersion()
-	
-	log.Printf("Attempting to save %d events for order %s with expectedVersion %d (original: %d, current: %d)", 
+
+	log.Printf("Attempting to save %d events for order %s with expectedVersion %d (original: %d, current: %d)",
 		len(uncommittedChanges), order.ID(), expectedVersion, order.OriginalVersion(), order.CurrentVersion())
-	
+
 	err := r.eventStore.SaveEvents(ctx, order.ID(), uncommittedChanges, expectedVersion)
 	if err != nil {
 		return fmt.Errorf("failed to save events for order %s: %w", order.ID(), err)
@@ -62,7 +62,7 @@ func (r *OrderRepository) Save(ctx context.Context, order *domain.Order) error {
 		eventCount := order.CurrentVersion()
 		if r.snapshotManager.ShouldCreateSnapshot(order, eventCount) {
 			log.Printf("Creating snapshot for order %s at version %d", order.ID(), order.Version())
-			
+
 			if err := r.snapshotManager.CreateSnapshot(ctx, order); err != nil {
 				// 스냅샷 생성 실패는 치명적이지 않음 (로그만 남김)
 				log.Printf("Failed to create snapshot for order %s: %v", order.ID(), err)
@@ -76,11 +76,11 @@ func (r *OrderRepository) Save(ctx context.Context, order *domain.Order) error {
 // GetByID ID로 주문 조회 (스냅샷 + 이벤트)
 func (r *OrderRepository) GetByID(ctx context.Context, orderID string) (*domain.Order, error) {
 	start := time.Now()
-	
+
 	var order *domain.Order
 	var fromVersion int = 1
 	var restoredFromSnapshot bool
-	
+
 	// 스냅샷에서 복원 시도
 	if r.enableSnapshots {
 		snapshotOrder, snapshotVersion, err := snapshots.RestoreOrderFromSnapshot(ctx, r.snapshotManager, orderID, int(^uint(0)>>1)) // max int
@@ -95,7 +95,7 @@ func (r *OrderRepository) GetByID(ctx context.Context, orderID string) (*domain.
 			log.Printf("Restored order %s from snapshot at version %d", orderID, snapshotVersion)
 		}
 	}
-	
+
 	// 스냅샷이 없으면 새 주문 생성
 	if order == nil {
 		order = domain.NewOrderWithID(orderID)
@@ -117,7 +117,7 @@ func (r *OrderRepository) GetByID(ctx context.Context, orderID string) (*domain.
 
 	// 이벤트들을 순서대로 적용하여 상태 복원
 	for _, event := range events {
-		err := order.Apply(event)
+		err := order.ApplyEvent(event)
 		if err != nil {
 			return nil, fmt.Errorf("failed to apply event %s for order %s: %w",
 				event.EventType(), orderID, err)
@@ -128,9 +128,9 @@ func (r *OrderRepository) GetByID(ctx context.Context, orderID string) (*domain.
 	order.SetOriginalVersion(order.CurrentVersion())
 
 	loadTime := time.Since(start)
-	log.Printf("Successfully loaded order %s with version %d in %v (snapshot: %v, events: %d)", 
+	log.Printf("Successfully loaded order %s with version %d in %v (snapshot: %v, events: %d)",
 		orderID, order.Version(), loadTime, restoredFromSnapshot, len(events))
-	
+
 	return order, nil
 }
 
@@ -144,7 +144,7 @@ func (r *OrderRepository) GetSnapshotInfo(ctx context.Context, orderID string) (
 	if !r.enableSnapshots {
 		return nil, fmt.Errorf("snapshots are not enabled")
 	}
-	
+
 	return r.snapshotManager.GetSnapshotInfo(ctx, orderID)
 }
 
@@ -153,13 +153,13 @@ func (r *OrderRepository) CreateSnapshot(ctx context.Context, orderID string) er
 	if !r.enableSnapshots {
 		return fmt.Errorf("snapshots are not enabled")
 	}
-	
+
 	// 주문 로드
 	order, err := r.GetByID(ctx, orderID)
 	if err != nil {
 		return fmt.Errorf("failed to load order for snapshot: %w", err)
 	}
-	
+
 	// 스냅샷 생성
 	return r.snapshotManager.CreateSnapshot(ctx, order)
 }
@@ -169,21 +169,21 @@ func (r *OrderRepository) CleanupSnapshots(ctx context.Context, orderID string) 
 	if !r.enableSnapshots {
 		return fmt.Errorf("snapshots are not enabled")
 	}
-	
+
 	return r.snapshotManager.CleanupOldSnapshots(ctx, orderID)
 }
 
 // GetPerformanceMetrics 성능 메트릭 조회
 func (r *OrderRepository) GetPerformanceMetrics(ctx context.Context, orderID string) (map[string]interface{}, error) {
 	metrics := make(map[string]interface{})
-	
+
 	// 이벤트 개수 조회
 	events, err := r.GetEventHistory(ctx, orderID)
 	if err != nil {
 		return nil, err
 	}
 	metrics["event_count"] = len(events)
-	
+
 	// 스냅샷 정보 조회
 	if r.enableSnapshots {
 		snapshotInfos, err := r.GetSnapshotInfo(ctx, orderID)
@@ -197,7 +197,7 @@ func (r *OrderRepository) GetPerformanceMetrics(ctx context.Context, orderID str
 			}
 		}
 	}
-	
+
 	return metrics, nil
 }
 

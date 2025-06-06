@@ -186,9 +186,11 @@ func (u *User) DeactivateUser(deactivatedBy, reason string) error {
 }
 
 // Apply 이벤트를 적용하여 상태 변경
-func (u *User) Apply(event cqrs.EventMessage) error {
+func (u *User) ApplyEvent(event cqrs.EventMessage) error {
 	// BaseAggregate의 Apply 메서드 호출 (버전 관리)
-	u.BaseAggregate.Apply(event, false)
+	if err := u.BaseAggregate.ApplyEvent(event); err != nil {
+		return err
+	}
 
 	// BSON에서 역직렬화된 데이터를 구체적인 이벤트 타입으로 변환
 	eventData, err := u.convertEventData(event.EventType(), event.EventData())

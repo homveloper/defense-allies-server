@@ -214,8 +214,8 @@ func (ss *MongoStateStore) GetAggregateVersion(ctx context.Context, aggregateID,
 	err := collection.FindOne(ctx, filter, opts).Decode(&doc)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return -1, cqrs.NewCQRSError(cqrs.ErrCodeAggregateNotFound.String(),
-				fmt.Sprintf("aggregate not found: %s/%s", aggregateType, aggregateID), nil)
+			// EventStore와 일치하도록 존재하지 않는 Aggregate는 버전 0 반환
+			return 0, nil
 		}
 		return -1, cqrs.NewCQRSError(cqrs.ErrCodeStateStoreError.String(),
 			fmt.Sprintf("failed to get aggregate version: %v", err), err)
@@ -378,7 +378,7 @@ func (ss *MongoStateStore) CreateIndexes(ctx context.Context) error {
 			Options: options.Index().SetName("idx_type_updated"),
 		},
 		{
-			Keys: bson.D{{Key: "deleted", Value: 1}},
+			Keys:    bson.D{{Key: "deleted", Value: 1}},
 			Options: options.Index().SetName("idx_deleted"),
 		},
 	}

@@ -83,7 +83,7 @@ func (r *UserRepository) GetByID(ctx context.Context, userID string) (*domain.Us
 
 	// 이벤트들을 순서대로 적용하여 상태 복원
 	for _, event := range events {
-		err := user.Apply(event)
+		err := user.ReplayEvent(event)
 		if err != nil {
 			return nil, fmt.Errorf("failed to apply event %s for user %s: %w",
 				event.EventType(), userID, err)

@@ -9,6 +9,15 @@
 - 다양한 View 생성 및 최적화
 - TTL을 활용한 캐시 관리
 
+## ✅ 구현 상태
+
+- [x] Domain Layer (Aggregates, Events, Commands)
+- [x] Read Models (Views)
+- [x] Projections (Event Handlers)
+- [x] Infrastructure (MongoDB Read Store)
+- [x] Demo Application
+- [x] Query Examples
+
 ## 🏗️ 아키텍처
 
 ```
@@ -28,7 +37,9 @@ Events → Event Handlers → Read Models → MongoDB Read Store
 ```
 04-read-models/
 ├── README.md
-├── main.go                        # 메인 데모 프로그램
+├── cmd
+│   └── basic
+│       └── main.go              # 메인 데모 프로그램   
 ├── domain/
 │   ├── user.go                   # User Aggregate
 │   ├── order.go                  # Order Aggregate
@@ -62,7 +73,7 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 
 ### 2. 예제 실행
 ```bash
-cd 04-read-models
+cd server/pkg/cqrs/cqrsx/examples/04-read-models/cmd/basic
 go run main.go
 ```
 

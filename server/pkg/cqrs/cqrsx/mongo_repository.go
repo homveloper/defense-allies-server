@@ -137,7 +137,7 @@ func (r *MongoEventSourcedRepository) GetByID(ctx context.Context, id string) (c
 
 	// Apply events to rebuild/update state
 	for _, event := range events {
-		aggregate.Apply(event, false)
+		aggregate.ReplayEvent(event)
 	}
 
 	// Clear changes (these are historical events, not new changes)
@@ -292,7 +292,7 @@ func (r *MongoHybridRepository) rebuildFromEvents(ctx context.Context, id string
 
 	// Apply events to rebuild state
 	for _, event := range events {
-		aggregate.Apply(event, false)
+		aggregate.ReplayEvent(event)
 	}
 
 	// Clear changes

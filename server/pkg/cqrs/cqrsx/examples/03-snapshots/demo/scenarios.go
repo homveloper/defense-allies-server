@@ -151,7 +151,7 @@ func (d *DemoRunner) RunBasicSnapshotDemo(ctx context.Context) error {
 		return fmt.Errorf("version mismatch: original %d vs restored %d", order.Version(), restoredOrder.Version())
 	}
 
-	if order.Status != restoredOrder.Status {
+	if order.Status() != restoredOrder.Status() {
 		return fmt.Errorf("status mismatch: original %s vs restored %s", order.Status, restoredOrder.Status)
 	}
 
@@ -261,8 +261,8 @@ func (d *DemoRunner) createOrderWithEvents(ctx context.Context, orderID string, 
 			rate := float64(i%10) / 100.0
 			err = order.ApplyDiscount(decimal.NewFromFloat(rate), fmt.Sprintf("Discount %d", i))
 		case 2: // 수량 변경 (기존 상품이 있는 경우)
-			if len(order.Items) > 0 {
-				firstItem := order.Items[0]
+			if len(order.Items()) > 0 {
+				firstItem := order.Items()[0]
 				newQty := (i % 5) + 1
 				err = order.ChangeItemQuantity(firstItem.ProductID, newQty)
 			}

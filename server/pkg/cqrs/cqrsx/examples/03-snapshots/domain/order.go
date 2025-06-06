@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -34,44 +35,41 @@ type OrderItem struct {
 // Order 주문 Aggregate
 type Order struct {
 	// BaseAggregate 필드들
-	AggregateID_     string              `json:"aggregate_id" bson:"aggregate_id"`
-	AggregateType_   string              `json:"aggregate_type" bson:"aggregate_type"`
-	Version_         int                 `json:"version" bson:"version"`
-	OriginalVersion_ int                 `json:"original_version" bson:"original_version"`
-	Changes_         []cqrs.EventMessage `json:"-" bson:"-"` // 직렬화하지 않음
+	*cqrs.BaseAggregate
 
-	// 비즈니스 필드들
-	CustomerID   string                 `json:"customer_id" bson:"customer_id"`
-	Items        []OrderItem            `json:"items" bson:"items"`
-	Status       OrderStatus            `json:"status" bson:"status"`
-	TotalAmount  decimal.Decimal        `json:"total_amount" bson:"total_amount"`
-	DiscountRate decimal.Decimal        `json:"discount_rate" bson:"discount_rate"`
-	TaxRate      decimal.Decimal        `json:"tax_rate" bson:"tax_rate"`
-	ShippingCost decimal.Decimal        `json:"shipping_cost" bson:"shipping_cost"`
-	FinalAmount  decimal.Decimal        `json:"final_amount" bson:"final_amount"`
-	CreatedAt    time.Time              `json:"created_at" bson:"created_at"`
-	UpdatedAt    time.Time              `json:"updated_at" bson:"updated_at"`
-	ConfirmedAt  *time.Time             `json:"confirmed_at,omitempty" bson:"confirmed_at,omitempty"`
-	ShippedAt    *time.Time             `json:"shipped_at,omitempty" bson:"shipped_at,omitempty"`
-	DeliveredAt  *time.Time             `json:"delivered_at,omitempty" bson:"delivered_at,omitempty"`
-	CancelledAt  *time.Time             `json:"cancelled_at,omitempty" bson:"cancelled_at,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata" bson:"metadata"`
+	// 비즈니스 필드들 (private)
+	customerID   string
+	items        []OrderItem
+	status       OrderStatus
+	totalAmount  decimal.Decimal
+	discountRate decimal.Decimal
+	taxRate      decimal.Decimal
+	shippingCost decimal.Decimal
+	finalAmount  decimal.Decimal
+	createdAt    time.Time
+	updatedAt    time.Time
+	confirmedAt  *time.Time
+	shippedAt    *time.Time
+	deliveredAt  *time.Time
+	cancelledAt  *time.Time
+	metadata     map[string]interface{}
 }
 
 // NewOrder 새로운 주문 생성
 func NewOrder() *Order {
+	id := uuid.New().String()
+
 	order := &Order{
-		BaseAggregate: cqrs.NewBaseAggregate("", "Order"),
-		Items:         make([]OrderItem, 0),
-		Status:        OrderStatusPending,
-		TotalAmount:   decimal.Zero,
-		DiscountRate:  decimal.Zero,
-		TaxRate:       decimal.NewFromFloat(0.1), // 기본 10% 세율
-		ShippingCost:  decimal.Zero,
-		FinalAmount:   decimal.Zero,
-		Metadata:      make(map[string]interface{}),
+		BaseAggregate: cqrs.NewBaseAggregate(id, "Order"),
+		items:         make([]OrderItem, 0),
+		status:        OrderStatusPending,
+		totalAmount:   decimal.Zero,
+		discountRate:  decimal.Zero,
+		taxRate:       decimal.NewFromFloat(0.1), // 기본 10% 세율
+		shippingCost:  decimal.Zero,
+		finalAmount:   decimal.Zero,
+		metadata:      make(map[string]interface{}),
 	}
-	order.syncFromBaseAggregate()
 	return order
 }
 
@@ -108,6 +106,12 @@ func (o *Order) CreateOrder(orderID, customerID string, shippingCost decimal.Dec
 	)
 
 	o.TrackChange(eventMessage)
+
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply OrderCreated event: %w", err)
+	}
+
 	return nil
 }
 
@@ -117,7 +121,7 @@ func (o *Order) AddItem(productID, productName string, quantity int, unitPrice d
 		return err
 	}
 
-	if o.Status != OrderStatusPending {
+	if o.Status() != OrderStatusPending {
 		return errors.New("cannot add items to non-pending order")
 	}
 
@@ -132,18 +136,24 @@ func (o *Order) AddItem(productID, productName string, quantity int, unitPrice d
 	)
 
 	o.TrackChange(eventMessage)
+
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply ItemAdded event: %w", err)
+	}
+
 	return nil
 }
 
 // RemoveItem 상품 제거
 func (o *Order) RemoveItem(productID string) error {
-	if o.Status != OrderStatusPending {
+	if o.Status() != OrderStatusPending {
 		return errors.New("cannot remove items from non-pending order")
 	}
 
 	// 상품이 존재하는지 확인
 	found := false
-	for _, item := range o.Items {
+	for _, item := range o.Items() {
 		if item.ProductID == productID {
 			found = true
 			break
@@ -174,7 +184,7 @@ func (o *Order) ChangeItemQuantity(productID string, newQuantity int) error {
 		return err
 	}
 
-	if o.Status != OrderStatusPending {
+	if o.Status() != OrderStatusPending {
 		return errors.New("cannot change item quantity in non-pending order")
 	}
 
@@ -194,7 +204,7 @@ func (o *Order) ChangeItemQuantity(productID string, newQuantity int) error {
 
 // ApplyDiscount 할인 적용
 func (o *Order) ApplyDiscount(discountRate decimal.Decimal, reason string) error {
-	if o.Status != OrderStatusPending {
+	if o.Status() != OrderStatusPending {
 		return errors.New("cannot apply discount to non-pending order")
 	}
 
@@ -213,16 +223,22 @@ func (o *Order) ApplyDiscount(discountRate decimal.Decimal, reason string) error
 	)
 
 	o.TrackChange(eventMessage)
+
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply DiscountApplied event: %w", err)
+	}
+
 	return nil
 }
 
 // ConfirmOrder 주문 확정
 func (o *Order) ConfirmOrder() error {
-	if o.Status != OrderStatusPending {
-		return fmt.Errorf("cannot confirm order with status %s", o.Status)
+	if o.Status() != OrderStatusPending {
+		return fmt.Errorf("cannot confirm order with status %s", o.Status())
 	}
 
-	if len(o.Items) == 0 {
+	if len(o.Items()) == 0 {
 		return errors.New("cannot confirm order with no items")
 	}
 
@@ -237,13 +253,19 @@ func (o *Order) ConfirmOrder() error {
 	)
 
 	o.TrackChange(eventMessage)
+
+	// 이벤트 즉시 적용
+	if err := o.ApplyEvent(eventMessage); err != nil {
+		return fmt.Errorf("failed to apply OrderConfirmed event: %w", err)
+	}
+
 	return nil
 }
 
 // ShipOrder 주문 배송 시작
 func (o *Order) ShipOrder(trackingNumber string) error {
-	if o.Status != OrderStatusConfirmed {
-		return fmt.Errorf("cannot ship order with status %s", o.Status)
+	if o.Status() != OrderStatusConfirmed {
+		return fmt.Errorf("cannot ship order with status %s", o.Status())
 	}
 
 	// 이벤트 생성
@@ -262,8 +284,8 @@ func (o *Order) ShipOrder(trackingNumber string) error {
 
 // DeliverOrder 주문 배송 완료
 func (o *Order) DeliverOrder() error {
-	if o.Status != OrderStatusShipped {
-		return fmt.Errorf("cannot deliver order with status %s", o.Status)
+	if o.Status() != OrderStatusShipped {
+		return fmt.Errorf("cannot deliver order with status %s", o.Status())
 	}
 
 	// 이벤트 생성
@@ -282,11 +304,11 @@ func (o *Order) DeliverOrder() error {
 
 // CancelOrder 주문 취소
 func (o *Order) CancelOrder(reason string) error {
-	if o.Status == OrderStatusDelivered {
+	if o.Status() == OrderStatusDelivered {
 		return errors.New("cannot cancel delivered order")
 	}
 
-	if o.Status == OrderStatusCancelled {
+	if o.Status() == OrderStatusCancelled {
 		return errors.New("order is already cancelled")
 	}
 
@@ -302,6 +324,75 @@ func (o *Order) CancelOrder(reason string) error {
 
 	o.TrackChange(eventMessage)
 	return nil
+}
+
+// Getter 메서드들 (private 필드 접근용)
+func (o *Order) CustomerID() string {
+	return o.customerID
+}
+
+func (o *Order) Items() []OrderItem {
+	// 방어적 복사를 통해 불변성 보장
+	items := make([]OrderItem, len(o.items))
+	copy(items, o.items)
+	return items
+}
+
+func (o *Order) Status() OrderStatus {
+	return o.status
+}
+
+func (o *Order) TotalAmount() decimal.Decimal {
+	return o.totalAmount
+}
+
+func (o *Order) DiscountRate() decimal.Decimal {
+	return o.discountRate
+}
+
+func (o *Order) TaxRate() decimal.Decimal {
+	return o.taxRate
+}
+
+func (o *Order) ShippingCost() decimal.Decimal {
+	return o.shippingCost
+}
+
+func (o *Order) FinalAmount() decimal.Decimal {
+	return o.finalAmount
+}
+
+func (o *Order) CreatedAt() time.Time {
+	return o.createdAt
+}
+
+func (o *Order) UpdatedAt() time.Time {
+	return o.updatedAt
+}
+
+func (o *Order) ConfirmedAt() *time.Time {
+	return o.confirmedAt
+}
+
+func (o *Order) ShippedAt() *time.Time {
+	return o.shippedAt
+}
+
+func (o *Order) DeliveredAt() *time.Time {
+	return o.deliveredAt
+}
+
+func (o *Order) CancelledAt() *time.Time {
+	return o.cancelledAt
+}
+
+func (o *Order) Metadata() map[string]interface{} {
+	// 방어적 복사를 통해 불변성 보장
+	metadata := make(map[string]interface{})
+	for k, v := range o.metadata {
+		metadata[k] = v
+	}
+	return metadata
 }
 
 // 편의 메서드들
@@ -322,15 +413,15 @@ func (o *Order) GetUncommittedChanges() []cqrs.EventMessage {
 }
 
 func (o *Order) ItemCount() int {
-	return len(o.Items)
+	return len(o.items)
 }
 
 func (o *Order) IsEmpty() bool {
-	return len(o.Items) == 0
+	return len(o.items) == 0
 }
 
 func (o *Order) HasItem(productID string) bool {
-	for _, item := range o.Items {
+	for _, item := range o.items {
 		if item.ProductID == productID {
 			return true
 		}
@@ -339,7 +430,7 @@ func (o *Order) HasItem(productID string) bool {
 }
 
 func (o *Order) GetItem(productID string) (OrderItem, bool) {
-	for _, item := range o.Items {
+	for _, item := range o.items {
 		if item.ProductID == productID {
 			return item, true
 		}
@@ -350,7 +441,7 @@ func (o *Order) GetItem(productID string) (OrderItem, bool) {
 // String 주문 정보를 문자열로 반환
 func (o *Order) String() string {
 	return fmt.Sprintf("Order{ID: %s, Customer: %s, Status: %s, Items: %d, Total: %s, Version: %d}",
-		o.ID(), o.CustomerID, o.Status, len(o.Items), o.FinalAmount.String(), o.Version())
+		o.ID(), o.customerID, o.Status(), len(o.Items()), o.FinalAmount().String(), o.Version())
 }
 
 // 비즈니스 규칙 검증 메서드들
@@ -396,7 +487,7 @@ func (o *Order) validateQuantityChange(productID string, newQuantity int) error 
 // 금액 계산 메서드들
 func (o *Order) calculateTotalAmount() decimal.Decimal {
 	total := decimal.Zero
-	for _, item := range o.Items {
+	for _, item := range o.items {
 		total = total.Add(item.TotalPrice)
 	}
 	return total
@@ -407,23 +498,43 @@ func (o *Order) calculateFinalAmount() decimal.Decimal {
 	subtotal := o.calculateTotalAmount()
 
 	// 할인 적용
-	discountAmount := subtotal.Mul(o.DiscountRate)
+	discountAmount := subtotal.Mul(o.discountRate)
 	afterDiscount := subtotal.Sub(discountAmount)
 
 	// 세금 적용
-	taxAmount := afterDiscount.Mul(o.TaxRate)
+	taxAmount := afterDiscount.Mul(o.taxRate)
 	afterTax := afterDiscount.Add(taxAmount)
 
 	// 배송비 추가
-	finalAmount := afterTax.Add(o.ShippingCost)
+	finalAmount := afterTax.Add(o.shippingCost)
 
 	return finalAmount
 }
 
-// Apply 이벤트를 적용하여 상태 변경
-func (o *Order) Apply(event cqrs.EventMessage) error {
-	// BaseAggregate의 Apply 메서드 호출 (버전 관리)
-	o.BaseAggregate.Apply(event, false)
+// ApplyEvent 새로운 이벤트를 적용하여 상태 변경 (추적함)
+func (o *Order) ApplyEvent(event cqrs.EventMessage) error {
+	// BaseAggregate의 ApplyEvent 메서드 호출 (버전 관리 및 추적)
+	if err := o.BaseAggregate.ApplyEvent(event); err != nil {
+		return err
+	}
+
+	// 도메인별 이벤트 적용
+	return o.applyDomainEvent(event)
+}
+
+// ReplayEvent 기존 이벤트를 재생하여 상태 변경 (추적하지 않음)
+func (o *Order) ReplayEvent(event cqrs.EventMessage) error {
+	// BaseAggregate의 ReplayEvent 메서드 호출 (버전 관리만)
+	if err := o.BaseAggregate.ReplayEvent(event); err != nil {
+		return err
+	}
+
+	// 도메인별 이벤트 적용
+	return o.applyDomainEvent(event)
+}
+
+// applyDomainEvent 공통 도메인 이벤트 적용 로직
+func (o *Order) applyDomainEvent(event cqrs.EventMessage) error {
 
 	// BSON에서 역직렬화된 데이터를 구체적인 이벤트 타입으로 변환
 	eventData, err := o.convertEventData(event.EventType(), event.EventData())
@@ -562,11 +673,11 @@ func (o *Order) convertEventData(eventType string, data interface{}) (interface{
 
 // 이벤트 적용 메서드들
 func (o *Order) applyOrderCreated(event *OrderCreated) error {
-	o.CustomerID = event.CustomerID
-	o.ShippingCost = event.ShippingCost
-	o.Status = OrderStatusPending
-	o.CreatedAt = event.CreatedAt
-	o.UpdatedAt = event.CreatedAt
+	o.customerID = event.CustomerID
+	o.shippingCost = event.ShippingCost
+	o.status = OrderStatusPending
+	o.createdAt = event.CreatedAt
+	o.updatedAt = event.CreatedAt
 	return nil
 }
 
@@ -578,100 +689,100 @@ func (o *Order) applyItemAdded(event *ItemAdded) error {
 		UnitPrice:   event.UnitPrice,
 		TotalPrice:  event.TotalPrice,
 	}
-	o.Items = append(o.Items, item)
-	o.TotalAmount = o.calculateTotalAmount()
-	o.FinalAmount = o.calculateFinalAmount()
-	o.UpdatedAt = event.AddedAt
+	o.items = append(o.items, item)
+	o.totalAmount = o.calculateTotalAmount()
+	o.finalAmount = o.calculateFinalAmount()
+	o.updatedAt = event.AddedAt
 	return nil
 }
 
 func (o *Order) applyItemRemoved(event *ItemRemoved) error {
-	for i, item := range o.Items {
+	for i, item := range o.items {
 		if item.ProductID == event.ProductID {
-			o.Items = append(o.Items[:i], o.Items[i+1:]...)
+			o.items = append(o.items[:i], o.items[i+1:]...)
 			break
 		}
 	}
-	o.TotalAmount = o.calculateTotalAmount()
-	o.FinalAmount = o.calculateFinalAmount()
-	o.UpdatedAt = event.RemovedAt
+	o.totalAmount = o.calculateTotalAmount()
+	o.finalAmount = o.calculateFinalAmount()
+	o.updatedAt = event.RemovedAt
 	return nil
 }
 
 func (o *Order) applyItemQuantityChanged(event *ItemQuantityChanged) error {
-	for i, item := range o.Items {
+	for i, item := range o.items {
 		if item.ProductID == event.ProductID {
-			o.Items[i].Quantity = event.NewQuantity
-			o.Items[i].TotalPrice = item.UnitPrice.Mul(decimal.NewFromInt(int64(event.NewQuantity)))
+			o.items[i].Quantity = event.NewQuantity
+			o.items[i].TotalPrice = item.UnitPrice.Mul(decimal.NewFromInt(int64(event.NewQuantity)))
 			break
 		}
 	}
-	o.TotalAmount = o.calculateTotalAmount()
-	o.FinalAmount = o.calculateFinalAmount()
-	o.UpdatedAt = event.ChangedAt
+	o.totalAmount = o.calculateTotalAmount()
+	o.finalAmount = o.calculateFinalAmount()
+	o.updatedAt = event.ChangedAt
 	return nil
 }
 
 func (o *Order) applyDiscountApplied(event *DiscountApplied) error {
-	o.DiscountRate = event.DiscountRate
-	o.FinalAmount = o.calculateFinalAmount()
-	o.UpdatedAt = event.AppliedAt
+	o.discountRate = event.DiscountRate
+	o.finalAmount = o.calculateFinalAmount()
+	o.updatedAt = event.AppliedAt
 	return nil
 }
 
 func (o *Order) applyOrderConfirmed(event *OrderConfirmed) error {
-	o.Status = OrderStatusConfirmed
-	o.ConfirmedAt = &event.ConfirmedAt
-	o.UpdatedAt = event.ConfirmedAt
+	o.status = OrderStatusConfirmed
+	o.confirmedAt = &event.ConfirmedAt
+	o.updatedAt = event.ConfirmedAt
 	return nil
 }
 
 func (o *Order) applyOrderShipped(event *OrderShipped) error {
-	o.Status = OrderStatusShipped
-	o.ShippedAt = &event.ShippedAt
-	o.UpdatedAt = event.ShippedAt
+	o.status = OrderStatusShipped
+	o.shippedAt = &event.ShippedAt
+	o.updatedAt = event.ShippedAt
 	// 메타데이터에 추적 번호 저장
-	o.Metadata["tracking_number"] = event.TrackingNumber
+	o.metadata["tracking_number"] = event.TrackingNumber
 	return nil
 }
 
 func (o *Order) applyOrderDelivered(event *OrderDelivered) error {
-	o.Status = OrderStatusDelivered
-	o.DeliveredAt = &event.DeliveredAt
-	o.UpdatedAt = event.DeliveredAt
+	o.status = OrderStatusDelivered
+	o.deliveredAt = &event.DeliveredAt
+	o.updatedAt = event.DeliveredAt
 	return nil
 }
 
 func (o *Order) applyOrderCancelled(event *OrderCancelled) error {
-	o.Status = OrderStatusCancelled
-	o.CancelledAt = &event.CancelledAt
-	o.UpdatedAt = event.CancelledAt
+	o.status = OrderStatusCancelled
+	o.cancelledAt = &event.CancelledAt
+	o.updatedAt = event.CancelledAt
 	// 메타데이터에 취소 사유 저장
-	o.Metadata["cancellation_reason"] = event.Reason
+	o.metadata["cancellation_reason"] = event.Reason
 	return nil
 }
 
 func (o *Order) applyTaxRateChanged(event *TaxRateChanged) error {
-	o.TaxRate = event.NewTaxRate
-	o.FinalAmount = o.calculateFinalAmount()
-	o.UpdatedAt = event.ChangedAt
+	o.taxRate = event.NewTaxRate
+	o.finalAmount = o.calculateFinalAmount()
+	o.updatedAt = event.ChangedAt
 	return nil
 }
 
 func (o *Order) applyShippingCostChanged(event *ShippingCostChanged) error {
-	o.ShippingCost = event.NewShippingCost
-	o.FinalAmount = o.calculateFinalAmount()
-	o.UpdatedAt = event.ChangedAt
+	o.shippingCost = event.NewShippingCost
+	o.finalAmount = o.calculateFinalAmount()
+	o.updatedAt = event.ChangedAt
 	// 메타데이터에 변경 사유 저장
-	o.Metadata["shipping_cost_change_reason"] = event.Reason
+	o.metadata["shipping_cost_change_reason"] = event.Reason
 	return nil
 }
 
 func (o *Order) applyMetadataUpdated(event *MetadataUpdated) error {
-	if o.Metadata == nil {
-		o.Metadata = make(map[string]interface{})
+	if o.metadata == nil {
+		o.metadata = make(map[string]interface{})
 	}
-	o.Metadata[event.Key] = event.Value
-	o.UpdatedAt = event.UpdatedAt
+	o.metadata[event.Key] = event.Value
+	o.updatedAt = event.UpdatedAt
 	return nil
 }
