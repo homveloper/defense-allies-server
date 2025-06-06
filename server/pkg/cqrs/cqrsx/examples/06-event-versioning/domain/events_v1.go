@@ -11,7 +11,6 @@ import (
 
 // UserCreatedV1 represents the initial version of user creation event
 type UserCreatedV1 struct {
-	*cqrs.BaseEventMessage
 	UserID string `json:"user_id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
@@ -20,16 +19,6 @@ type UserCreatedV1 struct {
 // NewUserCreatedV1 creates a new V1 user created event
 func NewUserCreatedV1(userID, name, email string) *UserCreatedV1 {
 	return &UserCreatedV1{
-		BaseEventMessage: cqrs.NewBaseEventMessage(
-			"UserCreated",
-			userID,
-			"User",
-			1, // V1
-			map[string]interface{}{
-				"version": "1.0",
-				"schema":  "user_created_v1",
-			},
-		),
 		UserID: userID,
 		Name:   name,
 		Email:  email,
@@ -47,7 +36,6 @@ func (e *UserCreatedV1) EventData() interface{} {
 
 // UserUpdatedV1 represents the initial version of user update event
 type UserUpdatedV1 struct {
-	*cqrs.BaseEventMessage
 	UserID string `json:"user_id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
@@ -56,16 +44,6 @@ type UserUpdatedV1 struct {
 // NewUserUpdatedV1 creates a new V1 user updated event
 func NewUserUpdatedV1(userID, name, email string) *UserUpdatedV1 {
 	return &UserUpdatedV1{
-		BaseEventMessage: cqrs.NewBaseEventMessage(
-			"UserUpdated",
-			userID,
-			"User",
-			1, // V1
-			map[string]interface{}{
-				"version": "1.0",
-				"schema":  "user_updated_v1",
-			},
-		),
 		UserID: userID,
 		Name:   name,
 		Email:  email,
@@ -83,7 +61,6 @@ func (e *UserUpdatedV1) EventData() interface{} {
 
 // UserDeletedV1 represents the initial version of user deletion event
 type UserDeletedV1 struct {
-	*cqrs.BaseEventMessage
 	UserID    string    `json:"user_id"`
 	DeletedAt time.Time `json:"deleted_at"`
 	Reason    string    `json:"reason"`
@@ -92,16 +69,6 @@ type UserDeletedV1 struct {
 // NewUserDeletedV1 creates a new V1 user deleted event
 func NewUserDeletedV1(userID, reason string) *UserDeletedV1 {
 	return &UserDeletedV1{
-		BaseEventMessage: cqrs.NewBaseEventMessage(
-			"UserDeleted",
-			userID,
-			"User",
-			1, // V1
-			map[string]interface{}{
-				"version": "1.0",
-				"schema":  "user_deleted_v1",
-			},
-		),
 		UserID:    userID,
 		DeletedAt: time.Now(),
 		Reason:    reason,
@@ -121,10 +88,10 @@ func (e *UserDeletedV1) EventData() interface{} {
 type V1EventFactory struct{}
 
 // CreateEvent creates a V1 event from event type and data
-func (f *V1EventFactory) CreateEvent(eventType string, aggregateID string, eventData []byte, metadata map[string]interface{}) (cqrs.EventMessage, error) {
+func (f *V1EventFactory) CreateEvent(eventType string, eventData interface{}, options ...*cqrs.BaseEventMessageOptions) (cqrs.EventMessage, error) {
 	switch eventType {
 	case "UserCreated":
-		return f.createUserCreatedV1(aggregateID, eventData, metadata)
+		return f.createUserCreatedV1(eventData, options...)
 	case "UserUpdated":
 		return f.createUserUpdatedV1(aggregateID, eventData, metadata)
 	case "UserDeleted":
@@ -135,7 +102,7 @@ func (f *V1EventFactory) CreateEvent(eventType string, aggregateID string, event
 }
 
 // createUserCreatedV1 creates UserCreatedV1 from raw data
-func (f *V1EventFactory) createUserCreatedV1(aggregateID string, eventData []byte, metadata map[string]interface{}) (*UserCreatedV1, error) {
+func (f *V1EventFactory) createUserCreatedV1(eventData []byte, metadata map[string]interface{}) (*UserCreatedV1, error) {
 	var data struct {
 		UserID string `json:"user_id"`
 		Name   string `json:"name"`
