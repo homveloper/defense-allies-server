@@ -38,8 +38,8 @@ type MongoSnapshot struct {
 	metadata      map[string]interface{}
 }
 
-func (s *MongoSnapshot) AggregateID() string              { return s.aggregateID }
-func (s *MongoSnapshot) AggregateType() string            { return s.aggregateType }
+func (s *MongoSnapshot) ID() string                       { return s.aggregateID }
+func (s *MongoSnapshot) Type() string                     { return s.aggregateType }
 func (s *MongoSnapshot) Version() int                     { return s.version }
 func (s *MongoSnapshot) Data() []byte                     { return s.data }
 func (s *MongoSnapshot) Timestamp() time.Time             { return s.timestamp }
@@ -69,12 +69,12 @@ func (s *MongoSnapshotStore) SaveSnapshot(ctx context.Context, snapshot Snapshot
 
 	return s.client.ExecuteCommand(ctx, func() error {
 		// 문서 ID 생성 (aggregate_id + version)
-		docID := fmt.Sprintf("%s_%d", snapshot.AggregateID(), snapshot.Version())
+		docID := fmt.Sprintf("%s_%d", snapshot.ID(), snapshot.Version())
 
 		doc := MongoSnapshotDocument{
 			ID:            docID,
-			AggregateID:   snapshot.AggregateID(),
-			AggregateType: snapshot.AggregateType(),
+			AggregateID:   snapshot.ID(),
+			AggregateType: snapshot.Type(),
 			Version:       snapshot.Version(),
 			Data:          snapshot.Data(),
 			Size:          int64(len(snapshot.Data())),

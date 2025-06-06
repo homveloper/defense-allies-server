@@ -63,7 +63,7 @@ func NewTimeBasedPolicy(interval time.Duration) *TimeBasedPolicy {
 }
 
 func (p *TimeBasedPolicy) ShouldCreateSnapshot(aggregate cqrs.AggregateRoot, eventCount int) bool {
-	aggregateID := aggregate.AggregateID()
+	aggregateID := aggregate.ID()
 	lastTime, exists := p.lastSnapshot[aggregateID]
 
 	if !exists {
@@ -103,7 +103,7 @@ func NewVersionBasedPolicy(versionInterval int) *VersionBasedPolicy {
 }
 
 func (p *VersionBasedPolicy) ShouldCreateSnapshot(aggregate cqrs.AggregateRoot, eventCount int) bool {
-	version := aggregate.CurrentVersion()
+	version := aggregate.Version()
 	return version > 0 && version%p.versionInterval == 0
 }
 
@@ -280,7 +280,7 @@ func NewAdaptivePolicy(baseThreshold int, adaptationFactor float64) *AdaptivePol
 }
 
 func (p *AdaptivePolicy) ShouldCreateSnapshot(aggregate cqrs.AggregateRoot, eventCount int) bool {
-	aggregateID := aggregate.AggregateID()
+	aggregateID := aggregate.ID()
 
 	// Use base threshold if no performance data
 	metrics, exists := p.performanceData[aggregateID]

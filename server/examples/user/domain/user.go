@@ -119,7 +119,7 @@ func (u *User) ChangeEmail(newEmail string) error {
 		return errors.Errorf("invalid email format: %s", newEmail)
 	}
 
-	event := NewEmailChangedEvent(u.AggregateID(), u.email, newEmail, u.CurrentVersion()+1)
+	event := NewEmailChangedEvent(u.ID(), u.email, newEmail, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -139,7 +139,7 @@ func (u *User) Deactivate(reason string) error {
 		return errors.New("deactivation reason cannot be empty")
 	}
 
-	event := NewUserDeactivatedEvent(u.AggregateID(), reason, u.CurrentVersion()+1)
+	event := NewUserDeactivatedEvent(u.ID(), reason, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -155,7 +155,7 @@ func (u *User) Activate() error {
 		return errors.New("user is already active")
 	}
 
-	event := NewUserActivatedEvent(u.AggregateID(), u.CurrentVersion()+1)
+	event := NewUserActivatedEvent(u.ID(), u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -231,7 +231,7 @@ func (u *User) AssignRole(roleType RoleType, assignedBy string) error {
 	role := NewRole(roleType, assignedBy)
 	u.roleManager.AddRole(role)
 
-	event := NewRoleAssignedEvent(u.AggregateID(), roleType, assignedBy, u.CurrentVersion()+1)
+	event := NewRoleAssignedEvent(u.ID(), roleType, assignedBy, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -254,7 +254,7 @@ func (u *User) AssignRoleWithExpiry(roleType RoleType, assignedBy string, expire
 	role := NewRoleWithExpiry(roleType, assignedBy, expiresAt)
 	u.roleManager.AddRole(role)
 
-	event := NewRoleAssignedWithExpiryEvent(u.AggregateID(), roleType, assignedBy, expiresAt, u.CurrentVersion()+1)
+	event := NewRoleAssignedWithExpiryEvent(u.ID(), roleType, assignedBy, expiresAt, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -277,7 +277,7 @@ func (u *User) RevokeRole(roleType RoleType, revokedBy string) error {
 
 	u.roleManager.RemoveRole(roleType)
 
-	event := NewRoleRevokedEvent(u.AggregateID(), roleType, revokedBy, u.CurrentVersion()+1)
+	event := NewRoleRevokedEvent(u.ID(), roleType, revokedBy, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -324,7 +324,7 @@ func (u *User) UpdateProfile(firstName, lastName, bio string) error {
 		"bio":        bio,
 	}
 
-	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	event := NewProfileUpdatedEvent(u.ID(), changes, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -348,7 +348,7 @@ func (u *User) UpdateDisplayName(displayName string) error {
 		"display_name": displayName,
 	}
 
-	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	event := NewProfileUpdatedEvent(u.ID(), changes, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -374,7 +374,7 @@ func (u *User) UpdateContactInfo(phoneNumber, address, city, country, postalCode
 		"postal_code":  postalCode,
 	}
 
-	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	event := NewProfileUpdatedEvent(u.ID(), changes, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -396,7 +396,7 @@ func (u *User) SetAvatar(avatarURL string) error {
 		"avatar": avatarURL,
 	}
 
-	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	event := NewProfileUpdatedEvent(u.ID(), changes, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil
@@ -416,7 +416,7 @@ func (u *User) SetPreference(key string, value interface{}) error {
 		},
 	}
 
-	event := NewProfileUpdatedEvent(u.AggregateID(), changes, u.CurrentVersion()+1)
+	event := NewProfileUpdatedEvent(u.ID(), changes, u.Version()+1)
 	u.Apply(event, true)
 
 	return nil

@@ -33,8 +33,8 @@ func (p *EventCountPolicy) GetPolicyName() string {
 
 // TimeBasedPolicy 시간 기반 스냅샷 정책
 type TimeBasedPolicy struct {
-	interval       time.Duration
-	lastSnapshot   map[string]time.Time
+	interval     time.Duration
+	lastSnapshot map[string]time.Time
 }
 
 // NewTimeBasedPolicy 시간 기반 정책 생성
@@ -49,19 +49,19 @@ func NewTimeBasedPolicy(interval time.Duration) *TimeBasedPolicy {
 }
 
 func (p *TimeBasedPolicy) ShouldCreateSnapshot(aggregate Aggregate, eventCount int) bool {
-	aggregateID := aggregate.AggregateID()
+	aggregateID := aggregate.ID()
 	lastTime, exists := p.lastSnapshot[aggregateID]
-	
+
 	if !exists {
 		p.lastSnapshot[aggregateID] = time.Now()
 		return true // 첫 번째 스냅샷
 	}
-	
+
 	if time.Since(lastTime) >= p.interval {
 		p.lastSnapshot[aggregateID] = time.Now()
 		return true
 	}
-	
+
 	return false
 }
 
@@ -89,7 +89,7 @@ func NewVersionBasedPolicy(versionInterval int) *VersionBasedPolicy {
 }
 
 func (p *VersionBasedPolicy) ShouldCreateSnapshot(aggregate Aggregate, eventCount int) bool {
-	version := aggregate.CurrentVersion()
+	version := aggregate.Version()
 	return version > 0 && version%p.versionInterval == 0
 }
 
@@ -122,7 +122,7 @@ func (p *CompositePolicy) ShouldCreateSnapshot(aggregate Aggregate, eventCount i
 	if len(p.policies) == 0 {
 		return false
 	}
-	
+
 	if p.operator == "AND" {
 		// 모든 정책이 true여야 함
 		for _, policy := range p.policies {
@@ -146,7 +146,7 @@ func (p *CompositePolicy) GetSnapshotInterval() int {
 	if len(p.policies) == 0 {
 		return 0
 	}
-	
+
 	if p.operator == "AND" {
 		// 가장 큰 간격 반환
 		maxInterval := 0
@@ -266,20 +266,20 @@ func NewAdaptivePolicy(baseThreshold int, adaptationFactor float64) *AdaptivePol
 }
 
 func (p *AdaptivePolicy) ShouldCreateSnapshot(aggregate Aggregate, eventCount int) bool {
-	aggregateID := aggregate.AggregateID()
-	
+	aggregateID := aggregate.ID()
+
 	// 성능 데이터가 없으면 기본 임계값 사용
 	metrics, exists := p.performanceData[aggregateID]
 	if !exists {
 		return eventCount >= p.baseThreshold
 	}
-	
+
 	// 복원 시간이 길수록 더 자주 스냅샷 생성
 	adaptedThreshold := float64(p.baseThreshold)
 	if metrics.AverageRestoreTime > 100*time.Millisecond {
 		adaptedThreshold *= p.adaptationFactor
 	}
-	
+
 	return eventCount >= int(adaptedThreshold)
 }
 
@@ -298,14 +298,14 @@ func (p *AdaptivePolicy) UpdatePerformanceMetrics(aggregateID string, restoreTim
 		metrics = &PerformanceMetrics{}
 		p.performanceData[aggregateID] = metrics
 	}
-	
+
 	// 이동 평균 계산
 	if metrics.AverageRestoreTime == 0 {
 		metrics.AverageRestoreTime = restoreTime
 	} else {
 		metrics.AverageRestoreTime = (metrics.AverageRestoreTime + restoreTime) / 2
 	}
-	
+
 	metrics.EventCount = eventCount
 	metrics.LastMeasurement = time.Now()
 }

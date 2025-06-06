@@ -320,8 +320,8 @@ func (h *AuditLogHandler) Handle(ctx context.Context, event cqrs.EventMessage) e
 	log.Printf("AUDIT: Event %s | Type: %s | Aggregate: %s (%s) | Version: %d | Timestamp: %s",
 		event.EventID(),
 		event.EventType(),
-		event.AggregateID(),
-		event.AggregateType(),
+		event.ID(),
+		event.Type(),
 		event.Version(),
 		event.Timestamp().Format(time.RFC3339),
 	)

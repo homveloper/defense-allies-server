@@ -34,19 +34,19 @@ func (r *InMemoryGuildRepository) Save(ctx context.Context, aggregate cqrs.Aggre
 
 	// Create a copy to avoid reference issues
 	guildCopy := *guild
-	r.guilds[aggregate.AggregateID()] = &guildCopy
+	r.guilds[aggregate.ID()] = &guildCopy
 
 	// Get uncommitted events
 	events := aggregate.GetChanges()
-	fmt.Printf("   🔧 Saving aggregate %s with %d events\n", aggregate.AggregateID(), len(events))
+	fmt.Printf("   🔧 Saving aggregate %s with %d events\n", aggregate.ID(), len(events))
 
 	if len(events) > 0 {
 		// Store events for history
-		if r.events[aggregate.AggregateID()] == nil {
-			r.events[aggregate.AggregateID()] = make([]cqrs.EventMessage, 0)
+		if r.events[aggregate.ID()] == nil {
+			r.events[aggregate.ID()] = make([]cqrs.EventMessage, 0)
 		}
-		r.events[aggregate.AggregateID()] = append(r.events[aggregate.AggregateID()], events...)
-		fmt.Printf("   🔧 Total events for %s: %d\n", aggregate.AggregateID(), len(r.events[aggregate.AggregateID()]))
+		r.events[aggregate.ID()] = append(r.events[aggregate.ID()], events...)
+		fmt.Printf("   🔧 Total events for %s: %d\n", aggregate.ID(), len(r.events[aggregate.ID()]))
 
 		// Process events through projections
 		for _, event := range events {
@@ -135,8 +135,8 @@ func (r *InMemoryGuildRepository) GetVersion(ctx context.Context, aggregateID st
 func (r *InMemoryGuildRepository) SaveEvents(ctx context.Context, aggregateID string, events []cqrs.EventMessage, expectedVersion int) error {
 	// Check version for optimistic concurrency control
 	if existing, exists := r.guilds[aggregateID]; exists {
-		if existing.CurrentVersion() != expectedVersion {
-			return fmt.Errorf("version conflict: expected %d, got %d", expectedVersion, existing.CurrentVersion())
+		if existing.Version() != expectedVersion {
+			return fmt.Errorf("version conflict: expected %d, got %d", expectedVersion, existing.Version())
 		}
 	}
 

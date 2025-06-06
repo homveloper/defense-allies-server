@@ -49,11 +49,11 @@ type MongoSnapshotData struct {
 	doc *MongoSnapshotDocument
 }
 
-func (s *MongoSnapshotData) AggregateID() string {
+func (s *MongoSnapshotData) ID() string {
 	return s.doc.AggregateID
 }
 
-func (s *MongoSnapshotData) AggregateType() string {
+func (s *MongoSnapshotData) Type() string {
 	return s.doc.AggregateType
 }
 
@@ -145,10 +145,10 @@ func (ss *MongoSnapshotStore) SaveSnapshot(ctx context.Context, aggregate cqrs.A
 
 		// Create enhanced snapshot document
 		doc := MongoSnapshotDocument{
-			AggregateID:   aggregate.AggregateID(),
-			AggregateType: aggregate.AggregateType(),
+			AggregateID:   aggregate.ID(),
+			AggregateType: aggregate.Type(),
 			SnapshotData:  bson.Raw(snapshotData),
-			Version:       aggregate.CurrentVersion(),
+			Version:       aggregate.Version(),
 			Timestamp:     time.Now(),
 			Size:          int64(len(snapshotData)),
 			ContentType:   getContentType(ss.serializer),
@@ -159,8 +159,8 @@ func (ss *MongoSnapshotStore) SaveSnapshot(ctx context.Context, aggregate cqrs.A
 
 		// Upsert snapshot (replace existing snapshot for this aggregate)
 		filter := bson.M{
-			"aggregate_id":   aggregate.AggregateID(),
-			"aggregate_type": aggregate.AggregateType(),
+			"aggregate_id":   aggregate.ID(),
+			"aggregate_type": aggregate.Type(),
 		}
 
 		update := bson.M{"$set": doc}

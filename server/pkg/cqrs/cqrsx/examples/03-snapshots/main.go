@@ -170,7 +170,7 @@ func runBasicDemo(ctx context.Context) error {
 	orderSnapshot := snapshot.(*domain.OrderSnapshot)
 	fmt.Printf("   ✅ 스냅샷 생성 완료\n")
 	fmt.Printf("   📸 스냅샷 정보:\n")
-	fmt.Printf("      - Aggregate ID: %s\n", orderSnapshot.AggregateID())
+	fmt.Printf("      - Aggregate ID: %s\n", orderSnapshot.ID())
 	fmt.Printf("      - 버전: %d\n", orderSnapshot.Version())
 	fmt.Printf("      - 고객 ID: %s\n", orderSnapshot.CustomerID)
 	fmt.Printf("      - 상품 개수: %d\n", orderSnapshot.GetItemCount())
@@ -198,7 +198,7 @@ func runBasicDemo(ctx context.Context) error {
 	}
 	fmt.Printf("   ✅ 역직렬화 완료\n")
 	fmt.Printf("   🔍 검증: Aggregate ID = %s, 버전 = %d\n\n",
-		newSnapshot.AggregateID(), newSnapshot.Version())
+		newSnapshot.ID(), newSnapshot.Version())
 
 	// 4. 스냅샷에서 주문 복원
 	fmt.Println("4️⃣ 스냅샷에서 주문 복원")
@@ -239,9 +239,9 @@ func runBasicDemo(ctx context.Context) error {
 	clonedSnapshot := orderSnapshot.Clone()
 	fmt.Printf("   ✅ 스냅샷 복사 완료\n")
 	fmt.Printf("   🔍 원본과 복사본 비교:\n")
-	fmt.Printf("      - 원본 ID: %s\n", orderSnapshot.AggregateID())
-	fmt.Printf("      - 복사본 ID: %s\n", clonedSnapshot.AggregateID())
-	fmt.Printf("      - ID 일치: %t\n", orderSnapshot.AggregateID() == clonedSnapshot.AggregateID())
+	fmt.Printf("      - 원본 ID: %s\n", orderSnapshot.ID())
+	fmt.Printf("      - 복사본 ID: %s\n", clonedSnapshot.ID())
+	fmt.Printf("      - ID 일치: %t\n", orderSnapshot.ID() == clonedSnapshot.ID())
 	fmt.Printf("      - 버전 일치: %t\n\n", orderSnapshot.Version() == clonedSnapshot.Version())
 
 	// 7. 스냅샷 유효성 검증

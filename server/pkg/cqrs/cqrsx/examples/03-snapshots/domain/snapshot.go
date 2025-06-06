@@ -111,11 +111,11 @@ func RestoreFromSnapshot(snapshot *OrderSnapshot) (*Order, error) {
 }
 
 // SnapshotData 인터페이스 구현
-func (s *OrderSnapshot) AggregateID() string {
+func (s *OrderSnapshot) ID() string {
 	return s.ID
 }
 
-func (s *OrderSnapshot) AggregateType() string {
+func (s *OrderSnapshot) Type() string {
 	return "Order"
 }
 

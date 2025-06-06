@@ -7,8 +7,8 @@ type EventMessage interface {
 	// Basic event information
 	EventID() string
 	EventType() string
-	AggregateID() string
-	AggregateType() string
+	ID() string
+	Type() string
 	Version() int
 
 	// Event data (serialization handled separately)

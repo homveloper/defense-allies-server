@@ -31,11 +31,11 @@ func (r *UserRedisRepository) Save(ctx context.Context, aggregate cqrs.Aggregate
 
 	// For simplicity, we'll convert the User to a BaseAggregate for storage
 	// In a real implementation, you'd want to preserve the actual user data
-	baseAggregate := cqrs.NewBaseAggregate(user.AggregateID(), "User")
+	baseAggregate := cqrs.NewBaseAggregate(user.ID(), "User")
 	baseAggregate.SetOriginalVersion(user.OriginalVersion())
 
 	// Set the current version to match the user's version
-	for i := baseAggregate.CurrentVersion(); i < user.CurrentVersion(); i++ {
+	for i := baseAggregate.Version(); i < user.Version(); i++ {
 		baseAggregate.IncrementVersion()
 	}
 
@@ -71,7 +71,7 @@ func (r *UserRedisRepository) GetVersion(ctx context.Context, id string) (int, e
 	if err != nil {
 		return 0, err
 	}
-	return aggregate.CurrentVersion(), nil
+	return aggregate.Version(), nil
 }
 
 // Exists checks if a User aggregate exists
@@ -87,7 +87,7 @@ func (r *UserRedisRepository) convertToUser(baseAggregate *cqrs.BaseAggregate) (
 
 	// Create a new User with minimal data
 	// This is a simplified approach - in production you'd want to store and retrieve actual user data
-	user, err := domain.NewUser(baseAggregate.AggregateID(), "user@example.com", "User Name")
+	user, err := domain.NewUser(baseAggregate.ID(), "user@example.com", "User Name")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create user from base aggregate")
 	}

@@ -208,7 +208,7 @@ func RunSearchFeaturesTest() {
 	fmt.Println("=========================")
 
 	if len(testUsers) > 0 {
-		userID := testUsers[0].AggregateID()
+		userID := testUsers[0].ID()
 		getUserQuery := queries.NewGetUserByIDQuery(userID)
 
 		result, err = queryDispatcher.Dispatch(ctx, getUserQuery)
@@ -303,7 +303,7 @@ func createTestUsers() []*domain.User {
 
 // createUserViewFromAggregate creates a UserView from a User aggregate
 func createUserViewFromAggregate(user *domain.User) *projections.UserView {
-	userView := projections.NewUserView(user.AggregateID())
+	userView := projections.NewUserView(user.ID())
 	userView.Email = user.Email()
 	userView.Name = user.Name()
 	userView.Status = user.Status().String()

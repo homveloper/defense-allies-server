@@ -15,13 +15,13 @@ import (
 // UserAggregateData represents serializable user data
 type UserAggregateData struct {
 	*cqrs.BaseAggregate
-	Email              string                 `json:"email" bson:"email"`
-	Name               string                 `json:"name" bson:"name"`
-	Status             string                 `json:"status" bson:"status"`
-	LastLoginAt        *time.Time             `json:"last_login_at,omitempty" bson:"last_login_at,omitempty"`
-	DeactivatedAt      *time.Time             `json:"deactivated_at,omitempty" bson:"deactivated_at,omitempty"`
-	DeactivationReason string                 `json:"deactivation_reason,omitempty" bson:"deactivation_reason,omitempty"`
-	Profile            map[string]interface{} `json:"profile,omitempty" bson:"profile,omitempty"`
+	Email              string                   `json:"email" bson:"email"`
+	Name               string                   `json:"name" bson:"name"`
+	Status             string                   `json:"status" bson:"status"`
+	LastLoginAt        *time.Time               `json:"last_login_at,omitempty" bson:"last_login_at,omitempty"`
+	DeactivatedAt      *time.Time               `json:"deactivated_at,omitempty" bson:"deactivated_at,omitempty"`
+	DeactivationReason string                   `json:"deactivation_reason,omitempty" bson:"deactivation_reason,omitempty"`
+	Profile            map[string]interface{}   `json:"profile,omitempty" bson:"profile,omitempty"`
 	Roles              []map[string]interface{} `json:"roles,omitempty" bson:"roles,omitempty"`
 }
 
@@ -63,14 +63,14 @@ func (s *UserSerializer) SerializeUser(user *domain.User) (*UserAggregateData, e
 	}
 
 	// Create base aggregate copy for serialization
-	baseAggregate := cqrs.NewBaseAggregate(user.AggregateID(), user.AggregateType())
+	baseAggregate := cqrs.NewBaseAggregate(user.ID(), user.Type())
 	baseAggregate.SetOriginalVersion(user.OriginalVersion())
-	
+
 	// Set current version to match user's version
-	for i := baseAggregate.CurrentVersion(); i < user.CurrentVersion(); i++ {
+	for i := baseAggregate.Version(); i < user.Version(); i++ {
 		baseAggregate.IncrementVersion()
 	}
-	
+
 	baseAggregate.SetCreatedAt(user.CreatedAt())
 	baseAggregate.SetUpdatedAt(user.UpdatedAt())
 	baseAggregate.SetDeleted(user.IsDeleted())
@@ -91,19 +91,19 @@ func (s *UserSerializer) SerializeUser(user *domain.User) (*UserAggregateData, e
 // DeserializeUser converts serializable data back to User aggregate
 func (s *UserSerializer) DeserializeUser(data *UserAggregateData) (*domain.User, error) {
 	// Create user with basic information
-	user, err := domain.NewUser(data.AggregateID(), data.Email, data.Name)
+	user, err := domain.NewUser(data.ID(), data.Email, data.Name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
 	// Set base aggregate properties
 	user.SetOriginalVersion(data.OriginalVersion())
-	
+
 	// Set current version to match serialized version
-	for i := user.CurrentVersion(); i < data.CurrentVersion(); i++ {
+	for i := user.Version(); i < data.Version(); i++ {
 		user.IncrementVersion()
 	}
-	
+
 	user.SetCreatedAt(data.CreatedAt())
 	user.SetUpdatedAt(data.UpdatedAt())
 	user.SetDeleted(data.IsDeleted())
@@ -143,9 +143,9 @@ func (r *JSONUserRepository) Save(user *domain.User) error {
 	}
 
 	// Store in memory (in real implementation, this would be database/file)
-	r.storage[user.AggregateID()] = jsonData
-	
-	fmt.Printf("✅ Saved user %s as JSON (%d bytes)\n", user.AggregateID(), len(jsonData))
+	r.storage[user.ID()] = jsonData
+
+	fmt.Printf("✅ Saved user %s as JSON (%d bytes)\n", user.ID(), len(jsonData))
 	return nil
 }
 
@@ -202,9 +202,9 @@ func (r *BSONUserRepository) Save(user *domain.User) error {
 	}
 
 	// Store in memory (in real implementation, this would be MongoDB)
-	r.storage[user.AggregateID()] = bsonData
-	
-	fmt.Printf("✅ Saved user %s as BSON (%d bytes)\n", user.AggregateID(), len(bsonData))
+	r.storage[user.ID()] = bsonData
+
+	fmt.Printf("✅ Saved user %s as BSON (%d bytes)\n", user.ID(), len(bsonData))
 	return nil
 }
 
@@ -251,40 +251,40 @@ func main() {
 		log.Fatalf("Failed to update display name: %v", err)
 	}
 
-	fmt.Printf("📝 Created user: %s (%s) - Version: %d\n", 
-		user.Name(), user.Email(), user.CurrentVersion())
+	fmt.Printf("📝 Created user: %s (%s) - Version: %d\n",
+		user.Name(), user.Email(), user.Version())
 
 	// 2. Test JSON serialization
 	fmt.Println("\n=== JSON Serialization Test ===")
 	jsonRepo := NewJSONUserRepository()
-	
+
 	if err := jsonRepo.Save(user); err != nil {
 		log.Fatalf("Failed to save user as JSON: %v", err)
 	}
 
-	loadedUserJSON, err := jsonRepo.Load(user.AggregateID())
+	loadedUserJSON, err := jsonRepo.Load(user.ID())
 	if err != nil {
 		log.Fatalf("Failed to load user from JSON: %v", err)
 	}
 
-	fmt.Printf("📋 Loaded user: %s (%s) - Version: %d\n", 
-		loadedUserJSON.Name(), loadedUserJSON.Email(), loadedUserJSON.CurrentVersion())
+	fmt.Printf("📋 Loaded user: %s (%s) - Version: %d\n",
+		loadedUserJSON.Name(), loadedUserJSON.Email(), loadedUserJSON.Version())
 
 	// 3. Test BSON serialization
 	fmt.Println("\n=== BSON Serialization Test ===")
 	bsonRepo := NewBSONUserRepository()
-	
+
 	if err := bsonRepo.Save(user); err != nil {
 		log.Fatalf("Failed to save user as BSON: %v", err)
 	}
 
-	loadedUserBSON, err := bsonRepo.Load(user.AggregateID())
+	loadedUserBSON, err := bsonRepo.Load(user.ID())
 	if err != nil {
 		log.Fatalf("Failed to load user from BSON: %v", err)
 	}
 
-	fmt.Printf("📋 Loaded user: %s (%s) - Version: %d\n", 
-		loadedUserBSON.Name(), loadedUserBSON.Email(), loadedUserBSON.CurrentVersion())
+	fmt.Printf("📋 Loaded user: %s (%s) - Version: %d\n",
+		loadedUserBSON.Name(), loadedUserBSON.Email(), loadedUserBSON.Version())
 
 	// 4. Test BaseAggregate serialization
 	fmt.Println("\n=== BaseAggregate Serialization Test ===")

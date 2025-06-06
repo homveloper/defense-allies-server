@@ -31,7 +31,7 @@ func (p *OrderProjection) GetName() string {
 // Handle handles domain events and updates read models accordingly
 func (p *OrderProjection) Handle(ctx context.Context, event cqrs.EventMessage) error {
 	log.Printf("OrderProjection: Processing event %s for aggregate %s",
-		event.EventType(), event.AggregateID())
+		event.EventType(), event.ID())
 
 	switch e := event.EventData().(type) {
 	case *domain.OrderCreated:

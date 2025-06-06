@@ -156,7 +156,7 @@ func (p *MemberViewProjection) Project(ctx context.Context, event cqrs.EventMess
 
 // handleGuildCreated handles GuildCreatedEvent (creates founder member)
 func (p *MemberViewProjection) handleGuildCreated(ctx context.Context, event *domain.GuildCreatedEvent) error {
-	guildID := event.AggregateID()
+	guildID := event.ID()
 	founderID := event.FounderID
 	founderUsername := event.FounderUsername
 
@@ -177,7 +177,7 @@ func (p *MemberViewProjection) handleGuildCreated(ctx context.Context, event *do
 
 // handleMemberInvited handles MemberInvitedEvent
 func (p *MemberViewProjection) handleMemberInvited(ctx context.Context, event *domain.MemberInvitedEvent) error {
-	guildID := event.AggregateID()
+	guildID := event.ID()
 	userID := event.UserID
 	username := event.Username
 	invitedBy := event.InvitedBy
@@ -200,7 +200,7 @@ func (p *MemberViewProjection) handleMemberInvited(ctx context.Context, event *d
 
 // handleMemberJoined handles MemberJoinedEvent
 func (p *MemberViewProjection) handleMemberJoined(ctx context.Context, event *domain.MemberJoinedEvent) error {
-	guildID := event.AggregateID()
+	guildID := event.ID()
 	userID := event.UserID
 	memberID := fmt.Sprintf("%s:%s", guildID, userID)
 
@@ -229,7 +229,7 @@ func (p *MemberViewProjection) handleMemberJoined(ctx context.Context, event *do
 
 // handleMemberKicked handles MemberKickedEvent
 func (p *MemberViewProjection) handleMemberKicked(ctx context.Context, event *domain.MemberKickedEvent) error {
-	guildID := event.AggregateID()
+	guildID := event.ID()
 	userID := event.UserID
 	kickedBy := event.KickedBy
 	reason := event.Reason
@@ -261,7 +261,7 @@ func (p *MemberViewProjection) handleMemberKicked(ctx context.Context, event *do
 
 // handleMemberPromoted handles MemberPromotedEvent
 func (p *MemberViewProjection) handleMemberPromoted(ctx context.Context, event *domain.MemberPromotedEvent) error {
-	guildID := event.AggregateID()
+	guildID := event.ID()
 	userID := event.UserID
 	newRole := event.NewRole.String()
 	memberID := fmt.Sprintf("%s:%s", guildID, userID)

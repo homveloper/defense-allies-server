@@ -39,8 +39,8 @@ func (s *JSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error)
 	eventData := EventData{
 		EventID:       event.EventID(),
 		EventType:     event.EventType(),
-		AggregateID:   event.AggregateID(),
-		AggregateType: event.AggregateType(),
+		AggregateID:   event.ID(),
+		AggregateType: event.Type(),
 		Version:       event.Version(),
 		Data:          event.EventData(),
 		Metadata:      event.Metadata(),
@@ -99,8 +99,8 @@ func (s *CompactEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, err
 	eventData := CompactEventData{
 		ID:  event.EventID(),
 		T:   event.EventType(),
-		AID: event.AggregateID(),
-		AT:  event.AggregateType(),
+		AID: event.ID(),
+		AT:  event.Type(),
 		V:   event.Version(),
 		D:   event.EventData(),
 		M:   event.Metadata(),
@@ -195,8 +195,8 @@ func (s *BSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error)
 	eventData := EventData{
 		EventID:       event.EventID(),
 		EventType:     event.EventType(),
-		AggregateID:   event.AggregateID(),
-		AggregateType: event.AggregateType(),
+		AggregateID:   event.ID(),
+		AggregateType: event.Type(),
 		Version:       event.Version(),
 		Data:          event.EventData(),
 		Metadata:      event.Metadata(),

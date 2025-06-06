@@ -243,7 +243,7 @@ func (r *InMemoryCargoRepository) Save(ctx context.Context, aggregate cqrs.Aggre
 	}
 
 	// Check version for optimistic concurrency control
-	if existing, exists := r.cargos[cargo.AggregateID()]; exists {
+	if existing, exists := r.cargos[cargo.ID()]; exists {
 		// For existing aggregates, check if the expected version matches the stored version
 		if existing.OriginalVersion() != expectedVersion {
 			return fmt.Errorf("version conflict: expected %d, got %d", expectedVersion, existing.OriginalVersion())
@@ -258,15 +258,15 @@ func (r *InMemoryCargoRepository) Save(ctx context.Context, aggregate cqrs.Aggre
 	// Store events for history
 	changes := cargo.GetChanges()
 	if len(changes) > 0 {
-		if r.events[cargo.AggregateID()] == nil {
-			r.events[cargo.AggregateID()] = make([]cqrs.EventMessage, 0)
+		if r.events[cargo.ID()] == nil {
+			r.events[cargo.ID()] = make([]cqrs.EventMessage, 0)
 		}
-		r.events[cargo.AggregateID()] = append(r.events[cargo.AggregateID()], changes...)
+		r.events[cargo.ID()] = append(r.events[cargo.ID()], changes...)
 	}
 
 	// Clone the cargo to avoid external modifications
 	clonedCargo := *cargo
-	r.cargos[cargo.AggregateID()] = &clonedCargo
+	r.cargos[cargo.ID()] = &clonedCargo
 
 	// Clear changes after saving
 	cargo.ClearChanges()
@@ -292,7 +292,7 @@ func (r *InMemoryCargoRepository) GetVersion(ctx context.Context, id string) (in
 	if !exists {
 		return 0, fmt.Errorf("cargo with ID %s not found", id)
 	}
-	return cargo.CurrentVersion(), nil
+	return cargo.Version(), nil
 }
 
 // Exists checks if an aggregate exists
@@ -307,8 +307,8 @@ func (r *InMemoryCargoRepository) Exists(ctx context.Context, id string) bool {
 func (r *InMemoryCargoRepository) SaveEvents(ctx context.Context, aggregateID string, events []cqrs.EventMessage, expectedVersion int) error {
 	// Check version for optimistic concurrency control
 	if existing, exists := r.cargos[aggregateID]; exists {
-		if existing.CurrentVersion() != expectedVersion {
-			return fmt.Errorf("version conflict: expected %d, got %d", expectedVersion, existing.CurrentVersion())
+		if existing.Version() != expectedVersion {
+			return fmt.Errorf("version conflict: expected %d, got %d", expectedVersion, existing.Version())
 		}
 	}
 

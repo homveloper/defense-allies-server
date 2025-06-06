@@ -31,7 +31,7 @@ func (p *UserProjection) GetName() string {
 // Handle handles domain events and updates read models accordingly
 func (p *UserProjection) Handle(ctx context.Context, event cqrs.EventMessage) error {
 	log.Printf("UserProjection: Processing event %s for aggregate %s",
-		event.EventType(), event.AggregateID())
+		event.EventType(), event.ID())
 
 	switch e := event.EventData().(type) {
 	case *domain.UserCreated:
@@ -206,7 +206,7 @@ func (p *UserProjection) ProcessEventBatch(ctx context.Context, events []cqrs.Ev
 
 	for _, event := range events {
 		if p.IsEventSupported(event.EventType()) {
-			userID := event.AggregateID()
+			userID := event.ID()
 			eventsByUser[userID] = append(eventsByUser[userID], event)
 		}
 	}

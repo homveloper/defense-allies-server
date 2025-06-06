@@ -41,7 +41,7 @@ func (r *UserRepository) Save(ctx context.Context, user *domain.User) error {
 	expectedVersion := user.OriginalVersion()
 
 	log.Printf("Attempting to save %d events for user %s with expectedVersion %d (original: %d, current: %d)",
-		len(uncommittedChanges), user.ID(), expectedVersion, user.OriginalVersion(), user.CurrentVersion())
+		len(uncommittedChanges), user.ID(), expectedVersion, user.OriginalVersion(), user.Version())
 
 	err := r.eventStore.SaveEvents(ctx, user.ID(), uncommittedChanges, expectedVersion)
 	if err != nil {
@@ -52,7 +52,7 @@ func (r *UserRepository) Save(ctx context.Context, user *domain.User) error {
 	user.ClearChanges()
 
 	// 저장 성공 후 원본 버전을 현재 버전으로 업데이트 (다음 저장을 위해)
-	user.SetOriginalVersion(user.CurrentVersion())
+	user.SetOriginalVersion(user.Version())
 
 	log.Printf("Successfully saved user %s with version %d", user.ID(), user.Version())
 	return nil
@@ -91,7 +91,7 @@ func (r *UserRepository) GetByID(ctx context.Context, userID string) (*domain.Us
 	}
 
 	// 로드 완료 후 원본 버전을 현재 버전으로 설정 (동시성 제어용)
-	user.SetOriginalVersion(user.CurrentVersion())
+	user.SetOriginalVersion(user.Version())
 
 	log.Printf("Successfully loaded user %s with version %d", userID, user.Version())
 	return user, nil

@@ -40,8 +40,8 @@ func TestJSONEventSerializer_Deserialize(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, deserializedEvent)
 	assert.Equal(t, originalEvent.EventType(), deserializedEvent.EventType())
-	assert.Equal(t, originalEvent.AggregateID(), deserializedEvent.AggregateID())
-	assert.Equal(t, originalEvent.AggregateType(), deserializedEvent.AggregateType())
+	assert.Equal(t, originalEvent.ID(), deserializedEvent.ID())
+	assert.Equal(t, originalEvent.Type(), deserializedEvent.Type())
 	assert.Equal(t, originalEvent.Version(), deserializedEvent.Version())
 	assert.Equal(t, originalEvent.EventData(), deserializedEvent.EventData())
 
@@ -71,8 +71,8 @@ func TestJSONEventSerializer_SerializeDeserialize_RoundTrip(t *testing.T) {
 	// Assert
 	assert.Equal(t, originalEvent.EventID(), deserializedEvent.EventID())
 	assert.Equal(t, originalEvent.EventType(), deserializedEvent.EventType())
-	assert.Equal(t, originalEvent.AggregateID(), deserializedEvent.AggregateID())
-	assert.Equal(t, originalEvent.AggregateType(), deserializedEvent.AggregateType())
+	assert.Equal(t, originalEvent.ID(), deserializedEvent.ID())
+	assert.Equal(t, originalEvent.Type(), deserializedEvent.Type())
 	assert.Equal(t, originalEvent.Version(), deserializedEvent.Version())
 
 	// Compare event data (as JSON objects)

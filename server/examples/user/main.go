@@ -338,11 +338,11 @@ func (r *InMemoryUserRepository) Save(ctx context.Context, aggregate cqrs.Aggreg
 	// Simplified version control for demo purposes
 	// In a real implementation, you would implement proper optimistic concurrency control
 	fmt.Printf("DEBUG SAVE: Saving user %s with version %d (expected: %d)\n",
-		user.AggregateID(), user.CurrentVersion(), expectedVersion)
+		user.ID(), user.Version(), expectedVersion)
 
 	// Clone the user to avoid reference issues
 	clonedUser := *user
-	r.users[user.AggregateID()] = &clonedUser
+	r.users[user.ID()] = &clonedUser
 	return nil
 }
 
@@ -357,11 +357,11 @@ func (r *InMemoryUserRepository) GetByID(ctx context.Context, id string) (cqrs.A
 	// Clone the user to avoid reference issues
 	clonedUser := *user
 	// Set original version to current version for optimistic concurrency control
-	clonedUser.SetOriginalVersion(clonedUser.CurrentVersion())
+	clonedUser.SetOriginalVersion(clonedUser.Version())
 	// Clear any uncommitted changes
 	clonedUser.ClearChanges()
 
-	fmt.Printf("DEBUG LOAD: User %s loaded with version %d\n", id, clonedUser.CurrentVersion())
+	fmt.Printf("DEBUG LOAD: User %s loaded with version %d\n", id, clonedUser.Version())
 	return &clonedUser, nil
 }
 
@@ -372,7 +372,7 @@ func (r *InMemoryUserRepository) GetVersion(ctx context.Context, id string) (int
 		return 0, cqrs.NewCQRSError(cqrs.ErrCodeAggregateNotFound.String(),
 			fmt.Sprintf("user with ID %s not found", id), nil)
 	}
-	return user.CurrentVersion(), nil
+	return user.Version(), nil
 }
 
 // Exists checks if an aggregate exists
@@ -548,11 +548,11 @@ func (r *UserRedisRepository) Save(ctx context.Context, aggregate cqrs.Aggregate
 
 	// For simplicity, we'll convert the User to a BaseAggregate for storage
 	// In a real implementation, you'd want to preserve the actual user data
-	baseAggregate := cqrs.NewBaseAggregate(user.AggregateID(), "User")
+	baseAggregate := cqrs.NewBaseAggregate(user.ID(), "User")
 	baseAggregate.SetOriginalVersion(user.OriginalVersion())
 
 	// Set the current version to match the user's version
-	for i := baseAggregate.CurrentVersion(); i < user.CurrentVersion(); i++ {
+	for i := baseAggregate.Version(); i < user.Version(); i++ {
 		baseAggregate.IncrementVersion()
 	}
 
@@ -588,7 +588,7 @@ func (r *UserRedisRepository) GetVersion(ctx context.Context, id string) (int, e
 	if err != nil {
 		return 0, err
 	}
-	return aggregate.CurrentVersion(), nil
+	return aggregate.Version(), nil
 }
 
 // Exists checks if a User aggregate exists
@@ -604,16 +604,16 @@ func (r *UserRedisRepository) convertToUser(baseAggregate *cqrs.BaseAggregate) (
 
 	// Create a new User with minimal data
 	// This is a simplified approach - in production you'd want to store and retrieve actual user data
-	user, err := domain.NewUser(baseAggregate.AggregateID(), "user@example.com", "User Name")
+	user, err := domain.NewUser(baseAggregate.ID(), "user@example.com", "User Name")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create user from base aggregate")
 	}
 
 	// Set the version information to match the stored aggregate
-	user.SetOriginalVersion(baseAggregate.CurrentVersion()) // Use CurrentVersion as OriginalVersion
+	user.SetOriginalVersion(baseAggregate.Version()) // Use CurrentVersion as OriginalVersion
 
 	// Set the current version to match the stored version
-	for i := user.CurrentVersion(); i < baseAggregate.CurrentVersion(); i++ {
+	for i := user.Version(); i < baseAggregate.Version(); i++ {
 		user.IncrementVersion()
 	}
 

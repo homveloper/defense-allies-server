@@ -90,11 +90,11 @@ func (h *CargoCommandHandler) handleCreateCargo(ctx context.Context, cmd *comman
 	// Return successful result
 	return &cqrs.CommandResult{
 		Success:     true,
-		AggregateID: cargo.AggregateID(),
-		Version:     cargo.CurrentVersion(),
+		AggregateID: cargo.ID(),
+		Version:     cargo.Version(),
 		Events:      cargo.GetChanges(),
 		Data: map[string]interface{}{
-			"cargo_id":    cargo.AggregateID(),
+			"cargo_id":    cargo.ID(),
 			"origin":      cargo.GetOrigin(),
 			"destination": cargo.GetDestination(),
 			"max_weight":  cargo.GetMaxWeight(),
@@ -162,11 +162,11 @@ func (h *CargoCommandHandler) handleLoadShipment(ctx context.Context, cmd *comma
 	// Return successful result
 	return &cqrs.CommandResult{
 		Success:     true,
-		AggregateID: cargo.AggregateID(),
-		Version:     cargo.CurrentVersion(),
+		AggregateID: cargo.ID(),
+		Version:     cargo.Version(),
 		Events:      cargo.GetChanges(),
 		Data: map[string]interface{}{
-			"cargo_id":         cargo.AggregateID(),
+			"cargo_id":         cargo.ID(),
 			"shipment_id":      shipment.ID,
 			"shipment_count":   cargo.GetShipmentCount(),
 			"current_weight":   cargo.GetCurrentWeight(),

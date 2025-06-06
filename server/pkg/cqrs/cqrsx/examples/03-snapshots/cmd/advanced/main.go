@@ -107,14 +107,14 @@ func main() {
 		fmt.Printf("   - Compression: %s\n", snapshotData.Compression())
 
 		// Test direct restoration from store (bypassing manager serialization issues)
-		restoredOrder, err := store.LoadSnapshot(context.Background(), order.ID(), order.AggregateType())
+		restoredOrder, err := store.LoadSnapshot(context.Background(), order.ID(), order.Type())
 		if err != nil {
 			fmt.Printf("⚠️  Direct restoration failed: %v\n", err)
 		} else {
 			fmt.Printf("🔍 Restored Order Details:\n")
-			fmt.Printf("   - Order ID: %s\n", restoredOrder.AggregateID())
-			fmt.Printf("   - Version: %d\n", restoredOrder.CurrentVersion())
-			fmt.Printf("   - Type: %s\n", restoredOrder.AggregateType())
+			fmt.Printf("   - Order ID: %s\n", restoredOrder.ID())
+			fmt.Printf("   - Version: %d\n", restoredOrder.Version())
+			fmt.Printf("   - Type: %s\n", restoredOrder.Type())
 		}
 	}
 
@@ -157,17 +157,17 @@ func (s *InMemoryAdvancedSnapshotStore) SaveSnapshot(ctx context.Context, aggreg
 		data, err = s.serializer.SerializeSnapshot(aggregate)
 		if err != nil {
 			// Fallback to simple data if serialization fails
-			data = []byte(fmt.Sprintf("snapshot-data-%s-v%d", aggregate.AggregateID(), aggregate.CurrentVersion()))
+			data = []byte(fmt.Sprintf("snapshot-data-%s-v%d", aggregate.ID(), aggregate.Version()))
 		}
 	} else {
 		// Fallback to simple data for demo
-		data = []byte(fmt.Sprintf("snapshot-data-%s-v%d", aggregate.AggregateID(), aggregate.CurrentVersion()))
+		data = []byte(fmt.Sprintf("snapshot-data-%s-v%d", aggregate.ID(), aggregate.Version()))
 	}
 
 	snapshot := &InMemorySnapshotData{
-		aggregateID:   aggregate.AggregateID(),
-		aggregateType: aggregate.AggregateType(),
-		version:       aggregate.CurrentVersion(),
+		aggregateID:   aggregate.ID(),
+		aggregateType: aggregate.Type(),
+		version:       aggregate.Version(),
 		data:          data,
 		timestamp:     time.Now(),
 		metadata:      map[string]interface{}{"demo": true, "original_aggregate": aggregate}, // Store original for demo
@@ -176,10 +176,10 @@ func (s *InMemoryAdvancedSnapshotStore) SaveSnapshot(ctx context.Context, aggreg
 		compression:   getCompressionType(s.serializer),
 	}
 
-	if s.snapshots[aggregate.AggregateID()] == nil {
-		s.snapshots[aggregate.AggregateID()] = []cqrsx.SnapshotData{}
+	if s.snapshots[aggregate.ID()] == nil {
+		s.snapshots[aggregate.ID()] = []cqrsx.SnapshotData{}
 	}
-	s.snapshots[aggregate.AggregateID()] = append(s.snapshots[aggregate.AggregateID()], snapshot)
+	s.snapshots[aggregate.ID()] = append(s.snapshots[aggregate.ID()], snapshot)
 	return nil
 }
 
@@ -291,8 +291,8 @@ type InMemorySnapshotData struct {
 	compression   string
 }
 
-func (s *InMemorySnapshotData) AggregateID() string              { return s.aggregateID }
-func (s *InMemorySnapshotData) AggregateType() string            { return s.aggregateType }
+func (s *InMemorySnapshotData) ID() string                       { return s.aggregateID }
+func (s *InMemorySnapshotData) Type() string                     { return s.aggregateType }
 func (s *InMemorySnapshotData) Version() int                     { return s.version }
 func (s *InMemorySnapshotData) Data() []byte                     { return s.data }
 func (s *InMemorySnapshotData) Timestamp() time.Time             { return s.timestamp }

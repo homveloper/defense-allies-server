@@ -40,7 +40,7 @@ func (h *TestCommandHandler) Handle(ctx context.Context, command Command) (*Comm
 	// Default implementation
 	return &CommandResult{
 		Success:     true,
-		AggregateID: command.AggregateID(),
+		AggregateID: command.ID(),
 		Version:     1,
 		Events:      []EventMessage{},
 	}, nil

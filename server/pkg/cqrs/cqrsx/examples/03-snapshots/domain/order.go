@@ -397,15 +397,15 @@ func (o *Order) Metadata() map[string]interface{} {
 
 // 편의 메서드들
 func (o *Order) Version() int {
-	return o.CurrentVersion()
+	return o.Version()
 }
 
 func (o *Order) ID() string {
-	return o.AggregateID()
+	return o.ID()
 }
 
 func (o *Order) Type() string {
-	return o.AggregateType()
+	return o.Type()
 }
 
 func (o *Order) GetUncommittedChanges() []cqrs.EventMessage {

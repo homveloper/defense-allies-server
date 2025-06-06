@@ -280,17 +280,17 @@ func (u *User) DeletedAt() *time.Time {
 
 // Version returns the current version (convenience method)
 func (u *User) Version() int {
-	return u.CurrentVersion()
+	return u.Version()
 }
 
 // ID returns the aggregate ID (convenience method)
 func (u *User) ID() string {
-	return u.AggregateID()
+	return u.ID()
 }
 
 // Type returns the aggregate type (convenience method)
 func (u *User) Type() string {
-	return u.AggregateType()
+	return u.Type()
 }
 
 // GetUncommittedChanges returns uncommitted changes (convenience method)

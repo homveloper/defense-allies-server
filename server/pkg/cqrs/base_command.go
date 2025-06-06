@@ -41,11 +41,11 @@ func (c *BaseCommand) CommandType() string {
 	return c.commandType
 }
 
-func (c *BaseCommand) AggregateID() string {
+func (c *BaseCommand) ID() string {
 	return c.aggregateID
 }
 
-func (c *BaseCommand) AggregateType() string {
+func (c *BaseCommand) Type() string {
 	return c.aggregateType
 }
 

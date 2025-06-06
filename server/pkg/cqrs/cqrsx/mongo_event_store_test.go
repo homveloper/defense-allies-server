@@ -64,8 +64,8 @@ func TestMongoEventStore_BasicOperations(t *testing.T) {
 
 		loadedEvent := events[0]
 		assert.Equal(t, "TestEvent", loadedEvent.EventType())
-		assert.Equal(t, aggregateID, loadedEvent.AggregateID())
-		assert.Equal(t, aggregateType, loadedEvent.AggregateType())
+		assert.Equal(t, aggregateID, loadedEvent.ID())
+		assert.Equal(t, aggregateType, loadedEvent.Type())
 		assert.Equal(t, 1, loadedEvent.Version())
 	})
 

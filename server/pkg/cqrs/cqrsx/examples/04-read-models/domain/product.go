@@ -71,7 +71,7 @@ func (p *Product) UpdateProduct(name string, price decimal.Decimal, category, de
 		return fmt.Errorf("product category cannot be empty")
 	}
 
-	event := NewProductUpdated(p.AggregateID(), name, price, category, description)
+	event := NewProductUpdated(p.ID(), name, price, category, description)
 	p.ApplyEvent(event)
 
 	return nil
@@ -164,7 +164,7 @@ func (p *Product) applyProductUpdated(event *ProductUpdated) error {
 
 // Validate validates the product aggregate state
 func (p *Product) Validate() error {
-	if p.AggregateID() == "" {
+	if p.ID() == "" {
 		return fmt.Errorf("product ID cannot be empty")
 	}
 	if p.name == "" {
@@ -275,7 +275,7 @@ func (h *ProductCommandHandler) Handle(ctx context.Context, command cqrs.Command
 // handleCreateProduct handles CreateProductCommand
 func (h *ProductCommandHandler) handleCreateProduct(ctx context.Context, cmd *CreateProductCommand) (*Product, error) {
 	// Create new product
-	product := NewProduct(cmd.AggregateID(), cmd.Name, cmd.Price, cmd.Category, cmd.Description)
+	product := NewProduct(cmd.ID(), cmd.Name, cmd.Price, cmd.Category, cmd.Description)
 
 	// Validate
 	if err := product.Validate(); err != nil {
@@ -300,7 +300,7 @@ func (h *ProductCommandHandler) handleUpdateProduct(ctx context.Context, cmd *Up
 	}
 
 	// Load product
-	product, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	product, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return nil, fmt.Errorf("failed to load product: %w", err)
 	}

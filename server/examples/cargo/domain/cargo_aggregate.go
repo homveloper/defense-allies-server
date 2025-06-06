@@ -81,11 +81,11 @@ func NewCargoAggregate(id, origin, destination string, maxWeight, maxVolume floa
 // CreateCargo creates a new cargo and applies the creation event
 func (c *CargoAggregate) CreateCargo(createdBy string) error {
 	if c.status != CargoCreated {
-		return fmt.Errorf("cargo %s is already created", c.AggregateID())
+		return fmt.Errorf("cargo %s is already created", c.ID())
 	}
 
 	event := events.NewCargoCreatedEvent(
-		c.AggregateID(),
+		c.ID(),
 		c.origin,
 		c.destination,
 		c.maxWeight,
@@ -100,12 +100,12 @@ func (c *CargoAggregate) CreateCargo(createdBy string) error {
 // LoadShipment loads a shipment into the cargo
 func (c *CargoAggregate) LoadShipment(shipment *Shipment, loadedBy string, loadingTime time.Duration) error {
 	if c.status != CargoCreated && c.status != CargoLoading {
-		return fmt.Errorf("cargo %s is not available for loading, current status: %s", c.AggregateID(), c.status.String())
+		return fmt.Errorf("cargo %s is not available for loading, current status: %s", c.ID(), c.status.String())
 	}
 
 	// Check if shipment already exists
 	if _, exists := c.shipments[shipment.ID]; exists {
-		return fmt.Errorf("shipment %s is already loaded in cargo %s", shipment.ID, c.AggregateID())
+		return fmt.Errorf("shipment %s is already loaded in cargo %s", shipment.ID, c.ID())
 	}
 
 	// Check weight capacity
@@ -150,7 +150,7 @@ func (c *CargoAggregate) LoadShipment(shipment *Shipment, loadedBy string, loadi
 	}
 
 	event := events.NewShipmentLoadedEvent(
-		c.AggregateID(),
+		c.ID(),
 		shipmentData,
 		loadedBy,
 		loadingTime,
@@ -165,7 +165,7 @@ func (c *CargoAggregate) LoadShipment(shipment *Shipment, loadedBy string, loadi
 func (c *CargoAggregate) UnloadShipment(shipmentID, unloadedBy string, unloadingTime time.Duration, reason, location string) error {
 	shipment, exists := c.shipments[shipmentID]
 	if !exists {
-		return fmt.Errorf("shipment %s not found in cargo %s", shipmentID, c.AggregateID())
+		return fmt.Errorf("shipment %s not found in cargo %s", shipmentID, c.ID())
 	}
 
 	if shipment.Status != ShipmentLoaded && shipment.Status != ShipmentInTransit {
@@ -178,7 +178,7 @@ func (c *CargoAggregate) UnloadShipment(shipmentID, unloadedBy string, unloading
 	}
 
 	event := events.NewShipmentUnloadedEvent(
-		c.AggregateID(),
+		c.ID(),
 		shipmentID,
 		unloadedBy,
 		unloadingTime,
@@ -193,15 +193,15 @@ func (c *CargoAggregate) UnloadShipment(shipmentID, unloadedBy string, unloading
 // StartTransport starts the transport of the cargo
 func (c *CargoAggregate) StartTransport(startedBy string, estimatedArrival time.Time, transportMode, vehicleID, driverID, route string) error {
 	if c.status != CargoLoading && c.status != CargoCreated {
-		return fmt.Errorf("cargo %s cannot start transport, current status: %s", c.AggregateID(), c.status.String())
+		return fmt.Errorf("cargo %s cannot start transport, current status: %s", c.ID(), c.status.String())
 	}
 
 	if len(c.shipments) == 0 {
-		return fmt.Errorf("cargo %s has no shipments to transport", c.AggregateID())
+		return fmt.Errorf("cargo %s has no shipments to transport", c.ID())
 	}
 
 	event := events.NewTransportStartedEvent(
-		c.AggregateID(),
+		c.ID(),
 		c.origin,
 		c.destination,
 		startedBy,
@@ -228,11 +228,11 @@ func (c *CargoAggregate) CompleteTransport(
 	completionStatus, notes string,
 ) error {
 	if c.status != CargoInTransit {
-		return fmt.Errorf("cargo %s is not in transit, current status: %s", c.AggregateID(), c.status.String())
+		return fmt.Errorf("cargo %s is not in transit, current status: %s", c.ID(), c.status.String())
 	}
 
 	if c.transportStartedAt == nil {
-		return fmt.Errorf("cargo %s transport start time is not set", c.AggregateID())
+		return fmt.Errorf("cargo %s transport start time is not set", c.ID())
 	}
 
 	estimatedDuration := time.Duration(0)
@@ -241,7 +241,7 @@ func (c *CargoAggregate) CompleteTransport(
 	}
 
 	event := events.NewTransportCompletedEvent(
-		c.AggregateID(),
+		c.ID(),
 		c.origin,
 		c.destination,
 		completedBy,

@@ -42,7 +42,7 @@ func (h *UserCommandHandler) Handle(ctx context.Context, command cqrs.Command) (
 		return &cqrs.CommandResult{
 			Success:       false,
 			Error:         fmt.Errorf("command validation failed: %w", err),
-			AggregateID:   command.AggregateID(),
+			AggregateID:   command.ID(),
 			ExecutionTime: time.Since(startTime),
 		}, nil
 	}
@@ -63,7 +63,7 @@ func (h *UserCommandHandler) Handle(ctx context.Context, command cqrs.Command) (
 		return &cqrs.CommandResult{
 			Success:       false,
 			Error:         fmt.Errorf("unsupported command type: %T", command),
-			AggregateID:   command.AggregateID(),
+			AggregateID:   command.ID(),
 			ExecutionTime: time.Since(startTime),
 		}, nil
 	}
@@ -72,7 +72,7 @@ func (h *UserCommandHandler) Handle(ctx context.Context, command cqrs.Command) (
 		return &cqrs.CommandResult{
 			Success:       false,
 			Error:         err,
-			AggregateID:   command.AggregateID(),
+			AggregateID:   command.ID(),
 			ExecutionTime: time.Since(startTime),
 		}, nil
 	}
@@ -84,21 +84,21 @@ func (h *UserCommandHandler) Handle(ctx context.Context, command cqrs.Command) (
 // handleCreateUser handles CreateUserCommand
 func (h *UserCommandHandler) handleCreateUser(ctx context.Context, cmd *domain.CreateUserCommand) (*cqrs.CommandResult, error) {
 	// Check if user already exists
-	if h.repository.Exists(ctx, cmd.AggregateID()) {
+	if h.repository.Exists(ctx, cmd.ID()) {
 		return &cqrs.CommandResult{
 			Success:     false,
-			Error:       fmt.Errorf("user with ID %s already exists", cmd.AggregateID()),
-			AggregateID: cmd.AggregateID(),
+			Error:       fmt.Errorf("user with ID %s already exists", cmd.ID()),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	// Create new user aggregate
-	user, err := domain.NewUser(cmd.AggregateID(), cmd.Email, cmd.Name)
+	user, err := domain.NewUser(cmd.ID(), cmd.Email, cmd.Name)
 	if err != nil {
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to create user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -107,7 +107,7 @@ func (h *UserCommandHandler) handleCreateUser(ctx context.Context, cmd *domain.C
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to save user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -117,17 +117,17 @@ func (h *UserCommandHandler) handleCreateUser(ctx context.Context, cmd *domain.C
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to publish events: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	return &cqrs.CommandResult{
 		Success:     true,
 		Events:      events,
-		AggregateID: cmd.AggregateID(),
-		Version:     user.CurrentVersion(),
+		AggregateID: cmd.ID(),
+		Version:     user.Version(),
 		Data: map[string]interface{}{
-			"user_id": user.AggregateID(),
+			"user_id": user.ID(),
 			"email":   user.Email(),
 			"name":    user.Name(),
 			"status":  user.Status().String(),
@@ -138,12 +138,12 @@ func (h *UserCommandHandler) handleCreateUser(ctx context.Context, cmd *domain.C
 // handleChangeEmail handles ChangeEmailCommand
 func (h *UserCommandHandler) handleChangeEmail(ctx context.Context, cmd *domain.ChangeEmailCommand) (*cqrs.CommandResult, error) {
 	// Load user aggregate
-	aggregate, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	aggregate, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to load user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -152,31 +152,31 @@ func (h *UserCommandHandler) handleChangeEmail(ctx context.Context, cmd *domain.
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("invalid aggregate type: expected *domain.User, got %T", aggregate),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	// Debug: Print version info
-	fmt.Printf("DEBUG: Before ChangeEmail - Original: %d, Current: %d\n", user.OriginalVersion(), user.CurrentVersion())
+	fmt.Printf("DEBUG: Before ChangeEmail - Original: %d, Current: %d\n", user.OriginalVersion(), user.Version())
 
 	// Execute business logic
 	if err := user.ChangeEmail(cmd.NewEmail); err != nil {
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to change email: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	// Debug: Print version info after change
-	fmt.Printf("DEBUG: After ChangeEmail - Original: %d, Current: %d\n", user.OriginalVersion(), user.CurrentVersion())
+	fmt.Printf("DEBUG: After ChangeEmail - Original: %d, Current: %d\n", user.OriginalVersion(), user.Version())
 
 	// Save the aggregate
 	if err := h.repository.Save(ctx, user, user.OriginalVersion()); err != nil {
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to save user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -186,17 +186,17 @@ func (h *UserCommandHandler) handleChangeEmail(ctx context.Context, cmd *domain.
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to publish events: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	return &cqrs.CommandResult{
 		Success:     true,
 		Events:      events,
-		AggregateID: cmd.AggregateID(),
-		Version:     user.CurrentVersion(),
+		AggregateID: cmd.ID(),
+		Version:     user.Version(),
 		Data: map[string]interface{}{
-			"user_id": user.AggregateID(),
+			"user_id": user.ID(),
 			"email":   user.Email(),
 		},
 	}, nil
@@ -205,12 +205,12 @@ func (h *UserCommandHandler) handleChangeEmail(ctx context.Context, cmd *domain.
 // handleDeactivateUser handles DeactivateUserCommand
 func (h *UserCommandHandler) handleDeactivateUser(ctx context.Context, cmd *domain.DeactivateUserCommand) (*cqrs.CommandResult, error) {
 	// Load user aggregate
-	aggregate, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	aggregate, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to load user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -219,7 +219,7 @@ func (h *UserCommandHandler) handleDeactivateUser(ctx context.Context, cmd *doma
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("invalid aggregate type: expected *domain.User, got %T", aggregate),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -228,7 +228,7 @@ func (h *UserCommandHandler) handleDeactivateUser(ctx context.Context, cmd *doma
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to deactivate user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -237,7 +237,7 @@ func (h *UserCommandHandler) handleDeactivateUser(ctx context.Context, cmd *doma
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to save user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -247,17 +247,17 @@ func (h *UserCommandHandler) handleDeactivateUser(ctx context.Context, cmd *doma
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to publish events: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	return &cqrs.CommandResult{
 		Success:     true,
 		Events:      events,
-		AggregateID: cmd.AggregateID(),
-		Version:     user.CurrentVersion(),
+		AggregateID: cmd.ID(),
+		Version:     user.Version(),
 		Data: map[string]interface{}{
-			"user_id": user.AggregateID(),
+			"user_id": user.ID(),
 			"status":  user.Status().String(),
 			"reason":  user.DeactivationReason(),
 		},
@@ -267,12 +267,12 @@ func (h *UserCommandHandler) handleDeactivateUser(ctx context.Context, cmd *doma
 // handleActivateUser handles ActivateUserCommand
 func (h *UserCommandHandler) handleActivateUser(ctx context.Context, cmd *domain.ActivateUserCommand) (*cqrs.CommandResult, error) {
 	// Load user aggregate
-	aggregate, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	aggregate, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to load user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -281,7 +281,7 @@ func (h *UserCommandHandler) handleActivateUser(ctx context.Context, cmd *domain
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("invalid aggregate type: expected *domain.User, got %T", aggregate),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -290,7 +290,7 @@ func (h *UserCommandHandler) handleActivateUser(ctx context.Context, cmd *domain
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to activate user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -299,7 +299,7 @@ func (h *UserCommandHandler) handleActivateUser(ctx context.Context, cmd *domain
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to save user: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
@@ -309,17 +309,17 @@ func (h *UserCommandHandler) handleActivateUser(ctx context.Context, cmd *domain
 		return &cqrs.CommandResult{
 			Success:     false,
 			Error:       fmt.Errorf("failed to publish events: %w", err),
-			AggregateID: cmd.AggregateID(),
+			AggregateID: cmd.ID(),
 		}, nil
 	}
 
 	return &cqrs.CommandResult{
 		Success:     true,
 		Events:      events,
-		AggregateID: cmd.AggregateID(),
-		Version:     user.CurrentVersion(),
+		AggregateID: cmd.ID(),
+		Version:     user.Version(),
 		Data: map[string]interface{}{
-			"user_id": user.AggregateID(),
+			"user_id": user.ID(),
 			"status":  user.Status().String(),
 		},
 	}, nil

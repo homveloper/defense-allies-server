@@ -42,7 +42,7 @@ func (r *OrderRepository) Save(ctx context.Context, order *domain.Order) error {
 	expectedVersion := order.OriginalVersion()
 
 	log.Printf("Attempting to save %d events for order %s with expectedVersion %d (original: %d, current: %d)",
-		len(uncommittedChanges), order.ID(), expectedVersion, order.OriginalVersion(), order.CurrentVersion())
+		len(uncommittedChanges), order.ID(), expectedVersion, order.OriginalVersion(), order.Version())
 
 	err := r.eventStore.SaveEvents(ctx, order.ID(), uncommittedChanges, expectedVersion)
 	if err != nil {
@@ -53,13 +53,13 @@ func (r *OrderRepository) Save(ctx context.Context, order *domain.Order) error {
 	order.ClearChanges()
 
 	// 저장 성공 후 원본 버전을 현재 버전으로 업데이트 (다음 저장을 위해)
-	order.SetOriginalVersion(order.CurrentVersion())
+	order.SetOriginalVersion(order.Version())
 
 	log.Printf("Successfully saved order %s with version %d", order.ID(), order.Version())
 
 	// 스냅샷 생성 여부 확인 및 생성
 	if r.enableSnapshots {
-		eventCount := order.CurrentVersion()
+		eventCount := order.Version()
 		if r.snapshotManager.ShouldCreateSnapshot(order, eventCount) {
 			log.Printf("Creating snapshot for order %s at version %d", order.ID(), order.Version())
 
@@ -125,7 +125,7 @@ func (r *OrderRepository) GetByID(ctx context.Context, orderID string) (*domain.
 	}
 
 	// 로드 완료 후 원본 버전을 현재 버전으로 설정 (동시성 제어용)
-	order.SetOriginalVersion(order.CurrentVersion())
+	order.SetOriginalVersion(order.Version())
 
 	loadTime := time.Since(start)
 	log.Printf("Successfully loaded order %s with version %d in %v (snapshot: %v, events: %d)",

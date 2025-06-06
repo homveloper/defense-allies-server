@@ -39,7 +39,7 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 	}
 
 	// Get aggregate type from first event
-	aggregateType := events[0].AggregateType()
+	aggregateType := events[0].Type()
 	eventKey := es.keyBuilder.EventKey(aggregateType, aggregateID)
 	metadataKey := es.keyBuilder.MetadataKey(aggregateType, aggregateID)
 

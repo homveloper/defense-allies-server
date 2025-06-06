@@ -37,7 +37,7 @@ func (s *InMemorySnapshotStore) Save(ctx context.Context, snapshot SnapshotData)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	key := s.getSnapshotKey(snapshot.AggregateID(), snapshot.AggregateType())
+	key := s.getSnapshotKey(snapshot.ID(), snapshot.Type())
 	s.snapshots[key] = snapshot
 
 	return nil
@@ -53,7 +53,7 @@ func (s *InMemorySnapshotStore) Load(ctx context.Context, aggregateID string) (S
 
 	// Try to find snapshot with any aggregate type (since we only have aggregateID)
 	for _, snapshot := range s.snapshots {
-		if snapshot.AggregateID() == aggregateID {
+		if snapshot.ID() == aggregateID {
 			return snapshot, nil
 		}
 	}
@@ -71,7 +71,7 @@ func (s *InMemorySnapshotStore) Delete(ctx context.Context, aggregateID string) 
 
 	// Find and delete snapshot with matching aggregate ID
 	for key, snapshot := range s.snapshots {
-		if snapshot.AggregateID() == aggregateID {
+		if snapshot.ID() == aggregateID {
 			delete(s.snapshots, key)
 			return nil
 		}
@@ -89,7 +89,7 @@ func (s *InMemorySnapshotStore) Exists(ctx context.Context, aggregateID string) 
 	defer s.mutex.RUnlock()
 
 	for _, snapshot := range s.snapshots {
-		if snapshot.AggregateID() == aggregateID {
+		if snapshot.ID() == aggregateID {
 			return true
 		}
 	}
@@ -158,7 +158,7 @@ func (s *InMemorySnapshotStore) GetSnapshotsByType(aggregateType string) []Snaps
 
 	var snapshots []SnapshotData
 	for _, snapshot := range s.snapshots {
-		if snapshot.AggregateType() == aggregateType {
+		if snapshot.Type() == aggregateType {
 			snapshots = append(snapshots, snapshot)
 		}
 	}

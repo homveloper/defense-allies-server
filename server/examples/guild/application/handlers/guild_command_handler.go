@@ -63,14 +63,14 @@ func (h *GuildCommandHandler) Handle(ctx context.Context, command cqrs.Command) 
 // handleCreateGuild handles the CreateGuildCommand
 func (h *GuildCommandHandler) handleCreateGuild(ctx context.Context, cmd *commands.CreateGuildCommand) (*cqrs.CommandResult, error) {
 	// Check if guild already exists
-	exists := h.repository.Exists(ctx, cmd.AggregateID())
+	exists := h.repository.Exists(ctx, cmd.ID())
 	if exists {
-		return nil, fmt.Errorf("guild with ID %s already exists", cmd.AggregateID())
+		return nil, fmt.Errorf("guild with ID %s already exists", cmd.ID())
 	}
 
 	// Create new guild aggregate
 	guild := domain.NewGuildAggregate(
-		cmd.AggregateID(),
+		cmd.ID(),
 		cmd.Name,
 		cmd.Description,
 		cmd.FounderID,
@@ -88,10 +88,10 @@ func (h *GuildCommandHandler) handleCreateGuild(ctx context.Context, cmd *comman
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
-			"guild_id": cmd.AggregateID(),
+			"guild_id": cmd.ID(),
 			"name":     cmd.Name,
 			"message":  "Guild created successfully",
 		},
@@ -101,7 +101,7 @@ func (h *GuildCommandHandler) handleCreateGuild(ctx context.Context, cmd *comman
 // handleUpdateGuildInfo handles the UpdateGuildInfoCommand
 func (h *GuildCommandHandler) handleUpdateGuildInfo(ctx context.Context, cmd *commands.UpdateGuildInfoCommand) (*cqrs.CommandResult, error) {
 	// Load guild aggregate
-	guild, err := h.loadGuild(ctx, cmd.AggregateID())
+	guild, err := h.loadGuild(ctx, cmd.ID())
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (h *GuildCommandHandler) handleUpdateGuildInfo(ctx context.Context, cmd *co
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
 			"message": "Guild info updated successfully",
@@ -128,7 +128,7 @@ func (h *GuildCommandHandler) handleUpdateGuildInfo(ctx context.Context, cmd *co
 // handleUpdateGuildSettings handles the UpdateGuildSettingsCommand
 func (h *GuildCommandHandler) handleUpdateGuildSettings(ctx context.Context, cmd *commands.UpdateGuildSettingsCommand) (*cqrs.CommandResult, error) {
 	// Load guild aggregate
-	guild, err := h.loadGuild(ctx, cmd.AggregateID())
+	guild, err := h.loadGuild(ctx, cmd.ID())
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (h *GuildCommandHandler) handleUpdateGuildSettings(ctx context.Context, cmd
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
 			"message": "Guild settings updated successfully",
@@ -155,7 +155,7 @@ func (h *GuildCommandHandler) handleUpdateGuildSettings(ctx context.Context, cmd
 // handleInviteMember handles the InviteMemberCommand
 func (h *GuildCommandHandler) handleInviteMember(ctx context.Context, cmd *commands.InviteMemberCommand) (*cqrs.CommandResult, error) {
 	// Load guild aggregate
-	guild, err := h.loadGuild(ctx, cmd.AggregateID())
+	guild, err := h.loadGuild(ctx, cmd.ID())
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (h *GuildCommandHandler) handleInviteMember(ctx context.Context, cmd *comma
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
 			"user_id":    cmd.UserID(),
@@ -185,7 +185,7 @@ func (h *GuildCommandHandler) handleInviteMember(ctx context.Context, cmd *comma
 // handleAcceptInvitation handles the AcceptInvitationCommand
 func (h *GuildCommandHandler) handleAcceptInvitation(ctx context.Context, cmd *commands.AcceptInvitationCommand) (*cqrs.CommandResult, error) {
 	// Load guild aggregate
-	guild, err := h.loadGuild(ctx, cmd.AggregateID())
+	guild, err := h.loadGuild(ctx, cmd.ID())
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (h *GuildCommandHandler) handleAcceptInvitation(ctx context.Context, cmd *c
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
 			"user_id": cmd.UserID(),
@@ -213,7 +213,7 @@ func (h *GuildCommandHandler) handleAcceptInvitation(ctx context.Context, cmd *c
 // handleKickMember handles the KickMemberCommand
 func (h *GuildCommandHandler) handleKickMember(ctx context.Context, cmd *commands.KickMemberCommand) (*cqrs.CommandResult, error) {
 	// Load guild aggregate
-	guild, err := h.loadGuild(ctx, cmd.AggregateID())
+	guild, err := h.loadGuild(ctx, cmd.ID())
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func (h *GuildCommandHandler) handleKickMember(ctx context.Context, cmd *command
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
 			"user_id":   cmd.UserID(),
@@ -243,7 +243,7 @@ func (h *GuildCommandHandler) handleKickMember(ctx context.Context, cmd *command
 // handlePromoteMember handles the PromoteMemberCommand
 func (h *GuildCommandHandler) handlePromoteMember(ctx context.Context, cmd *commands.PromoteMemberCommand) (*cqrs.CommandResult, error) {
 	// Load guild aggregate
-	guild, err := h.loadGuild(ctx, cmd.AggregateID())
+	guild, err := h.loadGuild(ctx, cmd.ID())
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,7 @@ func (h *GuildCommandHandler) handlePromoteMember(ctx context.Context, cmd *comm
 	}
 
 	return &cqrs.CommandResult{
-		AggregateID: cmd.AggregateID(),
+		AggregateID: cmd.ID(),
 		Success:     true,
 		Data: map[string]interface{}{
 			"user_id":     cmd.UserID(),

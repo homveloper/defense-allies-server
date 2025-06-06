@@ -244,7 +244,7 @@ func demoVersionCompatibility(vm *versioning.UserEventVersionManager) {
 func printEventDetails(event cqrs.EventMessage) {
 	fmt.Printf("     Type: %s\n", event.EventType())
 	fmt.Printf("     ID: %s\n", event.EventID())
-	fmt.Printf("     Aggregate: %s\n", event.AggregateID())
+	fmt.Printf("     Aggregate: %s\n", event.ID())
 	fmt.Printf("     Metadata: %v\n", event.Metadata())
 
 	eventData := event.EventData()

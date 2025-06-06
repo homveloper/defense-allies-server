@@ -65,7 +65,7 @@ func (a *UserRepositoryAdapter) GetByID(ctx context.Context, id string) (cqrs.Ag
 // setupVersionAfterLoad sets up version state after loading an aggregate
 func (a *UserRepositoryAdapter) setupVersionAfterLoad(aggregate cqrs.AggregateRoot) {
 	// 로드된 버전을 OriginalVersion으로 설정
-	currentVersion := aggregate.CurrentVersion()
+	currentVersion := aggregate.Version()
 	aggregate.SetOriginalVersion(currentVersion)
 
 	// 변경사항 정리 (로드된 상태이므로 변경사항 없음)
@@ -205,7 +205,7 @@ func (a *OrderRepositoryAdapter) determineExpectedVersion(ctx context.Context, a
 // setupVersionAfterLoad sets up version state after loading an aggregate
 func (a *OrderRepositoryAdapter) setupVersionAfterLoad(aggregate cqrs.AggregateRoot) {
 	// 로드된 버전을 OriginalVersion으로 설정
-	currentVersion := aggregate.CurrentVersion()
+	currentVersion := aggregate.Version()
 	aggregate.SetOriginalVersion(currentVersion)
 
 	// 변경사항 정리 (로드된 상태이므로 변경사항 없음)
@@ -272,7 +272,7 @@ func (a *OrderRepositoryAdapter) Create(ctx context.Context, aggregate cqrs.Aggr
 
 // Update updates an order (use Save instead)
 func (a *OrderRepositoryAdapter) Update(ctx context.Context, aggregate cqrs.AggregateRoot) error {
-	return a.repo.Save(ctx, aggregate, aggregate.CurrentVersion())
+	return a.repo.Save(ctx, aggregate, aggregate.Version())
 }
 
 // Delete deletes an order (not directly supported)
@@ -378,7 +378,7 @@ func (a *ProductRepositoryAdapter) determineExpectedVersion(ctx context.Context,
 // setupVersionAfterLoad sets up version state after loading an aggregate
 func (a *ProductRepositoryAdapter) setupVersionAfterLoad(aggregate cqrs.AggregateRoot) {
 	// 로드된 버전을 OriginalVersion으로 설정
-	currentVersion := aggregate.CurrentVersion()
+	currentVersion := aggregate.Version()
 	aggregate.SetOriginalVersion(currentVersion)
 
 	// 변경사항 정리 (로드된 상태이므로 변경사항 없음)
@@ -402,7 +402,7 @@ func (a *ProductRepositoryAdapter) Create(ctx context.Context, aggregate cqrs.Ag
 
 // Update updates a product (use Save instead)
 func (a *ProductRepositoryAdapter) Update(ctx context.Context, aggregate cqrs.AggregateRoot) error {
-	return a.repo.Save(ctx, aggregate, aggregate.CurrentVersion())
+	return a.repo.Save(ctx, aggregate, aggregate.Version())
 }
 
 // Delete deletes a product (not directly supported)

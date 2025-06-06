@@ -57,19 +57,19 @@ func NewRedisHybridRepository(eventStore *RedisEventStore, stateStore *RedisStat
 // RedisEventSourcedRepository implementation
 
 func (r *RedisEventSourcedRepository) Save(ctx context.Context, aggregate cqrs.AggregateRoot, expectedVersion int) error {
-	if aggregate.AggregateType() != r.aggregateType {
+	if aggregate.Type() != r.aggregateType {
 		return cqrs.NewCQRSError(cqrs.ErrCodeRepositoryError.String(),
-			fmt.Sprintf("aggregate type mismatch: expected %s, got %s", r.aggregateType, aggregate.AggregateType()), nil)
+			fmt.Sprintf("aggregate type mismatch: expected %s, got %s", r.aggregateType, aggregate.Type()), nil)
 	}
 
 	// Get uncommitted events
-	events := aggregate.GetChanges()
+	events := aggregate.Changes()
 	if len(events) == 0 {
 		return nil // No changes to save
 	}
 
 	// Save events
-	err := r.eventStore.SaveEvents(ctx, aggregate.AggregateID(), events, expectedVersion)
+	err := r.eventStore.SaveEvents(ctx, aggregate.ID(), events, expectedVersion)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (r *RedisEventSourcedRepository) GetByID(ctx context.Context, id string) (c
 		snapshot, err := r.snapshotStore.Load(ctx, id)
 		if err == nil && snapshot != nil {
 			// Create aggregate from snapshot
-			aggregate = cqrs.NewBaseAggregate(id, r.aggregateType)
+			aggregate = cqrs.NewBaseAggregate(id, r.aggregateType, cqrs.WithOriginalVersion(snapshot.Version()))
 			// Note: In real implementation, you'd need to restore aggregate state from snapshot
 			fromVersion = snapshot.Version() + 1
 		}
@@ -110,9 +110,6 @@ func (r *RedisEventSourcedRepository) GetByID(ctx context.Context, id string) (c
 	for _, event := range events {
 		aggregate.ReplayEvent(event) // false = existing event, don't track as change
 	}
-
-	// Set original version
-	aggregate.SetOriginalVersion(aggregate.CurrentVersion())
 
 	return aggregate, nil
 }

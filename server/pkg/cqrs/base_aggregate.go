@@ -1,12 +1,14 @@
 package cqrs
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 )
 
-// BaseAggregate provides a base implementation of the Aggregate interface
-// Compatible with go.cqrs style
+// BaseAggregate provides a base implementation of the AggregateRoot interface
+// Optimized for Defense Allies with clean and simple API
 type BaseAggregate struct {
 	id              string
 	aggregateType   string
@@ -18,10 +20,42 @@ type BaseAggregate struct {
 	deleted         bool
 }
 
-// NewBaseAggregate creates a new BaseAggregate
-func NewBaseAggregate(id, aggregateType string) *BaseAggregate {
+// BaseAggregateOption defines options for creating BaseAggregate
+type BaseAggregateOption func(*BaseAggregate)
+
+// WithOriginalVersion sets the original version (used when loading from storage)
+func WithOriginalVersion(version int) BaseAggregateOption {
+	return func(a *BaseAggregate) {
+		a.originalVersion = version
+		a.currentVersion = version
+	}
+}
+
+// WithCreatedAt sets the creation timestamp (used when loading from storage)
+func WithCreatedAt(createdAt time.Time) BaseAggregateOption {
+	return func(a *BaseAggregate) {
+		a.createdAt = createdAt
+	}
+}
+
+// WithUpdatedAt sets the update timestamp (used when loading from storage)
+func WithUpdatedAt(updatedAt time.Time) BaseAggregateOption {
+	return func(a *BaseAggregate) {
+		a.updatedAt = updatedAt
+	}
+}
+
+// WithDeleted sets the deleted flag (used when loading from storage)
+func WithDeleted(deleted bool) BaseAggregateOption {
+	return func(a *BaseAggregate) {
+		a.deleted = deleted
+	}
+}
+
+// NewBaseAggregate creates a new BaseAggregate with optional configuration
+func NewBaseAggregate(id, aggregateType string, options ...BaseAggregateOption) *BaseAggregate {
 	now := time.Now()
-	return &BaseAggregate{
+	aggregate := &BaseAggregate{
 		id:              id,
 		aggregateType:   aggregateType,
 		originalVersion: 0,
@@ -31,46 +65,69 @@ func NewBaseAggregate(id, aggregateType string) *BaseAggregate {
 		updatedAt:       now,
 		deleted:         false,
 	}
+
+	// Apply options
+	for _, option := range options {
+		option(aggregate)
+	}
+
+	return aggregate
 }
 
 // AggregateRoot interface implementation
 
-func (a *BaseAggregate) AggregateID() string {
+func (a *BaseAggregate) ID() string {
 	return a.id
+}
+
+func (a *BaseAggregate) Type() string {
+	return a.aggregateType
+}
+
+func (a *BaseAggregate) Version() int {
+	return a.currentVersion
 }
 
 func (a *BaseAggregate) OriginalVersion() int {
 	return a.originalVersion
 }
 
-func (a *BaseAggregate) CurrentVersion() int {
-	return a.currentVersion
-}
-
-func (a *BaseAggregate) IncrementVersion() {
+// incrementVersion increases the current version by 1 (private method)
+func (a *BaseAggregate) incrementVersion() {
 	a.currentVersion++
 	a.updatedAt = time.Now()
 }
 
-func (a *BaseAggregate) Apply(event EventMessage, isNew bool) {
-	// Note: This is a base implementation that handles common aggregate concerns.
-	// Domain-specific aggregates should override this method to apply business logic
-	// and then call this base implementation for infrastructure concerns.
-
-	// Track new events for persistence
-	if isNew {
-		a.TrackChange(event)
+// ApplyEvent applies a newly generated event and tracks it as an uncommitted change
+func (a *BaseAggregate) ApplyEvent(event EventMessage) error {
+	// Validate event
+	if event == nil {
+		return errors.New("event cannot be nil")
 	}
 
-	// Update version and timestamp for all event applications
-	a.IncrementVersion()
-}
-
-func (a *BaseAggregate) TrackChange(event EventMessage) {
+	// Track new events for persistence
 	a.changes = append(a.changes, event)
+
+	// Update version and timestamp
+	a.incrementVersion()
+
+	return nil
 }
 
-func (a *BaseAggregate) GetChanges() []EventMessage {
+// ReplayEvent applies an existing event during state reconstruction
+func (a *BaseAggregate) ReplayEvent(event EventMessage) error {
+	// Validate event
+	if event == nil {
+		return errors.New("event cannot be nil")
+	}
+
+	// Update version and timestamp (but don't track as new change)
+	a.incrementVersion()
+
+	return nil
+}
+
+func (a *BaseAggregate) Changes() []EventMessage {
 	return a.changes
 }
 
@@ -78,41 +135,14 @@ func (a *BaseAggregate) ClearChanges() {
 	a.changes = nil
 }
 
-// ApplyEvent applies an event during replay with error handling
-// This method implements EventSourcedAggregate interface
-func (a *BaseAggregate) ApplyEvent(event EventMessage) error {
-	// Validate event before applying
-	if event == nil {
-		return errors.New("event cannot be nil")
+// LoadFromHistory reconstructs the aggregate state by replaying events
+func (a *BaseAggregate) LoadFromHistory(events []EventMessage) error {
+	for _, event := range events {
+		if err := a.ReplayEvent(event); err != nil {
+			return fmt.Errorf("failed to replay event: %w", err)
+		}
 	}
-
-	// Apply event without tracking as new change (replay scenario)
-	a.Apply(event, false)
-
 	return nil
-}
-
-// Defense Allies Aggregate interface implementation
-
-func (a *BaseAggregate) AggregateType() string {
-	return a.aggregateType
-}
-
-func (a *BaseAggregate) CreatedAt() time.Time {
-	return a.createdAt
-}
-
-func (a *BaseAggregate) UpdatedAt() time.Time {
-	return a.updatedAt
-}
-
-func (a *BaseAggregate) IsDeleted() bool {
-	return a.deleted
-}
-
-func (a *BaseAggregate) MarkAsDeleted() {
-	a.deleted = true
-	a.updatedAt = time.Now()
 }
 
 func (a *BaseAggregate) Validate() error {
@@ -127,27 +157,6 @@ func (a *BaseAggregate) Validate() error {
 
 // Helper methods
 
-// SetOriginalVersion sets the original version (used when loading from storage)
-func (a *BaseAggregate) SetOriginalVersion(version int) {
-	a.originalVersion = version
-	a.currentVersion = version
-}
-
-// SetCreatedAt sets the creation time (used when loading from storage)
-func (a *BaseAggregate) SetCreatedAt(createdAt time.Time) {
-	a.createdAt = createdAt
-}
-
-// SetUpdatedAt sets the update time (used when loading from storage)
-func (a *BaseAggregate) SetUpdatedAt(updatedAt time.Time) {
-	a.updatedAt = updatedAt
-}
-
-// SetDeleted sets the deleted flag (used when loading from storage)
-func (a *BaseAggregate) SetDeleted(deleted bool) {
-	a.deleted = deleted
-}
-
 // HasUncommittedChanges returns true if there are uncommitted changes
 func (a *BaseAggregate) HasUncommittedChanges() bool {
 	return len(a.changes) > 0
@@ -156,4 +165,56 @@ func (a *BaseAggregate) HasUncommittedChanges() bool {
 // GetUncommittedChangeCount returns the number of uncommitted changes
 func (a *BaseAggregate) GetUncommittedChangeCount() int {
 	return len(a.changes)
+}
+
+// JSON Serialization Support
+
+// baseAggregateJSON represents the JSON structure for BaseAggregate
+type baseAggregateJSON struct {
+	ID              string         `json:"id"`
+	Type            string         `json:"type"`
+	OriginalVersion int            `json:"original_version"`
+	Version         int            `json:"version"`
+	Changes         []EventMessage `json:"changes,omitempty"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+	Deleted         bool           `json:"deleted"`
+}
+
+// MarshalJSON implements custom JSON marshaling for BaseAggregate
+func (a *BaseAggregate) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&baseAggregateJSON{
+		ID:              a.id,
+		Type:            a.aggregateType,
+		OriginalVersion: a.originalVersion,
+		Version:         a.currentVersion,
+		Changes:         a.changes,
+		CreatedAt:       a.createdAt,
+		UpdatedAt:       a.updatedAt,
+		Deleted:         a.deleted,
+	})
+}
+
+// UnmarshalJSON implements custom JSON unmarshaling for BaseAggregate
+func (a *BaseAggregate) UnmarshalJSON(data []byte) error {
+	var jsonData baseAggregateJSON
+	if err := json.Unmarshal(data, &jsonData); err != nil {
+		return err
+	}
+
+	a.id = jsonData.ID
+	a.aggregateType = jsonData.Type
+	a.originalVersion = jsonData.OriginalVersion
+	a.currentVersion = jsonData.Version
+	a.changes = jsonData.Changes
+	a.createdAt = jsonData.CreatedAt
+	a.updatedAt = jsonData.UpdatedAt
+	a.deleted = jsonData.Deleted
+
+	// Initialize changes slice if nil
+	if a.changes == nil {
+		a.changes = make([]EventMessage, 0)
+	}
+
+	return nil
 }

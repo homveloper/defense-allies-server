@@ -87,7 +87,7 @@ func (o *Order) AddItem(item OrderItem) error {
 		return fmt.Errorf("cannot add items to %s order", o.status)
 	}
 
-	event := NewOrderItemAdded(o.AggregateID(), item)
+	event := NewOrderItemAdded(o.ID(), item)
 	o.ApplyEvent(event)
 
 	return nil
@@ -112,7 +112,7 @@ func (o *Order) RemoveItem(productID string) error {
 		return fmt.Errorf("item with product ID %s not found in order", productID)
 	}
 
-	event := NewOrderItemRemoved(o.AggregateID(), productID)
+	event := NewOrderItemRemoved(o.ID(), productID)
 	o.ApplyEvent(event)
 
 	return nil
@@ -128,7 +128,7 @@ func (o *Order) Complete() error {
 		return fmt.Errorf("cannot complete order with no items")
 	}
 
-	event := NewOrderCompleted(o.AggregateID(), o.customerID, o.totalAmount)
+	event := NewOrderCompleted(o.ID(), o.customerID, o.totalAmount)
 	o.ApplyEvent(event)
 
 	return nil
@@ -140,7 +140,7 @@ func (o *Order) Cancel(reason string) error {
 		return fmt.Errorf("cannot cancel %s order", o.status)
 	}
 
-	event := NewOrderCancelled(o.AggregateID(), o.customerID, reason)
+	event := NewOrderCancelled(o.ID(), o.customerID, reason)
 	o.ApplyEvent(event)
 
 	return nil
@@ -270,7 +270,7 @@ func (o *Order) applyOrderItemRemoved(event *OrderItemRemoved) error {
 
 // Validate validates the order aggregate state
 func (o *Order) Validate() error {
-	if o.AggregateID() == "" {
+	if o.ID() == "" {
 		return fmt.Errorf("order ID cannot be empty")
 	}
 	if o.customerID == "" {
@@ -422,7 +422,7 @@ func (h *OrderCommandHandler) handleCreateOrder(ctx context.Context, cmd *Create
 	}
 
 	// Create new order
-	order := NewOrder(cmd.AggregateID(), cmd.CustomerID, cmd.Items)
+	order := NewOrder(cmd.ID(), cmd.CustomerID, cmd.Items)
 
 	// Validate
 	if err := order.Validate(); err != nil {
@@ -447,7 +447,7 @@ func (h *OrderCommandHandler) handleCompleteOrder(ctx context.Context, cmd *Comp
 	}
 
 	// Load order
-	order, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	order, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return nil, fmt.Errorf("failed to load order: %w", err)
 	}
@@ -478,7 +478,7 @@ func (h *OrderCommandHandler) handleCancelOrder(ctx context.Context, cmd *Cancel
 	}
 
 	// Load order
-	order, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	order, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return nil, fmt.Errorf("failed to load order: %w", err)
 	}
@@ -509,7 +509,7 @@ func (h *OrderCommandHandler) handleAddOrderItem(ctx context.Context, cmd *AddOr
 	}
 
 	// Load order
-	order, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	order, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return nil, fmt.Errorf("failed to load order: %w", err)
 	}

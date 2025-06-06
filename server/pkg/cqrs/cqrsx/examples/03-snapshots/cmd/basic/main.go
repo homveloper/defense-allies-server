@@ -89,10 +89,10 @@ type InMemoryAdvancedSnapshotStore struct {
 func (s *InMemoryAdvancedSnapshotStore) SaveSnapshot(ctx context.Context, aggregate cqrs.AggregateRoot) error {
 	// This would normally serialize the aggregate, but for demo we'll create a simple snapshot
 	snapshot := &InMemorySnapshotData{
-		aggregateID:   aggregate.AggregateID(),
-		aggregateType: aggregate.AggregateType(),
-		version:       aggregate.CurrentVersion(),
-		data:          []byte(fmt.Sprintf("snapshot-data-%s-v%d", aggregate.AggregateID(), aggregate.CurrentVersion())),
+		aggregateID:   aggregate.ID(),
+		aggregateType: aggregate.Type(),
+		version:       aggregate.Version(),
+		data:          []byte(fmt.Sprintf("snapshot-data-%s-v%d", aggregate.ID(), aggregate.Version())),
 		timestamp:     time.Now(),
 		metadata:      map[string]interface{}{"demo": true},
 		size:          100,
@@ -100,10 +100,10 @@ func (s *InMemoryAdvancedSnapshotStore) SaveSnapshot(ctx context.Context, aggreg
 		compression:   "none",
 	}
 
-	if s.snapshots[aggregate.AggregateID()] == nil {
-		s.snapshots[aggregate.AggregateID()] = []cqrsx.SnapshotData{}
+	if s.snapshots[aggregate.ID()] == nil {
+		s.snapshots[aggregate.ID()] = []cqrsx.SnapshotData{}
 	}
-	s.snapshots[aggregate.AggregateID()] = append(s.snapshots[aggregate.AggregateID()], snapshot)
+	s.snapshots[aggregate.ID()] = append(s.snapshots[aggregate.ID()], snapshot)
 	return nil
 }
 
@@ -187,12 +187,12 @@ type InMemorySnapshotData struct {
 	compression   string
 }
 
-func (s *InMemorySnapshotData) AggregateID() string                 { return s.aggregateID }
-func (s *InMemorySnapshotData) AggregateType() string               { return s.aggregateType }
-func (s *InMemorySnapshotData) Version() int                        { return s.version }
-func (s *InMemorySnapshotData) Data() []byte                        { return s.data }
-func (s *InMemorySnapshotData) Timestamp() time.Time                { return s.timestamp }
-func (s *InMemorySnapshotData) Metadata() map[string]interface{}    { return s.metadata }
-func (s *InMemorySnapshotData) Size() int64                         { return s.size }
-func (s *InMemorySnapshotData) ContentType() string                 { return s.contentType }
-func (s *InMemorySnapshotData) Compression() string                 { return s.compression }
+func (s *InMemorySnapshotData) ID() string                       { return s.aggregateID }
+func (s *InMemorySnapshotData) Type() string                     { return s.aggregateType }
+func (s *InMemorySnapshotData) Version() int                     { return s.version }
+func (s *InMemorySnapshotData) Data() []byte                     { return s.data }
+func (s *InMemorySnapshotData) Timestamp() time.Time             { return s.timestamp }
+func (s *InMemorySnapshotData) Metadata() map[string]interface{} { return s.metadata }
+func (s *InMemorySnapshotData) Size() int64                      { return s.size }
+func (s *InMemorySnapshotData) ContentType() string              { return s.contentType }
+func (s *InMemorySnapshotData) Compression() string              { return s.compression }

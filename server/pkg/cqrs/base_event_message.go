@@ -44,11 +44,11 @@ func (e *BaseEventMessage) EventType() string {
 	return e.eventType
 }
 
-func (e *BaseEventMessage) AggregateID() string {
+func (e *BaseEventMessage) ID() string {
 	return e.aggregateID
 }
 
-func (e *BaseEventMessage) AggregateType() string {
+func (e *BaseEventMessage) Type() string {
 	return e.aggregateType
 }
 

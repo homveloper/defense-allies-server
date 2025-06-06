@@ -43,14 +43,14 @@ type Command interface {
 	//
 	// Returns:
 	//   - string: Target aggregate identifier
-	AggregateID() string
+	ID() string
 
 	// AggregateType returns the type of the target aggregate.
 	// This is used for routing and validation purposes.
 	//
 	// Returns:
 	//   - string: Target aggregate type (e.g., "User", "Order", "Product")
-	AggregateType() string
+	Type() string
 
 	// Metadata
 

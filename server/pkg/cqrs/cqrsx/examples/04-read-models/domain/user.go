@@ -72,7 +72,7 @@ func (u *User) UpdateProfile(name, email string) error {
 		return nil // No changes
 	}
 
-	event := NewUserUpdated(u.AggregateID(), name, email)
+	event := NewUserUpdated(u.ID(), name, email)
 	u.ApplyEvent(event)
 
 	return nil
@@ -159,7 +159,7 @@ func (u *User) applyUserUpdated(event *UserUpdated) error {
 
 // Validate validates the user aggregate state
 func (u *User) Validate() error {
-	if u.AggregateID() == "" {
+	if u.ID() == "" {
 		return fmt.Errorf("user ID cannot be empty")
 	}
 	if u.name == "" {
@@ -271,7 +271,7 @@ func (h *UserCommandHandler) handleCreateUser(ctx context.Context, cmd *CreateUs
 	}
 
 	// Create new user
-	user := NewUser(cmd.AggregateID(), cmd.Name, cmd.Email)
+	user := NewUser(cmd.ID(), cmd.Name, cmd.Email)
 
 	// Validate
 	if err := user.Validate(); err != nil {
@@ -296,7 +296,7 @@ func (h *UserCommandHandler) handleUpdateUser(ctx context.Context, cmd *UpdateUs
 	}
 
 	// Load user
-	user, err := h.repository.GetByID(ctx, cmd.AggregateID())
+	user, err := h.repository.GetByID(ctx, cmd.ID())
 	if err != nil {
 		return nil, fmt.Errorf("failed to load user: %w", err)
 	}

@@ -8,8 +8,8 @@ import (
 
 // Snapshot 스냅샷 인터페이스
 type Snapshot interface {
-	AggregateID() string
-	AggregateType() string
+	ID() string
+	Type() string
 	Version() int
 	Data() []byte
 	Timestamp() time.Time
@@ -42,9 +42,9 @@ type SnapshotStore interface {
 
 // Aggregate 인터페이스 (임시 정의)
 type Aggregate interface {
-	AggregateID() string
-	AggregateType() string
-	CurrentVersion() int
+	ID() string
+	Type() string
+	Version() int
 	OriginalVersion() int
 }
 

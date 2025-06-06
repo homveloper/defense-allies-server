@@ -71,9 +71,9 @@ func (m *DefaultSnapshotManager) CreateSnapshot(ctx context.Context, aggregate A
 
 	// 스냅샷 객체 생성
 	snapshot := &MongoSnapshot{
-		aggregateID:   aggregate.AggregateID(),
-		aggregateType: aggregate.AggregateType(),
-		version:       aggregate.CurrentVersion(),
+		aggregateID:   aggregate.ID(),
+		aggregateType: aggregate.Type(),
+		version:       aggregate.Version(),
 		data:          data,
 		contentType:   m.serializer.GetContentType(),
 		compression:   m.serializer.GetCompressionType(),
@@ -101,8 +101,8 @@ func (m *DefaultSnapshotManager) CreateSnapshot(ctx context.Context, aggregate A
 			cleanupCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			if err := m.store.DeleteOldSnapshots(cleanupCtx, aggregate.AggregateID(), m.config.MaxSnapshotsPerAggregate); err != nil {
-				log.Printf("Failed to cleanup old snapshots for %s: %v", aggregate.AggregateID(), err)
+			if err := m.store.DeleteOldSnapshots(cleanupCtx, aggregate.ID(), m.config.MaxSnapshotsPerAggregate); err != nil {
+				log.Printf("Failed to cleanup old snapshots for %s: %v", aggregate.ID(), err)
 			}
 		}()
 	}
@@ -129,7 +129,7 @@ func (m *DefaultSnapshotManager) RestoreFromSnapshot(ctx context.Context, aggreg
 	}
 
 	// 역직렬화
-	aggregate, err := m.serializer.Deserialize(snapshot.Data(), snapshot.AggregateType())
+	aggregate, err := m.serializer.Deserialize(snapshot.Data(), snapshot.Type())
 	if err != nil {
 		m.logSnapshotEvent(SnapshotEventFailed, nil, int64(len(snapshot.Data())), time.Since(start), 0, err)
 		return nil, 0, &SnapshotError{
@@ -196,8 +196,8 @@ func (m *DefaultSnapshotManager) GetSnapshotInfo(ctx context.Context, aggregateI
 		metadata := snapshot.Metadata()
 
 		info := SnapshotInfo{
-			AggregateID:   snapshot.AggregateID(),
-			AggregateType: snapshot.AggregateType(),
+			AggregateID:   snapshot.ID(),
+			AggregateType: snapshot.Type(),
 			Version:       snapshot.Version(),
 			Size:          int64(len(snapshot.Data())),
 			Timestamp:     snapshot.Timestamp(),
@@ -230,9 +230,9 @@ func (m *DefaultSnapshotManager) logSnapshotEvent(eventType string, aggregate Ag
 	}
 
 	if aggregate != nil {
-		event.AggregateID = aggregate.AggregateID()
-		event.AggregateType = aggregate.AggregateType()
-		event.Version = aggregate.CurrentVersion()
+		event.AggregateID = aggregate.ID()
+		event.AggregateType = aggregate.Type()
+		event.Version = aggregate.Version()
 	} else {
 		event.Version = version
 	}

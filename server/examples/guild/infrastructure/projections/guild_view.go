@@ -185,7 +185,7 @@ func (p *GuildViewProjection) Project(ctx context.Context, event cqrs.EventMessa
 
 // handleGuildCreated handles GuildCreatedEvent
 func (p *GuildViewProjection) handleGuildCreated(ctx context.Context, event *domain.GuildCreatedEvent) error {
-	guildView := NewGuildView(event.AggregateID())
+	guildView := NewGuildView(event.ID())
 	guildView.Name = event.Name
 	guildView.Description = event.Description
 	guildView.Status = "Active"
@@ -205,7 +205,7 @@ func (p *GuildViewProjection) handleGuildCreated(ctx context.Context, event *dom
 // handleGuildInfoUpdated handles GuildInfoUpdatedEvent
 func (p *GuildViewProjection) handleGuildInfoUpdated(ctx context.Context, event *domain.GuildInfoUpdatedEvent) error {
 	// Load existing guild view
-	readModel, err := p.readStore.GetByID(ctx, event.AggregateID(), "GuildView")
+	readModel, err := p.readStore.GetByID(ctx, event.ID(), "GuildView")
 	if err != nil {
 		return fmt.Errorf("failed to load guild view: %w", err)
 	}
@@ -231,7 +231,7 @@ func (p *GuildViewProjection) handleGuildInfoUpdated(ctx context.Context, event 
 // handleGuildSettingsUpdated handles GuildSettingsUpdatedEvent
 func (p *GuildViewProjection) handleGuildSettingsUpdated(ctx context.Context, event *domain.GuildSettingsUpdatedEvent) error {
 	// Load existing guild view
-	readModel, err := p.readStore.GetByID(ctx, event.AggregateID(), "GuildView")
+	readModel, err := p.readStore.GetByID(ctx, event.ID(), "GuildView")
 	if err != nil {
 		return fmt.Errorf("failed to load guild view: %w", err)
 	}
@@ -255,7 +255,7 @@ func (p *GuildViewProjection) handleGuildSettingsUpdated(ctx context.Context, ev
 // handleMemberInvited handles MemberInvitedEvent
 func (p *GuildViewProjection) handleMemberInvited(ctx context.Context, event *domain.MemberInvitedEvent) error {
 	// Load existing guild view
-	readModel, err := p.readStore.GetByID(ctx, event.AggregateID(), "GuildView")
+	readModel, err := p.readStore.GetByID(ctx, event.ID(), "GuildView")
 	if err != nil {
 		return fmt.Errorf("failed to load guild view: %w", err)
 	}
@@ -276,7 +276,7 @@ func (p *GuildViewProjection) handleMemberInvited(ctx context.Context, event *do
 // handleMemberJoined handles MemberJoinedEvent
 func (p *GuildViewProjection) handleMemberJoined(ctx context.Context, event *domain.MemberJoinedEvent) error {
 	// Load existing guild view
-	readModel, err := p.readStore.GetByID(ctx, event.AggregateID(), "GuildView")
+	readModel, err := p.readStore.GetByID(ctx, event.ID(), "GuildView")
 	if err != nil {
 		return fmt.Errorf("failed to load guild view: %w", err)
 	}
@@ -297,7 +297,7 @@ func (p *GuildViewProjection) handleMemberJoined(ctx context.Context, event *dom
 // handleMemberKicked handles MemberKickedEvent
 func (p *GuildViewProjection) handleMemberKicked(ctx context.Context, event *domain.MemberKickedEvent) error {
 	// Load existing guild view
-	readModel, err := p.readStore.GetByID(ctx, event.AggregateID(), "GuildView")
+	readModel, err := p.readStore.GetByID(ctx, event.ID(), "GuildView")
 	if err != nil {
 		return fmt.Errorf("failed to load guild view: %w", err)
 	}
@@ -319,7 +319,7 @@ func (p *GuildViewProjection) handleMemberKicked(ctx context.Context, event *dom
 // handleMemberPromoted handles MemberPromotedEvent
 func (p *GuildViewProjection) handleMemberPromoted(ctx context.Context, event *domain.MemberPromotedEvent) error {
 	// Load existing guild view
-	readModel, err := p.readStore.GetByID(ctx, event.AggregateID(), "GuildView")
+	readModel, err := p.readStore.GetByID(ctx, event.ID(), "GuildView")
 	if err != nil {
 		return fmt.Errorf("failed to load guild view: %w", err)
 	}

@@ -29,14 +29,14 @@ type SnapshotData interface {
 	//
 	// Returns:
 	//   - string: Unique aggregate identifier
-	AggregateID() string
+	ID() string
 
 	// AggregateType returns the type of aggregate this snapshot represents.
 	// This is used for polymorphic storage and type-safe reconstruction.
 	//
 	// Returns:
 	//   - string: Aggregate type name (e.g., "User", "Order", "Product")
-	AggregateType() string
+	Type() string
 
 	// Version returns the aggregate version at which this snapshot was taken.
 	// This determines which events need to be replayed after loading the snapshot.
@@ -228,12 +228,12 @@ func NewBaseSnapshotData(aggregateID, aggregateType string, version int, data in
 // SnapshotData interface implementation
 
 // AggregateID returns the unique identifier of the aggregate this snapshot represents.
-func (s *BaseSnapshotData) AggregateID() string {
+func (s *BaseSnapshotData) ID() string {
 	return s.aggregateID
 }
 
 // AggregateType returns the type of aggregate this snapshot represents.
-func (s *BaseSnapshotData) AggregateType() string {
+func (s *BaseSnapshotData) Type() string {
 	return s.aggregateType
 }
 

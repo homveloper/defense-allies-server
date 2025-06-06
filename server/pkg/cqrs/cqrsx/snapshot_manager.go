@@ -137,8 +137,8 @@ type AdvancedSnapshotStore interface {
 
 // SnapshotData represents snapshot data with metadata
 type SnapshotData interface {
-	AggregateID() string
-	AggregateType() string
+	ID() string
+	Type() string
 	Version() int
 	Data() []byte
 	Timestamp() time.Time
@@ -215,8 +215,8 @@ func (m *DefaultSnapshotManager) CreateSnapshot(ctx context.Context, aggregate c
 			cleanupCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
-			if err := m.store.DeleteOldSnapshots(cleanupCtx, aggregate.AggregateID(), m.config.MaxSnapshotsPerAggregate); err != nil {
-				log.Printf("Failed to cleanup old snapshots for %s: %v", aggregate.AggregateID(), err)
+			if err := m.store.DeleteOldSnapshots(cleanupCtx, aggregate.ID(), m.config.MaxSnapshotsPerAggregate); err != nil {
+				log.Printf("Failed to cleanup old snapshots for %s: %v", aggregate.ID(), err)
 			}
 		}()
 	}
@@ -243,7 +243,7 @@ func (m *DefaultSnapshotManager) RestoreFromSnapshot(ctx context.Context, aggreg
 	}
 
 	// Deserialize
-	aggregate, err := m.serializer.DeserializeSnapshot(snapshot.Data(), snapshot.AggregateType())
+	aggregate, err := m.serializer.DeserializeSnapshot(snapshot.Data(), snapshot.Type())
 	if err != nil {
 		m.logSnapshotEvent(SnapshotEventFailed, nil, int64(len(snapshot.Data())), time.Since(start), 0, err)
 		return nil, 0, &SnapshotError{
@@ -306,8 +306,8 @@ func (m *DefaultSnapshotManager) GetSnapshotInfo(ctx context.Context, aggregateI
 	var infos []SnapshotInfo
 	for _, snapshot := range snapshots {
 		info := SnapshotInfo{
-			AggregateID:   snapshot.AggregateID(),
-			AggregateType: snapshot.AggregateType(),
+			AggregateID:   snapshot.ID(),
+			AggregateType: snapshot.Type(),
 			Version:       snapshot.Version(),
 			Size:          snapshot.Size(),
 			Timestamp:     snapshot.Timestamp(),
@@ -352,9 +352,9 @@ func (m *DefaultSnapshotManager) logSnapshotEvent(eventType string, aggregate cq
 	}
 
 	if aggregate != nil {
-		event.AggregateID = aggregate.AggregateID()
-		event.AggregateType = aggregate.AggregateType()
-		event.Version = aggregate.CurrentVersion()
+		event.AggregateID = aggregate.ID()
+		event.AggregateType = aggregate.Type()
+		event.Version = aggregate.Version()
 	} else {
 		event.Version = version
 	}

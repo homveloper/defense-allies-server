@@ -34,7 +34,7 @@ func (p *AnalyticsProjection) GetName() string {
 // Handle handles domain events and updates analytics read models
 func (p *AnalyticsProjection) Handle(ctx context.Context, event cqrs.EventMessage) error {
 	log.Printf("AnalyticsProjection: Processing event %s for aggregate %s",
-		event.EventType(), event.AggregateID())
+		event.EventType(), event.ID())
 
 	switch e := event.EventData().(type) {
 	case *domain.UserCreated:

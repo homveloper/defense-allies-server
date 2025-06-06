@@ -147,7 +147,7 @@ func (g *GuildAggregate) UpdateInfo(name, description, notice, tag string, updat
 		return fmt.Errorf("user %s does not have permission to manage guild", updatedBy)
 	}
 
-	event := NewGuildInfoUpdatedEvent(g.AggregateID(), name, description, notice, tag, updatedBy)
+	event := NewGuildInfoUpdatedEvent(g.ID(), name, description, notice, tag, updatedBy)
 	g.Apply(event, true)
 	return nil
 }
@@ -167,7 +167,7 @@ func (g *GuildAggregate) UpdateSettings(maxMembers, minLevel int, isPublic, requ
 		return fmt.Errorf("max members cannot be less than current active members count")
 	}
 
-	event := NewGuildSettingsUpdatedEvent(g.AggregateID(), maxMembers, minLevel, isPublic, requireApproval, updatedBy)
+	event := NewGuildSettingsUpdatedEvent(g.ID(), maxMembers, minLevel, isPublic, requireApproval, updatedBy)
 	g.Apply(event, true)
 	return nil
 }
@@ -197,7 +197,7 @@ func (g *GuildAggregate) InviteMember(userID, username, invitedBy string) error 
 		return fmt.Errorf("guild has reached maximum member capacity")
 	}
 
-	event := NewMemberInvitedEvent(g.AggregateID(), userID, username, invitedBy)
+	event := NewMemberInvitedEvent(g.ID(), userID, username, invitedBy)
 	g.Apply(event, true)
 	return nil
 }
@@ -213,7 +213,7 @@ func (g *GuildAggregate) AcceptInvitation(userID string) error {
 		return fmt.Errorf("user %s does not have a pending invitation", userID)
 	}
 
-	event := NewMemberJoinedEvent(g.AggregateID(), userID)
+	event := NewMemberJoinedEvent(g.ID(), userID)
 	g.Apply(event, true)
 	return nil
 }
@@ -238,7 +238,7 @@ func (g *GuildAggregate) KickMember(userID, kickedBy, reason string) error {
 		return fmt.Errorf("cannot kick yourself")
 	}
 
-	event := NewMemberKickedEvent(g.AggregateID(), userID, kickedBy, reason)
+	event := NewMemberKickedEvent(g.ID(), userID, kickedBy, reason)
 	g.Apply(event, true)
 	return nil
 }
@@ -263,7 +263,7 @@ func (g *GuildAggregate) PromoteMember(userID, promotedBy string, newRole GuildR
 		return fmt.Errorf("new role must be higher than current role")
 	}
 
-	event := NewMemberPromotedEvent(g.AggregateID(), userID, promotedBy, member.Role, newRole)
+	event := NewMemberPromotedEvent(g.ID(), userID, promotedBy, member.Role, newRole)
 	g.Apply(event, true)
 	return nil
 }
@@ -336,7 +336,7 @@ func (g *GuildAggregate) GetLevel() int {
 // GetMining returns the guild mining state
 func (g *GuildAggregate) GetMining() *GuildMining {
 	if g.mining == nil {
-		g.mining = NewGuildMining(g.AggregateID())
+		g.mining = NewGuildMining(g.ID())
 	}
 	return g.mining
 }
@@ -375,7 +375,7 @@ func (g *GuildAggregate) StartMiningOperation(operationID, nodeID string, worker
 		return err
 	}
 
-	event := NewMiningOperationStartedEvent(g.AggregateID(), operationID, nodeID, workerUserIDs, startedBy)
+	event := NewMiningOperationStartedEvent(g.ID(), operationID, nodeID, workerUserIDs, startedBy)
 	g.Apply(event, true)
 	return nil
 }
@@ -405,7 +405,7 @@ func (g *GuildAggregate) HarvestMinerals(operationID string, harvestedBy string)
 		}
 		g.treasury += treasuryIncrease
 
-		event := NewMineralsHarvestedEvent(g.AggregateID(), operationID, harvested, treasuryIncrease, harvestedBy)
+		event := NewMineralsHarvestedEvent(g.ID(), operationID, harvested, treasuryIncrease, harvestedBy)
 		g.Apply(event, true)
 	}
 
@@ -428,7 +428,7 @@ func (g *GuildAggregate) StopMiningOperation(operationID string, stoppedBy strin
 		return err
 	}
 
-	event := NewMiningOperationStoppedEvent(g.AggregateID(), operationID, stoppedBy)
+	event := NewMiningOperationStoppedEvent(g.ID(), operationID, stoppedBy)
 	g.Apply(event, true)
 	return nil
 }
@@ -612,7 +612,7 @@ func (g *GuildAggregate) CreateTransportRecruitment(recruitmentID, title, descri
 		}
 	}
 
-	recruitment := NewTransportRecruitment(recruitmentID, g.AggregateID(), createdBy, member.Username,
+	recruitment := NewTransportRecruitment(recruitmentID, g.ID(), createdBy, member.Username,
 		title, description, maxParticipants, minParticipants, duration, transportTime, totalCargo)
 
 	if err := recruitment.Validate(); err != nil {
@@ -622,7 +622,7 @@ func (g *GuildAggregate) CreateTransportRecruitment(recruitmentID, title, descri
 	g.transportRecruitments[recruitmentID] = recruitment
 
 	// Apply event
-	event := NewTransportRecruitmentCreatedEvent(g.AggregateID(), recruitmentID, title, description,
+	event := NewTransportRecruitmentCreatedEvent(g.ID(), recruitmentID, title, description,
 		maxParticipants, minParticipants, int64(duration), int64(transportTime), totalCargo, createdBy, member.Username)
 	g.Apply(event, true)
 
@@ -650,7 +650,7 @@ func (g *GuildAggregate) JoinTransportRecruitment(recruitmentID, userID string) 
 	}
 
 	// Apply event
-	event := NewTransportRecruitmentJoinedEvent(g.AggregateID(), recruitmentID, userID, member.Username)
+	event := NewTransportRecruitmentJoinedEvent(g.ID(), recruitmentID, userID, member.Username)
 	g.Apply(event, true)
 
 	return nil
@@ -673,7 +673,7 @@ func (g *GuildAggregate) LeaveTransportRecruitment(recruitmentID, userID string)
 	}
 
 	// Apply event
-	event := NewTransportRecruitmentLeftEvent(g.AggregateID(), recruitmentID, userID, member.Username)
+	event := NewTransportRecruitmentLeftEvent(g.ID(), recruitmentID, userID, member.Username)
 	g.Apply(event, true)
 
 	return nil
@@ -705,7 +705,7 @@ func (g *GuildAggregate) StartTransportFromRecruitment(recruitmentID, transportI
 	}
 
 	// Apply event
-	event := NewTransportRecruitmentStartedEvent(g.AggregateID(), recruitmentID, transportID, startedBy)
+	event := NewTransportRecruitmentStartedEvent(g.ID(), recruitmentID, transportID, startedBy)
 	g.Apply(event, true)
 
 	return nil
@@ -738,7 +738,7 @@ func (g *GuildAggregate) CompleteTransportRecruitment(recruitmentID string, comp
 	}
 
 	// Apply event
-	event := NewTransportRecruitmentCompletedEvent(g.AggregateID(), recruitmentID, rewards, completedBy)
+	event := NewTransportRecruitmentCompletedEvent(g.ID(), recruitmentID, rewards, completedBy)
 	g.Apply(event, true)
 
 	return rewards, nil
@@ -771,7 +771,7 @@ func (g *GuildAggregate) ForceCompleteTransportRecruitment(recruitmentID string,
 	}
 
 	// Apply event
-	event := NewTransportRecruitmentCompletedEvent(g.AggregateID(), recruitmentID, rewards, completedBy)
+	event := NewTransportRecruitmentCompletedEvent(g.ID(), recruitmentID, rewards, completedBy)
 	g.Apply(event, true)
 
 	return rewards, nil
@@ -799,7 +799,7 @@ func (g *GuildAggregate) GetTransportRecruitment(recruitmentID string) (*Transpo
 func (g *GuildAggregate) applyMiningOperationStartedEvent(event *MiningOperationStartedEvent) error {
 	// Initialize mining if not exists
 	if g.mining == nil {
-		g.mining = NewGuildMining(g.AggregateID())
+		g.mining = NewGuildMining(g.ID())
 	}
 
 	g.lastActiveAt = event.Timestamp()
@@ -825,7 +825,7 @@ func (g *GuildAggregate) applyTransportRecruitmentCreatedEvent(event *TransportR
 	transportTime := time.Duration(event.TransportTime)
 
 	// Create recruitment
-	recruitment := NewTransportRecruitment(event.RecruitmentID, g.AggregateID(), event.CreatedBy, event.CreatedByUsername,
+	recruitment := NewTransportRecruitment(event.RecruitmentID, g.ID(), event.CreatedBy, event.CreatedByUsername,
 		event.Title, event.Description, event.MaxParticipants, event.MinParticipants, duration, transportTime, event.TotalCargo)
 
 	// Set created time from event

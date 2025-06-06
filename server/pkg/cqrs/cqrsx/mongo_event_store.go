@@ -72,7 +72,7 @@ func (es *MongoEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 		_, err = session.WithTransaction(ctx, func(sessCtx mongo.SessionContext) (interface{}, error) {
 			// Check current version for optimistic concurrency control
 			if expectedVersion >= 0 {
-				currentVersion, err := es.getLastEventVersion(sessCtx, aggregateID, events[0].AggregateType())
+				currentVersion, err := es.getLastEventVersion(sessCtx, aggregateID, events[0].Type())
 				if err != nil {
 					return nil, err
 				}
@@ -106,7 +106,7 @@ func (es *MongoEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 				// Standard Event Sourcing document structure - no duplication
 				doc := MongoEventDocument{
 					AggregateID:   aggregateID,
-					AggregateType: event.AggregateType(),
+					AggregateType: event.Type(),
 					EventID:       event.EventID(),
 					EventType:     event.EventType(),
 					EventData:     bson.Raw(eventDataBytes), // Only store the actual event data

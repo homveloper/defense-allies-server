@@ -351,9 +351,9 @@ Set containing active session IDs
 // go.cqrs 호환성과 Defense Allies 확장 기능을 모두 포함
 type AggregateRoot interface {
     // 기본 식별자 및 버전 관리 (go.cqrs 호환)
-    AggregateID() string
+    ID() string
     OriginalVersion() int  // 로드 시점의 버전
-    CurrentVersion() int   // 현재 버전
+    Version() int   // 현재 버전
     IncrementVersion()     // 버전 증가
 
     // 이벤트 적용 및 추적 (go.cqrs 호환)
@@ -363,7 +363,7 @@ type AggregateRoot interface {
     ClearChanges()                        // 변경사항 초기화
 
     // 추가 메타데이터 (Defense Allies 확장)
-    AggregateType() string    // Aggregate 타입 식별
+    Type() string    // Aggregate 타입 식별
     CreatedAt() time.Time     // 생성 시간
     UpdatedAt() time.Time     // 마지막 업데이트 시간
 
@@ -428,8 +428,8 @@ type EventMessage interface {
     // 기본 이벤트 정보
     EventID() string
     EventType() string
-    AggregateID() string
-    AggregateType() string
+    ID() string
+    Type() string
     Version() int
 
     // 이벤트 데이터 (직렬화는 별도 처리)
@@ -484,8 +484,8 @@ type Command interface {
     // 기본 식별 정보
     CommandID() string        // 커맨드 고유 ID
     CommandType() string      // 커맨드 타입
-    AggregateID() string      // 대상 Aggregate ID
-    AggregateType() string    // 대상 Aggregate 타입
+    ID() string      // 대상 Aggregate ID
+    Type() string    // 대상 Aggregate 타입
 
     // 메타데이터
     Timestamp() time.Time     // 커맨드 생성 시간
@@ -539,7 +539,7 @@ type BaseAggregate struct {
 }
 
 // AggregateRoot 인터페이스 구현
-func (a *BaseAggregate) AggregateID() string {
+func (a *BaseAggregate) ID() string {
     return a.id
 }
 
@@ -547,7 +547,7 @@ func (a *BaseAggregate) OriginalVersion() int {
     return a.originalVersion
 }
 
-func (a *BaseAggregate) CurrentVersion() int {
+func (a *BaseAggregate) Version() int {
     return a.currentVersion
 }
 
@@ -606,8 +606,8 @@ func (a *BaseAggregate) Validate() error {
 ```go
 // 스냅샷 데이터 인터페이스 (직렬화 제거)
 type SnapshotData interface {
-    AggregateID() string
-    AggregateType() string
+    ID() string
+    Type() string
     Version() int
     Data() interface{}      // 스냅샷 데이터 (직렬화는 별도 처리)
     Timestamp() time.Time
