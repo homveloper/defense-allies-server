@@ -352,7 +352,7 @@ func NewBaseDomainEventMessage(eventType string, eventData interface{}, baseOpti
 		BaseEventMessage: NewBaseEventMessage(eventType, eventData, baseOptions...),
 		issuerType:       UserIssuer, // Default to user issuer
 		category:         DomainEvent,
-		priority:         Normal,
+		priority:         PriorityNormal,
 	}
 
 	// Merge and apply domain-specific options

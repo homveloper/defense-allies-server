@@ -99,7 +99,7 @@ func TestNewBaseDomainEvent(t *testing.T) {
 
 	// Domain event specific fields
 	assert.Equal(t, DomainEvent, event.GetEventCategory())
-	assert.Equal(t, Normal, event.GetPriority())
+	assert.Equal(t, Priority, event.GetPriority())
 	assert.Equal(t, UserIssuer, event.IssuerType()) // Default issuer type
 	assert.Empty(t, event.CausationID())
 	assert.Empty(t, event.CorrelationID())
@@ -116,7 +116,7 @@ func TestBaseDomainEvent_SetFields(t *testing.T) {
 	event.SetIssuerID("issuer-789")
 	event.SetIssuerType(SystemIssuer)
 	event.SetCategory(SystemEvent)
-	event.SetPriority(High)
+	event.SetPriority(PriorityHigh)
 
 	// Assert
 	assert.Equal(t, "causation-123", event.CausationID())
@@ -124,7 +124,7 @@ func TestBaseDomainEvent_SetFields(t *testing.T) {
 	assert.Equal(t, "issuer-789", event.IssuerID())
 	assert.Equal(t, SystemIssuer, event.IssuerType())
 	assert.Equal(t, SystemEvent, event.GetEventCategory())
-	assert.Equal(t, High, event.GetPriority())
+	assert.Equal(t, PriorityHigh, event.GetPriority())
 }
 
 func TestBaseDomainEvent_ValidateEvent(t *testing.T) {
@@ -232,10 +232,10 @@ func TestEventPriority_String(t *testing.T) {
 		priority EventPriority
 		expected string
 	}{
-		{Low, "low"},
-		{Normal, "normal"},
-		{High, "high"},
-		{Critical, "critical"},
+		{PriorityLow, "low"},
+		{Priority, "normal"},
+		{PriorityHigh, "high"},
+		{PriorityCritical, "critical"},
 		{EventPriority(999), "unknown"},
 	}
 
@@ -295,7 +295,7 @@ func TestNewBaseDomainEventMessageWithIssuer(t *testing.T) {
 	assert.Equal(t, issuerID, event.IssuerID())
 	assert.Equal(t, issuerType, event.IssuerType())
 	assert.Equal(t, DomainEvent, event.GetEventCategory())
-	assert.Equal(t, Normal, event.GetPriority())
+	assert.Equal(t, Priority, event.GetPriority())
 }
 
 func TestBaseDomainEvent_IssuerTypes(t *testing.T) {

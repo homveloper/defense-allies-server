@@ -137,7 +137,7 @@ func NewBaseEventHandler(name string, handlerType HandlerType, eventTypes []stri
 	for _, eventType := range eventTypes {
 		typeMap[eventType] = true
 	}
-	
+
 	return &BaseEventHandler{
 		name:        name,
 		handlerType: handlerType,

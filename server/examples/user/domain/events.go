@@ -49,7 +49,7 @@ func NewUserCreatedEvent(userID, email, name string) *UserCreatedEvent {
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.Normal)
+	event.SetPriority(cqrs.Priority)
 	return event
 }
 
@@ -81,7 +81,7 @@ func NewEmailChangedEvent(userID, oldEmail, newEmail string, version int) *Email
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.Normal)
+	event.SetPriority(cqrs.Priority)
 	return event
 }
 
@@ -113,7 +113,7 @@ func NewUserDeactivatedEvent(userID, reason string, version int) *UserDeactivate
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.High)
+	event.SetPriority(cqrs.PriorityHigh)
 	return event
 }
 
@@ -142,7 +142,7 @@ func NewUserActivatedEvent(userID string, version int) *UserActivatedEvent {
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.Normal)
+	event.SetPriority(cqrs.Priority)
 	return event
 }
 
@@ -177,7 +177,7 @@ func NewRoleAssignedEvent(userID string, roleType RoleType, assignedBy string, v
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.Normal)
+	event.SetPriority(cqrs.Priority)
 	return event
 }
 
@@ -215,7 +215,7 @@ func NewRoleAssignedWithExpiryEvent(userID string, roleType RoleType, assignedBy
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.Normal)
+	event.SetPriority(cqrs.Priority)
 	return event
 }
 
@@ -250,7 +250,7 @@ func NewRoleRevokedEvent(userID string, roleType RoleType, revokedBy string, ver
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.High)
+	event.SetPriority(cqrs.PriorityHigh)
 	return event
 }
 
@@ -282,7 +282,7 @@ func NewProfileUpdatedEvent(userID string, changes map[string]interface{}, versi
 	}
 
 	event.SetCategory(cqrs.DomainEvent)
-	event.SetPriority(cqrs.Normal)
+	event.SetPriority(cqrs.Priority)
 	return event
 }
 

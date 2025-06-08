@@ -43,7 +43,7 @@ func (bus *InMemoryEventBus) Publish(ctx context.Context, event EventMessage, op
 	}
 
 	start := time.Now()
-	
+
 	bus.mutex.Lock()
 	bus.metrics.PublishedEvents++
 	bus.metrics.LastEventTime = start
@@ -190,23 +190,23 @@ func (bus *InMemoryEventBus) GetMetrics() *EventBusMetrics {
 
 func (bus *InMemoryEventBus) processEvent(ctx context.Context, event EventMessage) error {
 	bus.mutex.RLock()
-	
+
 	// Get handlers for specific event type
 	handlers := make([]EventHandler, 0)
 	if eventHandlers, exists := bus.subscriptions[event.EventType()]; exists {
 		handlers = append(handlers, eventHandlers...)
 	}
-	
+
 	// Add all-event handlers
 	handlers = append(handlers, bus.allHandlers...)
-	
+
 	bus.mutex.RUnlock()
 
 	// Process handlers
 	for _, handler := range handlers {
 		if handler.CanHandle(event.EventType()) {
 			if err := handler.Handle(ctx, event); err != nil {
-				return NewCQRSError(ErrCodeEventValidation.String(), 
+				return NewCQRSError(ErrCodeEventValidation.String(),
 					fmt.Sprintf("handler %s failed to process event %s", handler.GetHandlerName(), event.EventType()), err)
 			}
 		}

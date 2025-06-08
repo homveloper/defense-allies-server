@@ -50,21 +50,21 @@ func (ec EventCategory) String() string {
 type EventPriority int
 
 const (
-	Low EventPriority = iota
-	Normal
-	High
-	Critical
+	PriorityLow EventPriority = iota
+	PriorityNormal
+	PriorityHigh
+	PriorityCritical
 )
 
 func (ep EventPriority) String() string {
 	switch ep {
-	case Low:
+	case PriorityLow:
 		return "low"
-	case Normal:
+	case PriorityNormal:
 		return "normal"
-	case High:
+	case PriorityHigh:
 		return "high"
-	case Critical:
+	case PriorityCritical:
 		return "critical"
 	default:
 		return "unknown"
