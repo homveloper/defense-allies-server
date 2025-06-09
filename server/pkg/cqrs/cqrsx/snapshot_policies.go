@@ -3,7 +3,7 @@ package cqrsx
 import (
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // SnapshotPolicy defines when snapshots should be created

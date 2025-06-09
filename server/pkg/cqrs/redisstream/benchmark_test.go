@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // BenchmarkEventBusPublishing benchmarks event publishing performance
@@ -210,7 +210,7 @@ func BenchmarkPriorityStreamManager(b *testing.B) {
 			priority := priorities[i%len(priorities)]
 			category := categories[i%len(categories)]
 			partitionKey := partitionKeys[i%len(partitionKeys)]
-			
+
 			_ = manager.GetStreamName(priority, category, partitionKey)
 		}
 	})
@@ -219,7 +219,7 @@ func BenchmarkPriorityStreamManager(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			category := categories[i%len(categories)]
 			partitionKey := partitionKeys[i%len(partitionKeys)]
-			
+
 			_ = manager.GetStreamsByPriority(category, partitionKey)
 		}
 	})
@@ -229,7 +229,7 @@ func BenchmarkPriorityStreamManager(b *testing.B) {
 			category := categories[i%len(categories)]
 			partitionKey := partitionKeys[i%len(partitionKeys)]
 			handlerType := cqrs.ProjectionHandler
-			
+
 			_ = manager.GetConsumerConfigurations(category, partitionKey, handlerType)
 		}
 	})
@@ -266,7 +266,7 @@ func BenchmarkCircuitBreaker(b *testing.B) {
 	b.Run("RecordFailure", func(b *testing.B) {
 		// Reset circuit breaker state before each run
 		cb.Reset()
-		
+
 		for i := 0; i < b.N; i++ {
 			if i%10 == 0 {
 				cb.Reset() // Reset every 10 operations to prevent circuit opening
@@ -319,7 +319,7 @@ func BenchmarkRetryPolicyManager(b *testing.B) {
 
 	b.Run("CalculateDelay", func(b *testing.B) {
 		policy := manager.GetDefaultRetryPolicy()
-		
+
 		for i := 0; i < b.N; i++ {
 			attempt := (i % 10) + 1 // 1-10 attempts
 			_ = manager.CalculateDelay(policy, attempt)
@@ -437,7 +437,7 @@ func BenchmarkHealthChecker(b *testing.B) {
 			check := NewCustomHealthCheck(checkName, func(ctx context.Context) HealthCheckResult {
 				return HealthCheckResult{Status: HealthStatusHealthy}
 			})
-			
+
 			hc.AddCheck(checkName, check)
 			hc.RemoveCheck(checkName)
 		}
@@ -478,7 +478,7 @@ func BenchmarkConcurrentOperations(b *testing.B) {
 			wg.Add(1)
 			go func(goroutineID int) {
 				defer wg.Done()
-				
+
 				for i := 0; i < eventsPerGoroutine; i++ {
 					baseOptions := cqrs.Options().
 						WithAggregateID(fmt.Sprintf("concurrent-test-%d-%d", goroutineID, i)).

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"cqrs"
 	"defense-allies-server/examples/guild/application/commands"
 	"defense-allies-server/examples/guild/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // GuildCommandHandler handles guild-related commands

@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // RedisStreamEventBus implements EventBus interface using Redis Streams
@@ -21,7 +21,7 @@ type RedisStreamEventBus struct {
 	serializer EventSerializer
 
 	// State management
-	running     int32                                  // atomic boolean
+	running     int32                                 // atomic boolean
 	subscribers map[cqrs.SubscriptionID]*subscription // subscription registry
 	mu          sync.RWMutex                          // protects subscribers map
 
@@ -31,7 +31,7 @@ type RedisStreamEventBus struct {
 	waitGroup sync.WaitGroup
 
 	// Metrics
-	metrics *cqrs.EventBusMetrics
+	metrics   *cqrs.EventBusMetrics
 	metricsMu sync.RWMutex
 }
 
@@ -87,7 +87,7 @@ func (bus *RedisStreamEventBus) Publish(ctx context.Context, event cqrs.EventMes
 	}
 
 	streamName := bus.getStreamName(event, options...)
-	
+
 	// Convert event to Redis stream format
 	fields, err := bus.eventToFields(event)
 	if err != nil {
@@ -124,7 +124,7 @@ func (bus *RedisStreamEventBus) PublishBatch(ctx context.Context, events []cqrs.
 
 	for _, event := range events {
 		streamName := bus.getStreamName(event, options...)
-		
+
 		fields, err := bus.eventToFields(event)
 		if err != nil {
 			return ErrStreamOperation("convert_event_batch", err)
@@ -306,11 +306,11 @@ func (bus *RedisStreamEventBus) SetSerializer(serializer EventSerializer) error 
 	if bus.IsRunning() {
 		return fmt.Errorf("cannot change serializer while event bus is running")
 	}
-	
+
 	if serializer == nil {
 		return fmt.Errorf("serializer cannot be nil")
 	}
-	
+
 	bus.serializer = serializer
 	return nil
 }
@@ -368,12 +368,12 @@ func (bus *RedisStreamEventBus) getConsumerName(handler cqrs.EventHandler) strin
 func (bus *RedisStreamEventBus) ensureConsumerGroup(streamName, groupName string) error {
 	result := bus.client.XGroupCreateMkStream(context.Background(), streamName, groupName, "0")
 	err := result.Err()
-	
+
 	// Ignore error if group already exists
 	if err != nil && err.Error() != "BUSYGROUP Consumer Group name already exists" {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -390,11 +390,11 @@ func (bus *RedisStreamEventBus) eventToFields(event cqrs.EventMessage) (map[stri
 		"event_type":      event.EventType(),
 		"aggregate_id":    event.ID(),
 		"aggregate_type":  event.Type(),
-		"event_id":       event.EventID(),
-		"version":        event.Version(),
-		"timestamp":      event.Timestamp().Format(time.RFC3339Nano),
+		"event_id":        event.EventID(),
+		"version":         event.Version(),
+		"timestamp":       event.Timestamp().Format(time.RFC3339Nano),
 		"serialized_data": string(serializedData),
-		"format":         string(bus.serializer.Format()),
+		"format":          string(bus.serializer.Format()),
 	}
 
 	// Add partition key for routing
@@ -512,7 +512,7 @@ func (bus *RedisStreamEventBus) fieldsToEvent(fields map[string]interface{}) (cq
 func (bus *RedisStreamEventBus) updatePublishedMetrics(count int64) {
 	bus.metricsMu.Lock()
 	defer bus.metricsMu.Unlock()
-	
+
 	bus.metrics.PublishedEvents += count
 	bus.metrics.LastEventTime = time.Now()
 }
@@ -521,7 +521,7 @@ func (bus *RedisStreamEventBus) updatePublishedMetrics(count int64) {
 func (bus *RedisStreamEventBus) updateProcessedMetrics(count int64) {
 	bus.metricsMu.Lock()
 	defer bus.metricsMu.Unlock()
-	
+
 	bus.metrics.ProcessedEvents += count
 }
 
@@ -529,6 +529,6 @@ func (bus *RedisStreamEventBus) updateProcessedMetrics(count int64) {
 func (bus *RedisStreamEventBus) updateFailedMetrics(count int64) {
 	bus.metricsMu.Lock()
 	defer bus.metricsMu.Unlock()
-	
+
 	bus.metrics.FailedEvents += count
 }

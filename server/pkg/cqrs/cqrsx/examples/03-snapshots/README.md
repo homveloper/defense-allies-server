@@ -128,7 +128,7 @@ type OrderItem struct {
 ### 2. 커스텀 스냅샷 구현
 ```go
 type OrderSnapshot struct {
-    AggregateID   string                 `json:"aggregate_id"`
+    string   string                 `json:"aggregate_id"`
     Version       int                    `json:"version"`
     CustomerID    string                 `json:"customer_id"`
     Items         map[string]*OrderItem  `json:"items"`
@@ -143,7 +143,7 @@ type OrderSnapshot struct {
 
 func (o *Order) CreateSnapshot() (cqrs.Snapshot, error) {
     return &OrderSnapshot{
-        AggregateID:  o.ID(),
+        string:  o.ID(),
         Version:      o.Version(),
         CustomerID:   o.CustomerID,
         Items:        o.Items,

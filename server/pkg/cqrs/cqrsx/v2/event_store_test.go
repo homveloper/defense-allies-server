@@ -74,7 +74,7 @@ func (s *EventStoreTestSuite) TestSaveAndLoadEvents() {
 	assert.Len(s.T(), loadedEvents, len(events))
 
 	for i, event := range events {
-		assert.Equal(s.T(), event.AggregateID(), loadedEvents[i].AggregateID())
+		assert.Equal(s.T(), event.string(), loadedEvents[i].string())
 		assert.Equal(s.T(), event.EventType(), loadedEvents[i].EventType())
 		assert.Equal(s.T(), event.Version(), loadedEvents[i].Version())
 	}

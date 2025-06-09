@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // TestRetryPolicyManager_Creation tests retry policy manager creation

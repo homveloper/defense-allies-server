@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // V3 이벤트들 - 구조적 변경 버전

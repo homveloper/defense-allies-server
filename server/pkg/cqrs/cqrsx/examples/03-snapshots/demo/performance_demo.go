@@ -9,8 +9,8 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/infrastructure"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx/examples/03-snapshots/infrastructure"
 )
 
 // PerformanceDemo 성능 비교 데모

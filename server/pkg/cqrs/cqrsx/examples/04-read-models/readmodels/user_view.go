@@ -2,7 +2,7 @@ package readmodels
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 
 	"github.com/shopspring/decimal"

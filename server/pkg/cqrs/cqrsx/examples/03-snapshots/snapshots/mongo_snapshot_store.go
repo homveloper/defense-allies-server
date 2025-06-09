@@ -9,13 +9,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"defense-allies-server/pkg/cqrs/cqrsx"
+	"cqrs/cqrsx"
 )
 
 // MongoSnapshotDocument MongoDB 스냅샷 문서 구조
 type MongoSnapshotDocument struct {
 	ID            string                 `bson:"_id"`
-	AggregateID   string                 `bson:"aggregate_id"`
+	string        string                 `bson:"aggregate_id"`
 	AggregateType string                 `bson:"aggregate_type"`
 	Version       int                    `bson:"version"`
 	Data          []byte                 `bson:"data"`
@@ -73,7 +73,7 @@ func (s *MongoSnapshotStore) SaveSnapshot(ctx context.Context, snapshot Snapshot
 
 		doc := MongoSnapshotDocument{
 			ID:            docID,
-			AggregateID:   snapshot.ID(),
+			string:        snapshot.ID(),
 			AggregateType: snapshot.Type(),
 			Version:       snapshot.Version(),
 			Data:          snapshot.Data(),
@@ -142,7 +142,7 @@ func (s *MongoSnapshotStore) GetSnapshot(ctx context.Context, aggregateID string
 		metadata["size"] = doc.Size
 
 		snapshot = &MongoSnapshot{
-			aggregateID:   doc.AggregateID,
+			aggregateID:   doc.string,
 			aggregateType: doc.AggregateType,
 			version:       doc.Version,
 			data:          doc.Data,
@@ -190,7 +190,7 @@ func (s *MongoSnapshotStore) GetSnapshotByVersion(ctx context.Context, aggregate
 		metadata["size"] = doc.Size
 
 		snapshot = &MongoSnapshot{
-			aggregateID:   doc.AggregateID,
+			aggregateID:   doc.string,
 			aggregateType: doc.AggregateType,
 			version:       doc.Version,
 			data:          doc.Data,
@@ -304,7 +304,7 @@ func (s *MongoSnapshotStore) ListSnapshots(ctx context.Context, aggregateID stri
 			metadata["size"] = doc.Size
 
 			snapshot := &MongoSnapshot{
-				aggregateID:   doc.AggregateID,
+				aggregateID:   doc.string,
 				aggregateType: doc.AggregateType,
 				version:       doc.Version,
 				data:          doc.Data,

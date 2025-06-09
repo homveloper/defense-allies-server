@@ -2,8 +2,8 @@ package demo
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/infrastructure"
+	"cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
+	"cqrs/cqrsx/examples/01-basic-event-sourcing/infrastructure"
 	"fmt"
 	"strings"
 	"time"

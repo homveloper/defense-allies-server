@@ -2,7 +2,7 @@ package readmodels
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -31,8 +31,8 @@ type OrderSummary struct {
 // CustomerStats represents customer statistics for dashboard
 type CustomerStats struct {
 	TotalCustomers    int             `json:"total_customers"`
-	NewCustomers      int             `json:"new_customers"`      // This month
-	ActiveCustomers   int             `json:"active_customers"`   // Last 30 days
+	NewCustomers      int             `json:"new_customers"`    // This month
+	ActiveCustomers   int             `json:"active_customers"` // Last 30 days
 	VIPCustomers      int             `json:"vip_customers"`
 	AverageOrderValue decimal.Decimal `json:"average_order_value"`
 	CustomerRetention decimal.Decimal `json:"customer_retention"` // Percentage
@@ -40,40 +40,40 @@ type CustomerStats struct {
 
 // SalesMetrics represents sales metrics for dashboard
 type SalesMetrics struct {
-	TodayRevenue    decimal.Decimal `json:"today_revenue"`
-	WeekRevenue     decimal.Decimal `json:"week_revenue"`
-	MonthRevenue    decimal.Decimal `json:"month_revenue"`
-	YearRevenue     decimal.Decimal `json:"year_revenue"`
-	TodayOrders     int             `json:"today_orders"`
-	WeekOrders      int             `json:"week_orders"`
-	MonthOrders     int             `json:"month_orders"`
-	YearOrders      int             `json:"year_orders"`
-	GrowthRate      decimal.Decimal `json:"growth_rate"` // Month over month
+	TodayRevenue decimal.Decimal `json:"today_revenue"`
+	WeekRevenue  decimal.Decimal `json:"week_revenue"`
+	MonthRevenue decimal.Decimal `json:"month_revenue"`
+	YearRevenue  decimal.Decimal `json:"year_revenue"`
+	TodayOrders  int             `json:"today_orders"`
+	WeekOrders   int             `json:"week_orders"`
+	MonthOrders  int             `json:"month_orders"`
+	YearOrders   int             `json:"year_orders"`
+	GrowthRate   decimal.Decimal `json:"growth_rate"` // Month over month
 }
 
 // DashboardView represents a dashboard read model with TTL caching
 type DashboardView struct {
 	*cqrs.BaseReadModel
-	TotalUsers       int             `json:"total_users"`
-	TotalOrders      int             `json:"total_orders"`
-	TotalProducts    int             `json:"total_products"`
-	TotalRevenue     decimal.Decimal `json:"total_revenue"`
-	SalesMetrics     SalesMetrics    `json:"sales_metrics"`
-	CustomerStats    CustomerStats   `json:"customer_stats"`
-	PopularProducts  []ProductStats  `json:"popular_products"`
-	RecentOrders     []OrderSummary  `json:"recent_orders"`
-	TopCategories    []string        `json:"top_categories"`
-	Alerts           []string        `json:"alerts"`
-	GeneratedAt      time.Time       `json:"generated_at"`
-	ExpiresAt        time.Time       `json:"expires_at"`
-	RefreshInterval  time.Duration   `json:"refresh_interval"`
+	TotalUsers      int             `json:"total_users"`
+	TotalOrders     int             `json:"total_orders"`
+	TotalProducts   int             `json:"total_products"`
+	TotalRevenue    decimal.Decimal `json:"total_revenue"`
+	SalesMetrics    SalesMetrics    `json:"sales_metrics"`
+	CustomerStats   CustomerStats   `json:"customer_stats"`
+	PopularProducts []ProductStats  `json:"popular_products"`
+	RecentOrders    []OrderSummary  `json:"recent_orders"`
+	TopCategories   []string        `json:"top_categories"`
+	Alerts          []string        `json:"alerts"`
+	GeneratedAt     time.Time       `json:"generated_at"`
+	ExpiresAt       time.Time       `json:"expires_at"`
+	RefreshInterval time.Duration   `json:"refresh_interval"`
 }
 
 // NewDashboardView creates a new DashboardView with TTL
 func NewDashboardView() *DashboardView {
 	now := time.Now()
 	refreshInterval := 5 * time.Minute // 5 minutes TTL
-	
+
 	return &DashboardView{
 		BaseReadModel:   cqrs.NewBaseReadModel("dashboard", "DashboardView", nil),
 		TotalUsers:      0,
@@ -257,13 +257,13 @@ func (dv *DashboardView) GetTopProductsByRevenue(limit int) []ProductStats {
 // GetRecentOrdersByStatus returns recent orders filtered by status
 func (dv *DashboardView) GetRecentOrdersByStatus(status string) []OrderSummary {
 	filteredOrders := make([]OrderSummary, 0)
-	
+
 	for _, order := range dv.RecentOrders {
 		if order.Status == status {
 			filteredOrders = append(filteredOrders, order)
 		}
 	}
-	
+
 	return filteredOrders
 }
 
@@ -321,16 +321,16 @@ func (dv *DashboardView) Validate() error {
 type DashboardViewRepository interface {
 	// Save saves a DashboardView with TTL
 	Save(ctx context.Context, dashboardView *DashboardView) error
-	
+
 	// Get retrieves the current DashboardView
 	Get(ctx context.Context) (*DashboardView, error)
-	
+
 	// Refresh forces a refresh of dashboard data
 	Refresh(ctx context.Context) (*DashboardView, error)
-	
+
 	// IsExpired checks if the cached dashboard data has expired
 	IsExpired(ctx context.Context) (bool, error)
-	
+
 	// Delete removes the DashboardView (forces refresh on next access)
 	Delete(ctx context.Context) error
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // TransportCompletedEventData contains the data for transport completion

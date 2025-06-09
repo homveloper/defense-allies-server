@@ -118,7 +118,7 @@ func TestIntegration_BasicOperations(t *testing.T) {
 	// When & Then - 로드
 	loadedState, err := store.Load(ctx, aggregateID)
 	assert.NoError(t, err)
-	assert.Equal(t, state.AggregateID, loadedState.AggregateID)
+	assert.Equal(t, state.string, loadedState.string)
 	assert.Equal(t, state.Version, loadedState.Version)
 
 	deserializedData := aggregateStateToDeserializedData(loadedState)

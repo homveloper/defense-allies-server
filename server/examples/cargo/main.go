@@ -6,10 +6,10 @@ import (
 	"log"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/cargo/application/commands"
 	"defense-allies-server/examples/cargo/application/handlers"
 	"defense-allies-server/examples/cargo/domain"
-	"defense-allies-server/pkg/cqrs"
 
 	"github.com/google/uuid"
 )

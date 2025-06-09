@@ -115,7 +115,7 @@ func (m *MongoStateStore) Save(ctx context.Context, state *AggregateState) error
 
 	// 보존 정책 적용 (백그라운드에서)
 	if m.config.RetentionPolicy != nil {
-		go m.applyRetentionPolicy(context.Background(), state.AggregateID)
+		go m.applyRetentionPolicy(context.Background(), state.string)
 	}
 
 	return nil
@@ -844,7 +844,7 @@ func (m *MongoStateStore) ApplyRetentionPolicy(ctx context.Context, aggregateID 
 
 	candidates := m.config.RetentionPolicy.GetCleanupCandidates(ctx, states)
 	for _, candidate := range candidates {
-		m.Delete(ctx, candidate.AggregateID, candidate.Version)
+		m.Delete(ctx, candidate.string, candidate.Version)
 	}
 }
 

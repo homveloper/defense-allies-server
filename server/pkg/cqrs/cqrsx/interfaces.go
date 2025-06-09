@@ -2,7 +2,7 @@ package cqrsx
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // EventStore 이벤트 저장소 인터페이스

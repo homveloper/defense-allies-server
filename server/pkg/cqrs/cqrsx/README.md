@@ -170,8 +170,8 @@ import (
     "log"
     "time"
 
-    "defense-allies-server/pkg/cqrs"
-    "defense-allies-server/pkg/cqrs/cqrsx"
+    "cqrs"
+    "cqrs/cqrsx"
 )
 
 // MongoDB 클라이언트 설정
@@ -505,6 +505,6 @@ go test ./pkg/cqrs/cqrsx/ -run TestRedisClientManager
 
 - `go.mongodb.org/mongo-driver`: MongoDB 클라이언트
 - `github.com/redis/go-redis/v9`: Redis 클라이언트
-- `defense-allies-server/pkg/cqrs`: Core CQRS 인터페이스
+- `cqrs`: Core CQRS 인터페이스
 - `encoding/json`: JSON 직렬화
 - `context`: 컨텍스트 관리

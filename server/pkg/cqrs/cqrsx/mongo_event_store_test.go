@@ -2,7 +2,7 @@ package cqrsx
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"testing"
 	"time"
 

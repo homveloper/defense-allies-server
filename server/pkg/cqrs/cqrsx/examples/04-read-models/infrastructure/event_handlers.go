@@ -2,8 +2,8 @@ package infrastructure
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/projections"
+	"cqrs"
+	"cqrs/cqrsx/examples/04-read-models/projections"
 	"fmt"
 	"log"
 	"sync"

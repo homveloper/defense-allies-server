@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 
 	"github.com/shopspring/decimal"

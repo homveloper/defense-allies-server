@@ -2,7 +2,7 @@ package projections
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"fmt"
 	"log"
 	"sync"

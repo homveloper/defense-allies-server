@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // SearchUsersQuery represents a query to search users with various filters

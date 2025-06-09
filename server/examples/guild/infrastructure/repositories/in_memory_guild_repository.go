@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"cqrs"
 	"defense-allies-server/examples/guild/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // InMemoryGuildRepository is a simple in-memory repository for the guild example

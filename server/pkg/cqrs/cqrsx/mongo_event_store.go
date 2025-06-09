@@ -2,7 +2,7 @@ package cqrsx
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"fmt"
 	"time"
 
@@ -133,7 +133,7 @@ func (es *MongoEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 }
 
 // LoadEvents loads events from MongoDB using standard Event Sourcing queries
-func (es *MongoEventStore) LoadEvents(ctx context.Context, aggregateID, aggregateType string, fromVersion, toVersion int) ([]cqrs.EventMessage, error) {
+func (es *MongoEventStore) LoadEvents(ctx context.Context, aggregateID string, aggregateType string, fromVersion, toVersion int) ([]cqrs.EventMessage, error) {
 	if aggregateID == "" {
 		return nil, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
@@ -226,7 +226,7 @@ func (es *MongoEventStore) LoadEvents(ctx context.Context, aggregateID, aggregat
 }
 
 // GetEventHistory retrieves event history for an aggregate (standard Event Sourcing operation)
-func (es *MongoEventStore) GetEventHistory(ctx context.Context, aggregateID, aggregateType string, fromVersion int) ([]cqrs.EventMessage, error) {
+func (es *MongoEventStore) GetEventHistory(ctx context.Context, aggregateID string, aggregateType string, fromVersion int) ([]cqrs.EventMessage, error) {
 	if aggregateID == "" {
 		return nil, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
@@ -239,7 +239,7 @@ func (es *MongoEventStore) GetEventHistory(ctx context.Context, aggregateID, agg
 }
 
 // GetLastEventVersion gets the last event version for an aggregate (standard Event Sourcing query)
-func (es *MongoEventStore) GetLastEventVersion(ctx context.Context, aggregateID, aggregateType string) (int, error) {
+func (es *MongoEventStore) GetLastEventVersion(ctx context.Context, aggregateID string, aggregateType string) (int, error) {
 	if aggregateID == "" {
 		return -1, cqrs.NewCQRSError(cqrs.ErrCodeEventStoreError.String(), "aggregate ID cannot be empty", nil)
 	}
@@ -252,7 +252,7 @@ func (es *MongoEventStore) GetLastEventVersion(ctx context.Context, aggregateID,
 }
 
 // getLastEventVersion internal method to get last event version
-func (es *MongoEventStore) getLastEventVersion(ctx context.Context, aggregateID, aggregateType string) (int, error) {
+func (es *MongoEventStore) getLastEventVersion(ctx context.Context, aggregateID string, aggregateType string) (int, error) {
 	collection := es.client.GetCollection(es.collectionName)
 
 	// Standard Event Sourcing query to get latest version

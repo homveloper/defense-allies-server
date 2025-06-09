@@ -504,7 +504,7 @@ type CommandResult struct {
     Success       bool              // 성공 여부
     Error         error             // 에러 정보
     Events        []EventMessage    // 발생한 이벤트들
-    AggregateID   string           // 처리된 Aggregate ID
+    string   string           // 처리된 Aggregate ID
     Version       int              // 처리 후 Aggregate 버전
     Data          interface{}      // 응답 데이터 (필요시)
     ExecutionTime time.Duration    // 실행 시간

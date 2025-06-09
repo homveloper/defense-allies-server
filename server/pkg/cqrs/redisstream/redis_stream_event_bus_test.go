@@ -12,7 +12,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // TestRedisContainer manages Redis container for integration tests

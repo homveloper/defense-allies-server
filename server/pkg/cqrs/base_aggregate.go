@@ -55,7 +55,7 @@ func WithDeleted(deleted bool) BaseAggregateOption {
 }
 
 // NewBaseAggregate creates a new BaseAggregate with optional configuration
-func NewBaseAggregate(id, aggregateType string, options ...BaseAggregateOption) *BaseAggregate {
+func NewBaseAggregate(id string, aggregateType string, options ...BaseAggregateOption) *BaseAggregate {
 	now := time.Now()
 	aggregate := &BaseAggregate{
 		id:              id,
@@ -119,7 +119,7 @@ func (a *BaseAggregate) ApplyEvent(event EventMessage) error {
 
 		event = baseEvent.CloneWithOptions(
 			&BaseEventMessageOptions{
-				AggregateID:   &a.id,
+				string:        &a.id,
 				AggregateType: &a.aggregateType,
 				Version:       &version,
 				Timestamp:     &timestamp,

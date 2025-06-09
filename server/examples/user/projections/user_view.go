@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/user/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // UserView represents a read model for user data

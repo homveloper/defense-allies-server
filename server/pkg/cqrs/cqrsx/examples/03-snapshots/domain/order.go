@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 	"go.mongodb.org/mongo-driver/bson"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // OrderStatus 주문 상태

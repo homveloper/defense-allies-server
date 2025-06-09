@@ -2,8 +2,8 @@ package demo
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/readmodels"
+	"cqrs"
+	"cqrs/cqrsx/examples/04-read-models/readmodels"
 	"fmt"
 	"log"
 	"time"

@@ -8,13 +8,13 @@ import (
 
 	"github.com/google/uuid"
 
+	"cqrs"
 	"defense-allies-server/examples/guild/application/commands"
 	"defense-allies-server/examples/guild/application/handlers"
 	"defense-allies-server/examples/guild/domain"
 	"defense-allies-server/examples/guild/infrastructure/projections"
 	"defense-allies-server/examples/guild/infrastructure/queries"
 	"defense-allies-server/examples/guild/infrastructure/repositories"
-	"defense-allies-server/pkg/cqrs"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // CircuitBreakerState represents the state of a circuit breaker
@@ -37,12 +37,12 @@ type CircuitBreaker interface {
 	Call(fn func() error) error
 	RecordSuccess()
 	RecordFailure(reason string) error
-	
+
 	// State management
 	GetState() CircuitBreakerState
 	IsEnabled() bool
 	Reset()
-	
+
 	// Monitoring
 	GetMetrics() *CircuitBreakerMetrics
 }
@@ -65,24 +65,24 @@ type CircuitBreakerMetrics struct {
 
 // circuitBreaker implements CircuitBreaker interface
 type circuitBreaker struct {
-	serviceName      string
-	config          *RedisStreamConfig
-	enabled         bool
-	
+	serviceName string
+	config      *RedisStreamConfig
+	enabled     bool
+
 	// State management
 	state           CircuitBreakerState
 	failureCount    int
 	lastFailureTime time.Time
 	lastStateChange time.Time
-	
+
 	// Metrics
-	totalCalls      int64
-	successfulCalls int64
-	failedCalls     int64
-	rejectedCalls   int64
-	stateTransitions int64
+	totalCalls        int64
+	successfulCalls   int64
+	failedCalls       int64
+	rejectedCalls     int64
+	stateTransitions  int64
 	lastFailureReason string
-	
+
 	// Thread safety
 	mu sync.RWMutex
 }
@@ -92,17 +92,17 @@ func NewCircuitBreaker(serviceName string, config *RedisStreamConfig) (CircuitBr
 	if serviceName == "" {
 		return nil, fmt.Errorf("service name cannot be empty")
 	}
-	
+
 	if config == nil {
 		return nil, fmt.Errorf("config cannot be nil")
 	}
-	
+
 	if config.Monitoring.CircuitBreakerEnabled {
 		if err := validateCircuitBreakerConfig(&config.Monitoring); err != nil {
 			return nil, err
 		}
 	}
-	
+
 	return &circuitBreaker{
 		serviceName:     serviceName,
 		config:          config,
@@ -119,9 +119,9 @@ func (cb *circuitBreaker) Call(fn func() error) error {
 		cb.mu.Lock()
 		cb.totalCalls++
 		cb.mu.Unlock()
-		
+
 		err := cb.safeCall(fn)
-		
+
 		cb.mu.Lock()
 		if err != nil {
 			cb.failedCalls++
@@ -129,10 +129,10 @@ func (cb *circuitBreaker) Call(fn func() error) error {
 			cb.successfulCalls++
 		}
 		cb.mu.Unlock()
-		
+
 		return err
 	}
-	
+
 	// Check if call should be allowed
 	if !cb.allowCall() {
 		cb.mu.Lock()
@@ -140,21 +140,21 @@ func (cb *circuitBreaker) Call(fn func() error) error {
 		cb.mu.Unlock()
 		return ErrCircuitBreakerOpen
 	}
-	
+
 	// Execute the call
 	cb.mu.Lock()
 	cb.totalCalls++
 	cb.mu.Unlock()
-	
+
 	err := cb.safeCall(fn)
-	
+
 	// Record the result
 	if err != nil {
 		cb.RecordFailure(err.Error())
 	} else {
 		cb.RecordSuccess()
 	}
-	
+
 	return err
 }
 
@@ -163,15 +163,15 @@ func (cb *circuitBreaker) RecordSuccess() {
 	if !cb.enabled {
 		return
 	}
-	
+
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	
+
 	cb.successfulCalls++
-	
+
 	// Reset failure count on success
 	cb.failureCount = 0
-	
+
 	// If in half-open state, close the circuit
 	if cb.state == CircuitBreakerStateHalfOpen {
 		cb.setState(CircuitBreakerStateClosed)
@@ -183,21 +183,21 @@ func (cb *circuitBreaker) RecordFailure(reason string) error {
 	if !cb.enabled {
 		return nil
 	}
-	
+
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	
+
 	cb.failedCalls++
 	cb.failureCount++
 	cb.lastFailureTime = time.Now()
 	cb.lastFailureReason = reason
-	
+
 	// Check if we should open the circuit
 	if cb.shouldOpen() {
 		cb.setState(CircuitBreakerStateOpen)
 		return ErrCircuitBreakerOpen
 	}
-	
+
 	return nil
 }
 
@@ -205,7 +205,7 @@ func (cb *circuitBreaker) RecordFailure(reason string) error {
 func (cb *circuitBreaker) GetState() CircuitBreakerState {
 	cb.mu.RLock()
 	defer cb.mu.RUnlock()
-	
+
 	// Check if we should transition from open to half-open
 	if cb.state == CircuitBreakerStateOpen && cb.shouldAttemptReset() {
 		cb.mu.RUnlock()
@@ -217,7 +217,7 @@ func (cb *circuitBreaker) GetState() CircuitBreakerState {
 		cb.mu.Unlock()
 		cb.mu.RLock()
 	}
-	
+
 	return cb.state
 }
 
@@ -230,7 +230,7 @@ func (cb *circuitBreaker) IsEnabled() bool {
 func (cb *circuitBreaker) Reset() {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	
+
 	cb.failureCount = 0
 	cb.setState(CircuitBreakerStateClosed)
 }
@@ -239,16 +239,16 @@ func (cb *circuitBreaker) Reset() {
 func (cb *circuitBreaker) GetMetrics() *CircuitBreakerMetrics {
 	cb.mu.RLock()
 	defer cb.mu.RUnlock()
-	
+
 	totalCalls := cb.totalCalls
 	successRate := 0.0
 	failureRate := 0.0
-	
+
 	if totalCalls > 0 {
 		successRate = float64(cb.successfulCalls) / float64(totalCalls)
 		failureRate = float64(cb.failedCalls) / float64(totalCalls)
 	}
-	
+
 	var recoveryTimeLeft time.Duration
 	if cb.state == CircuitBreakerStateOpen {
 		recoveryTime := cb.lastFailureTime.Add(cb.config.Monitoring.RecoveryTimeout)
@@ -257,7 +257,7 @@ func (cb *circuitBreaker) GetMetrics() *CircuitBreakerMetrics {
 			recoveryTimeLeft = 0
 		}
 	}
-	
+
 	return &CircuitBreakerMetrics{
 		ServiceName:       cb.serviceName,
 		CurrentState:      cb.state,
@@ -294,7 +294,7 @@ func (cb *circuitBreaker) setState(newState CircuitBreakerState) {
 		cb.state = newState
 		cb.lastStateChange = time.Now()
 		cb.stateTransitions++
-		
+
 		// Reset failure count when closing
 		if newState == CircuitBreakerStateClosed {
 			cb.failureCount = 0
@@ -308,7 +308,7 @@ func (cb *circuitBreaker) safeCall(fn func() error) (err error) {
 			err = fmt.Errorf("panic in circuit breaker call: %v", r)
 		}
 	}()
-	
+
 	return fn()
 }
 
@@ -336,7 +336,7 @@ func NewCircuitBreakerProtectedHandler(handler cqrs.EventHandler, config *RedisS
 		// If circuit breaker creation fails, create a disabled one
 		cb = &disabledCircuitBreaker{}
 	}
-	
+
 	return &CircuitBreakerProtectedHandler{
 		handler:        handler,
 		circuitBreaker: cb,
@@ -431,7 +431,7 @@ func (cbm *circuitBreakerManager) GetCircuitBreaker(serviceName string) CircuitB
 		return cb
 	}
 	cbm.mu.RUnlock()
-	
+
 	return cbm.CreateCircuitBreaker(serviceName)
 }
 
@@ -439,18 +439,18 @@ func (cbm *circuitBreakerManager) GetCircuitBreaker(serviceName string) CircuitB
 func (cbm *circuitBreakerManager) CreateCircuitBreaker(serviceName string) CircuitBreaker {
 	cbm.mu.Lock()
 	defer cbm.mu.Unlock()
-	
+
 	// Double-check if another goroutine created it
 	if cb, exists := cbm.breakers[serviceName]; exists {
 		return cb
 	}
-	
+
 	cb, err := NewCircuitBreaker(serviceName, cbm.config)
 	if err != nil {
 		// Return disabled circuit breaker on error
 		cb = &disabledCircuitBreaker{}
 	}
-	
+
 	cbm.breakers[serviceName] = cb
 	return cb
 }
@@ -459,12 +459,12 @@ func (cbm *circuitBreakerManager) CreateCircuitBreaker(serviceName string) Circu
 func (cbm *circuitBreakerManager) GetAllMetrics() map[string]*CircuitBreakerMetrics {
 	cbm.mu.RLock()
 	defer cbm.mu.RUnlock()
-	
+
 	metrics := make(map[string]*CircuitBreakerMetrics)
 	for serviceName, cb := range cbm.breakers {
 		metrics[serviceName] = cb.GetMetrics()
 	}
-	
+
 	return metrics
 }
 
@@ -472,7 +472,7 @@ func (cbm *circuitBreakerManager) GetAllMetrics() map[string]*CircuitBreakerMetr
 func (cbm *circuitBreakerManager) ResetAll() {
 	cbm.mu.RLock()
 	defer cbm.mu.RUnlock()
-	
+
 	for _, cb := range cbm.breakers {
 		cb.Reset()
 	}

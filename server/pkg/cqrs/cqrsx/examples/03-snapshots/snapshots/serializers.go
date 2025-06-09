@@ -9,7 +9,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
 )
 
 // JSONSerializer JSON 기반 스냅샷 직렬화

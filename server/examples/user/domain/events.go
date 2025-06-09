@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // Event type constants

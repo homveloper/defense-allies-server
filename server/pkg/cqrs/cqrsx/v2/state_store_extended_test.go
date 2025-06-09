@@ -44,7 +44,7 @@ func TestQueryableStateStore_Query(t *testing.T) {
 
 	states := []*AggregateState{
 		{
-			AggregateID:   aggregateID1,
+			string:        aggregateID1,
 			AggregateType: "Guild",
 			Version:       1,
 			Data:          []byte("guild data 1"),
@@ -52,7 +52,7 @@ func TestQueryableStateStore_Query(t *testing.T) {
 			Metadata:      map[string]any{"level": 1},
 		},
 		{
-			AggregateID:   aggregateID1,
+			string:        aggregateID1,
 			AggregateType: "Guild",
 			Version:       2,
 			Data:          []byte("guild data 2"),
@@ -60,7 +60,7 @@ func TestQueryableStateStore_Query(t *testing.T) {
 			Metadata:      map[string]any{"level": 2},
 		},
 		{
-			AggregateID:   aggregateID2,
+			string:        aggregateID2,
 			AggregateType: "User",
 			Version:       1,
 			Data:          []byte("user data 1"),

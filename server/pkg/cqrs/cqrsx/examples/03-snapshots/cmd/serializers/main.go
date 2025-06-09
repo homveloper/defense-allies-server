@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"defense-allies-server/pkg/cqrs/cqrsx"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
 
 	"github.com/shopspring/decimal"
 )

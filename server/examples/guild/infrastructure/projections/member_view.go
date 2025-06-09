@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/guild/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // MemberView represents a read model for guild member data

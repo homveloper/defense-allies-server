@@ -19,12 +19,12 @@ type JSONEventSerializer struct {
 
 // SerializableEvent는 직렬화 가능한 이벤트 구조체입니다
 type SerializableEvent struct {
-	AggregateID uuid.UUID   `json:"aggregateId"`
-	EventType   EventType   `json:"eventType"`
-	Data        interface{} `json:"data"`
-	Version     int         `json:"version"`
-	Timestamp   time.Time   `json:"timestamp"`
-	Metadata    Metadata    `json:"metadata"`
+	string    uuid.UUID   `json:"aggregateId"`
+	EventType EventType   `json:"eventType"`
+	Data      interface{} `json:"data"`
+	Version   int         `json:"version"`
+	Timestamp time.Time   `json:"timestamp"`
+	Metadata  Metadata    `json:"metadata"`
 }
 
 // NewJSONEventSerializer는 새로운 JSON 직렬화기를 생성합니다
@@ -50,12 +50,12 @@ func (s *JSONEventSerializer) RegisterEventType(eventType EventType, dataType in
 // Serialize는 이벤트를 JSON으로 직렬화합니다
 func (s *JSONEventSerializer) Serialize(event Event) ([]byte, error) {
 	serializableEvent := SerializableEvent{
-		AggregateID: event.AggregateID(),
-		EventType:   event.EventType(),
-		Data:        event.Data(),
-		Version:     event.Version(),
-		Timestamp:   event.Timestamp(),
-		Metadata:    event.Metadata(),
+		string:    event.string(),
+		EventType: event.EventType(),
+		Data:      event.Data(),
+		Version:   event.Version(),
+		Timestamp: event.Timestamp(),
+		Metadata:  event.Metadata(),
 	}
 
 	return json.Marshal(serializableEvent)
@@ -75,7 +75,7 @@ func (s *JSONEventSerializer) Deserialize(data []byte, eventType EventType) (Eve
 	}
 
 	return &BaseEvent{
-		aggregateID: serializableEvent.AggregateID,
+		aggregateID: serializableEvent.string,
 		eventType:   serializableEvent.EventType,
 		data:        eventData,
 		version:     serializableEvent.Version,

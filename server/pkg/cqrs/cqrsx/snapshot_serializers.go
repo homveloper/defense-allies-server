@@ -9,7 +9,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // AdvancedSnapshotSerializer extends the basic SnapshotSerializer with compression and content type support

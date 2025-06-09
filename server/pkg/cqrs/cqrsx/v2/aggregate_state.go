@@ -10,7 +10,7 @@ import (
 
 // AggregateState는 집합체의 특정 시점 상태를 나타냅니다
 type AggregateState struct {
-	AggregateID   uuid.UUID      `json:"aggregateId" bson:"aggregateId"`
+	string        uuid.UUID      `json:"aggregateId" bson:"aggregateId"`
 	AggregateType string         `json:"aggregateType" bson:"aggregateType"`
 	Version       int            `json:"version" bson:"version"`
 	Data          []byte         `json:"data" bson:"data"`
@@ -21,7 +21,7 @@ type AggregateState struct {
 // NewAggregateState는 새로운 집합체 상태를 생성합니다
 func NewAggregateState(aggregateID uuid.UUID, aggregateType string, version int, data []byte) *AggregateState {
 	return &AggregateState{
-		AggregateID:   aggregateID,
+		string:        aggregateID,
 		AggregateType: aggregateType,
 		Version:       version,
 		Data:          data,
@@ -43,7 +43,7 @@ func (as *AggregateState) IsEmpty() bool {
 // Clone은 깊은 복사를 수행합니다
 func (as *AggregateState) Clone() *AggregateState {
 	cloned := &AggregateState{
-		AggregateID:   as.AggregateID,
+		string:        as.string,
 		AggregateType: as.AggregateType,
 		Version:       as.Version,
 		Data:          make([]byte, len(as.Data)),
@@ -129,9 +129,9 @@ func (e *StateValidationError) Error() string {
 
 // Validate는 상태 데이터를 검증합니다
 func (as *AggregateState) Validate() error {
-	if as.AggregateID == uuid.Nil {
+	if as.string == uuid.Nil {
 		return &StateValidationError{
-			Field:   "AggregateID",
+			Field:   "string",
 			Message: "aggregate ID cannot be nil",
 		}
 	}

@@ -216,7 +216,7 @@ func (doc *mongoStateDocument) SetLastError(err error) {
 func NewMongoStateDocument(aggregateID uuid.UUID, aggregateType string, version int, stateTimestamp time.Time) *mongoStateDocument {
 	doc := &mongoStateDocument{
 		ID:              fmt.Sprintf("%s-%s-v%d", aggregateType, aggregateID.String(), version),
-		AggregateID:     aggregateID.String(),
+		string:          aggregateID.String(),
 		AggregateType:   aggregateType,
 		Version:         version,
 		DocumentVersion: DocumentVersionCurrent,
@@ -233,7 +233,7 @@ func NewMongoStateDocument(aggregateID uuid.UUID, aggregateType string, version 
 
 // FromAggregateState는 AggregateState로부터 MongoDB 문서를 생성합니다
 func FromAggregateState(state *AggregateState) *mongoStateDocument {
-	doc := NewMongoStateDocument(state.AggregateID, state.AggregateType, state.Version, state.Timestamp)
+	doc := NewMongoStateDocument(state.string, state.AggregateType, state.Version, state.Timestamp)
 
 	// 원본 데이터 설정
 	doc.Data = state.Data
@@ -250,7 +250,7 @@ func FromAggregateState(state *AggregateState) *mongoStateDocument {
 
 // ToAggregateState는 MongoDB 문서를 AggregateState로 변환합니다
 func (doc *mongoStateDocument) ToAggregateState() (*AggregateState, error) {
-	aggregateID, err := uuid.Parse(doc.AggregateID)
+	aggregateID, err := uuid.Parse(doc.string)
 	if err != nil {
 		return nil, fmt.Errorf("invalid aggregate ID: %w", err)
 	}
@@ -273,7 +273,7 @@ func (doc *mongoStateDocument) ToAggregateState() (*AggregateState, error) {
 
 	// AggregateState 생성
 	state := &AggregateState{
-		AggregateID:   aggregateID,
+		string:        aggregateID,
 		AggregateType: doc.AggregateType,
 		Version:       doc.Version,
 		Data:          data,
@@ -325,7 +325,7 @@ func (doc *mongoStateDocument) Validate() error {
 		return fmt.Errorf("document ID cannot be empty")
 	}
 
-	if doc.AggregateID == "" {
+	if doc.string == "" {
 		return fmt.Errorf("aggregate ID cannot be empty")
 	}
 

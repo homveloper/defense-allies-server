@@ -52,6 +52,20 @@ func (h *TestEventHandler) GetLastHandledEvent() EventMessage {
 	return h.HandledEvents[len(h.HandledEvents)-1]
 }
 
+const TestedEventDataType = "TestedEventType"
+
+type testedEventData struct {
+	Field1 string
+	Field2 int
+}
+
+func newTestedEventMessage() *BaseEventMessage {
+	return NewBaseEventMessage(TestedEventDataType, &testedEventData{
+		Field1: "test",
+		Field2: 123,
+	})
+}
+
 func TestNewInMemoryEventBus(t *testing.T) {
 	// Act
 	bus := NewInMemoryEventBus()
@@ -201,7 +215,7 @@ func TestEventBus_Publish_NilEvent(t *testing.T) {
 func TestEventBus_Publish_NoHandlers(t *testing.T) {
 	// Arrange
 	bus := NewInMemoryEventBus()
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	// Act
 	err := bus.Publish(context.Background(), event)
@@ -218,7 +232,7 @@ func TestEventBus_Publish_HandlerError(t *testing.T) {
 	// Arrange
 	bus := NewInMemoryEventBus()
 	handler := NewTestEventHandler("TestHandler", []string{"TestEvent"})
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	// Set up handler to return error
 	handler.HandleFunc = func(ctx context.Context, event EventMessage) error {
@@ -244,7 +258,7 @@ func TestEventBus_Publish_AllHandlers(t *testing.T) {
 	bus := NewInMemoryEventBus()
 	specificHandler := NewTestEventHandler("SpecificHandler", []string{"TestEvent"})
 	allHandler := NewTestEventHandler("AllHandler", []string{"TestEvent", "OtherEvent"})
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	bus.Subscribe("TestEvent", specificHandler)
 	bus.SubscribeAll(allHandler)
@@ -263,9 +277,9 @@ func TestEventBus_PublishBatch(t *testing.T) {
 	bus := NewInMemoryEventBus()
 	handler := NewTestEventHandler("TestHandler", []string{"TestEvent"})
 	events := []EventMessage{
-		NewBaseEventMessage("TestEvent", "test-id-1", "TestAggregate", 1, "data 1"),
-		NewBaseEventMessage("TestEvent", "test-id-2", "TestAggregate", 2, "data 2"),
-		NewBaseEventMessage("TestEvent", "test-id-3", "TestAggregate", 3, "data 3"),
+		newTestedEventMessage(),
+		newTestedEventMessage(),
+		newTestedEventMessage(),
 	}
 
 	bus.Subscribe("TestEvent", handler)
@@ -297,7 +311,7 @@ func TestEventBus_Publish_Async(t *testing.T) {
 	// Arrange
 	bus := NewInMemoryEventBus()
 	handler := NewTestEventHandler("TestHandler", []string{"TestEvent"})
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	bus.Subscribe("TestEvent", handler)
 
@@ -317,7 +331,7 @@ func TestEventBus_Clear(t *testing.T) {
 	// Arrange
 	bus := NewInMemoryEventBus()
 	handler := NewTestEventHandler("TestHandler", []string{"TestEvent"})
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	bus.Subscribe("TestEvent", handler)
 	bus.Publish(context.Background(), event)

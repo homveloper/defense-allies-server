@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // RetryPolicyManager manages retry policies and retry logic

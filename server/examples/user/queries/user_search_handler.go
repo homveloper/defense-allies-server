@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
+	"cqrs"
 	"defense-allies-server/examples/user/projections"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // UserSearchHandler handles user search queries

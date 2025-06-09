@@ -2,7 +2,7 @@ package readmodels
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -10,34 +10,34 @@ import (
 
 // ProductSalesData represents sales data for a specific time period
 type ProductSalesData struct {
-	Period      string          `json:"period"`      // "daily", "weekly", "monthly"
-	Date        time.Time       `json:"date"`
-	UnitsSold   int             `json:"units_sold"`
-	Revenue     decimal.Decimal `json:"revenue"`
-	OrderCount  int             `json:"order_count"`
+	Period     string          `json:"period"` // "daily", "weekly", "monthly"
+	Date       time.Time       `json:"date"`
+	UnitsSold  int             `json:"units_sold"`
+	Revenue    decimal.Decimal `json:"revenue"`
+	OrderCount int             `json:"order_count"`
 }
 
 // ProductPopularityView represents a product's popularity and sales metrics
 type ProductPopularityView struct {
 	*cqrs.BaseReadModel
-	ProductID          string             `json:"product_id"`
-	ProductName        string             `json:"product_name"`
-	Category           string             `json:"category"`
-	CurrentPrice       decimal.Decimal    `json:"current_price"`
-	TotalUnitsSold     int                `json:"total_units_sold"`
-	TotalRevenue       decimal.Decimal    `json:"total_revenue"`
-	TotalOrders        int                `json:"total_orders"`
-	AverageOrderValue  decimal.Decimal    `json:"average_order_value"`
-	AverageUnitsPerOrder decimal.Decimal  `json:"average_units_per_order"`
-	PopularityScore    decimal.Decimal    `json:"popularity_score"`
-	PopularityRank     int                `json:"popularity_rank"`
-	LastSoldDate       *time.Time         `json:"last_sold_date,omitempty"`
-	FirstSoldDate      *time.Time         `json:"first_sold_date,omitempty"`
-	SalesData          []ProductSalesData `json:"sales_data"`
-	Tags               []string           `json:"tags"` // "Bestseller", "Trending", "New", etc.
-	IsActive           bool               `json:"is_active"`
-	CreatedAt          time.Time          `json:"created_at"`
-	UpdatedAt          time.Time          `json:"updated_at"`
+	ProductID            string             `json:"product_id"`
+	ProductName          string             `json:"product_name"`
+	Category             string             `json:"category"`
+	CurrentPrice         decimal.Decimal    `json:"current_price"`
+	TotalUnitsSold       int                `json:"total_units_sold"`
+	TotalRevenue         decimal.Decimal    `json:"total_revenue"`
+	TotalOrders          int                `json:"total_orders"`
+	AverageOrderValue    decimal.Decimal    `json:"average_order_value"`
+	AverageUnitsPerOrder decimal.Decimal    `json:"average_units_per_order"`
+	PopularityScore      decimal.Decimal    `json:"popularity_score"`
+	PopularityRank       int                `json:"popularity_rank"`
+	LastSoldDate         *time.Time         `json:"last_sold_date,omitempty"`
+	FirstSoldDate        *time.Time         `json:"first_sold_date,omitempty"`
+	SalesData            []ProductSalesData `json:"sales_data"`
+	Tags                 []string           `json:"tags"` // "Bestseller", "Trending", "New", etc.
+	IsActive             bool               `json:"is_active"`
+	CreatedAt            time.Time          `json:"created_at"`
+	UpdatedAt            time.Time          `json:"updated_at"`
 }
 
 // NewProductPopularityView creates a new ProductPopularityView
@@ -71,7 +71,7 @@ func (ppv *ProductPopularityView) RecordSale(unitsSold int, revenue decimal.Deci
 	ppv.TotalUnitsSold += unitsSold
 	ppv.TotalRevenue = ppv.TotalRevenue.Add(revenue)
 	ppv.TotalOrders++
-	
+
 	// Update first/last sold dates
 	if ppv.FirstSoldDate == nil || saleDate.Before(*ppv.FirstSoldDate) {
 		ppv.FirstSoldDate = &saleDate
@@ -79,7 +79,7 @@ func (ppv *ProductPopularityView) RecordSale(unitsSold int, revenue decimal.Deci
 	if ppv.LastSoldDate == nil || saleDate.After(*ppv.LastSoldDate) {
 		ppv.LastSoldDate = &saleDate
 	}
-	
+
 	ppv.recalculateMetrics()
 	ppv.updateTags()
 	ppv.UpdatedAt = time.Now()
@@ -114,7 +114,7 @@ func (ppv *ProductPopularityView) AddSalesData(salesData ProductSalesData) {
 			return
 		}
 	}
-	
+
 	// Add new sales data
 	ppv.SalesData = append(ppv.SalesData, salesData)
 	ppv.UpdatedAt = time.Now()
@@ -151,7 +151,7 @@ func (ppv *ProductPopularityView) recalculateMetrics() {
 		ppv.AverageOrderValue = decimal.Zero
 		ppv.AverageUnitsPerOrder = decimal.Zero
 	}
-	
+
 	// Calculate popularity score (weighted combination of units sold, revenue, and recency)
 	ppv.calculatePopularityScore()
 }
@@ -160,10 +160,10 @@ func (ppv *ProductPopularityView) recalculateMetrics() {
 func (ppv *ProductPopularityView) calculatePopularityScore() {
 	// Base score from units sold (normalized)
 	unitsScore := decimal.NewFromInt(int64(ppv.TotalUnitsSold))
-	
+
 	// Revenue score (normalized)
 	revenueScore := ppv.TotalRevenue.Div(decimal.NewFromInt(100)) // Divide by 100 to normalize
-	
+
 	// Recency score (higher for recently sold items)
 	recencyScore := decimal.Zero
 	if ppv.LastSoldDate != nil {
@@ -172,7 +172,7 @@ func (ppv *ProductPopularityView) calculatePopularityScore() {
 			recencyScore = decimal.NewFromFloat(30 - daysSinceLastSale)
 		}
 	}
-	
+
 	// Weighted combination
 	ppv.PopularityScore = unitsScore.Mul(decimal.NewFromFloat(0.4)).
 		Add(revenueScore.Mul(decimal.NewFromFloat(0.4))).
@@ -182,12 +182,12 @@ func (ppv *ProductPopularityView) calculatePopularityScore() {
 // updateTags updates product tags based on metrics
 func (ppv *ProductPopularityView) updateTags() {
 	ppv.Tags = make([]string, 0)
-	
+
 	// Bestseller tag (top 10 rank)
 	if ppv.PopularityRank > 0 && ppv.PopularityRank <= 10 {
 		ppv.Tags = append(ppv.Tags, "Bestseller")
 	}
-	
+
 	// Trending tag (sold recently and high popularity score)
 	if ppv.LastSoldDate != nil {
 		sevenDaysAgo := time.Now().AddDate(0, 0, -7)
@@ -195,12 +195,12 @@ func (ppv *ProductPopularityView) updateTags() {
 			ppv.Tags = append(ppv.Tags, "Trending")
 		}
 	}
-	
+
 	// High value tag (high average order value)
 	if ppv.AverageOrderValue.GreaterThan(decimal.NewFromInt(100)) {
 		ppv.Tags = append(ppv.Tags, "HighValue")
 	}
-	
+
 	// New tag (first sold within 30 days)
 	if ppv.FirstSoldDate != nil {
 		thirtyDaysAgo := time.Now().AddDate(0, 0, -30)
@@ -208,12 +208,12 @@ func (ppv *ProductPopularityView) updateTags() {
 			ppv.Tags = append(ppv.Tags, "New")
 		}
 	}
-	
+
 	// Active tag
 	if ppv.IsActive {
 		ppv.Tags = append(ppv.Tags, "Active")
 	}
-	
+
 	// Popular tag (high total units sold)
 	if ppv.TotalUnitsSold > 100 {
 		ppv.Tags = append(ppv.Tags, "Popular")
@@ -305,13 +305,13 @@ func (ppv *ProductPopularityView) IncrementVersion() {
 // GetSalesDataByPeriod returns sales data for a specific period
 func (ppv *ProductPopularityView) GetSalesDataByPeriod(period string) []ProductSalesData {
 	filteredData := make([]ProductSalesData, 0)
-	
+
 	for _, data := range ppv.SalesData {
 		if data.Period == period {
 			filteredData = append(filteredData, data)
 		}
 	}
-	
+
 	return filteredData
 }
 
@@ -362,28 +362,28 @@ func (ppv *ProductPopularityView) Validate() error {
 type ProductPopularityViewRepository interface {
 	// Save saves a ProductPopularityView
 	Save(ctx context.Context, popularityView *ProductPopularityView) error
-	
+
 	// GetByID retrieves a ProductPopularityView by product ID
 	GetByID(ctx context.Context, productID string) (*ProductPopularityView, error)
-	
+
 	// GetByCategory retrieves ProductPopularityViews by category
 	GetByCategory(ctx context.Context, category string) ([]*ProductPopularityView, error)
-	
+
 	// GetByTag retrieves ProductPopularityViews by tag
 	GetByTag(ctx context.Context, tag string) ([]*ProductPopularityView, error)
-	
+
 	// GetTopProducts retrieves top products by popularity score
 	GetTopProducts(ctx context.Context, limit int) ([]*ProductPopularityView, error)
-	
+
 	// GetTrendingProducts retrieves trending products
 	GetTrendingProducts(ctx context.Context) ([]*ProductPopularityView, error)
-	
+
 	// GetBestsellers retrieves bestseller products
 	GetBestsellers(ctx context.Context) ([]*ProductPopularityView, error)
-	
+
 	// UpdateRankings updates popularity rankings for all products
 	UpdateRankings(ctx context.Context) error
-	
+
 	// Delete removes a ProductPopularityView
 	Delete(ctx context.Context, productID string) error
 }

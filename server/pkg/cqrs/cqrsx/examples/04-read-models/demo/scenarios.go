@@ -2,7 +2,7 @@ package demo
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/domain"
+	"cqrs/cqrsx/examples/04-read-models/domain"
 	"fmt"
 	"log"
 	"time"
@@ -174,12 +174,12 @@ func createSampleUsers(ctx context.Context, deps *DemoDependencies) error {
 	for _, user := range users {
 		userID := uuid.New().String()
 		cmd := domain.NewCreateUserCommand(userID, user.name, user.email)
-		
+
 		_, err := deps.UserCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			return fmt.Errorf("failed to create user %s: %w", user.name, err)
 		}
-		
+
 		log.Printf("Created user: %s (%s)", user.name, user.email)
 	}
 
@@ -206,12 +206,12 @@ func createSampleProducts(ctx context.Context, deps *DemoDependencies) error {
 	for _, product := range products {
 		productID := uuid.New().String()
 		cmd := domain.NewCreateProductCommand(productID, product.name, product.price, product.category, product.description)
-		
+
 		_, err := deps.ProductCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			return fmt.Errorf("failed to create product %s: %w", product.name, err)
 		}
-		
+
 		log.Printf("Created product: %s - $%s", product.name, product.price.String())
 	}
 
@@ -222,7 +222,7 @@ func createSampleOrders(ctx context.Context, deps *DemoDependencies) error {
 	// This is a simplified version - in a real scenario, you'd need to:
 	// 1. Get actual user IDs and product IDs from the system
 	// 2. Create proper order items with correct product information
-	
+
 	orders := []struct {
 		customerID string
 		items      []domain.OrderItem
@@ -263,12 +263,12 @@ func createSampleOrders(ctx context.Context, deps *DemoDependencies) error {
 	for i, order := range orders {
 		orderID := uuid.New().String()
 		cmd := domain.NewCreateOrderCommand(orderID, order.customerID, order.items)
-		
+
 		_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			return fmt.Errorf("failed to create order %d: %w", i+1, err)
 		}
-		
+
 		log.Printf("Created order: %s for customer %s", orderID, order.customerID)
 	}
 
@@ -278,18 +278,18 @@ func createSampleOrders(ctx context.Context, deps *DemoDependencies) error {
 func completeSampleOrders(ctx context.Context, deps *DemoDependencies) error {
 	// This would complete some of the orders created in the previous step
 	// In a real implementation, you'd track the order IDs
-	
+
 	orderIDs := []string{"order-1", "order-2"} // These would be real order IDs
-	
+
 	for _, orderID := range orderIDs {
 		cmd := domain.NewCompleteOrderCommand(orderID)
-		
+
 		_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			log.Printf("Warning: failed to complete order %s: %v", orderID, err)
 			continue
 		}
-		
+
 		log.Printf("Completed order: %s", orderID)
 	}
 
@@ -299,12 +299,12 @@ func completeSampleOrders(ctx context.Context, deps *DemoDependencies) error {
 func createNewCustomer(ctx context.Context, deps *DemoDependencies) error {
 	userID := uuid.New().String()
 	cmd := domain.NewCreateUserCommand(userID, "Demo Customer", "demo.customer@example.com")
-	
+
 	_, err := deps.UserCommandHandler.Handle(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to create new customer: %w", err)
 	}
-	
+
 	log.Printf("Created new customer: Demo Customer")
 	return nil
 }
@@ -321,32 +321,32 @@ func makeFirstPurchase(ctx context.Context, deps *DemoDependencies) error {
 			SubTotal:  decimal.NewFromInt(49),
 		},
 	}
-	
+
 	cmd := domain.NewCreateOrderCommand(orderID, "demo-customer-id", items)
 	_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to create first purchase: %w", err)
 	}
-	
+
 	// Complete the order
 	completeCmd := domain.NewCompleteOrderCommand(orderID)
 	_, err = deps.OrderCommandHandler.Handle(ctx, completeCmd)
 	if err != nil {
 		log.Printf("Warning: failed to complete first purchase: %v", err)
 	}
-	
+
 	log.Printf("Demo customer made first purchase")
 	return nil
 }
 
 func updateCustomerProfile(ctx context.Context, deps *DemoDependencies) error {
 	cmd := domain.NewUpdateUserCommand("demo-customer-id", "Demo Customer Updated", "demo.updated@example.com")
-	
+
 	_, err := deps.UserCommandHandler.Handle(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to update customer profile: %w", err)
 	}
-	
+
 	log.Printf("Updated demo customer profile")
 	return nil
 }
@@ -376,22 +376,22 @@ func makeMultiplePurchases(ctx context.Context, deps *DemoDependencies) error {
 	for i, purchase := range purchases {
 		orderID := uuid.New().String()
 		cmd := domain.NewCreateOrderCommand(orderID, "demo-customer-id", purchase.items)
-		
+
 		_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			log.Printf("Warning: failed to create purchase %d: %v", i+1, err)
 			continue
 		}
-		
+
 		// Complete the order
 		completeCmd := domain.NewCompleteOrderCommand(orderID)
 		_, err = deps.OrderCommandHandler.Handle(ctx, completeCmd)
 		if err != nil {
 			log.Printf("Warning: failed to complete purchase %d: %v", i+1, err)
 		}
-		
+
 		log.Printf("Demo customer made purchase %d", i+1)
-		
+
 		// Add some delay between purchases
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -405,20 +405,20 @@ func cancelOrder(ctx context.Context, deps *DemoDependencies) error {
 	items := []domain.OrderItem{
 		{ProductID: "product-cancel", Name: "Item to Cancel", Price: decimal.NewFromInt(99), Quantity: 1, SubTotal: decimal.NewFromInt(99)},
 	}
-	
+
 	cmd := domain.NewCreateOrderCommand(orderID, "demo-customer-id", items)
 	_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to create order for cancellation: %w", err)
 	}
-	
+
 	// Cancel the order
 	cancelCmd := domain.NewCancelOrderCommand(orderID, "Customer changed mind")
 	_, err = deps.OrderCommandHandler.Handle(ctx, cancelCmd)
 	if err != nil {
 		return fmt.Errorf("failed to cancel order: %w", err)
 	}
-	
+
 	log.Printf("Demo customer cancelled order")
 	return nil
 }
@@ -450,13 +450,13 @@ func createProductCategories(ctx context.Context, deps *DemoDependencies) error 
 		for _, product := range products {
 			productID := uuid.New().String()
 			cmd := domain.NewCreateProductCommand(productID, product.name, product.price, category, product.desc)
-			
+
 			_, err := deps.ProductCommandHandler.Handle(ctx, cmd)
 			if err != nil {
 				log.Printf("Warning: failed to create product %s: %v", product.name, err)
 				continue
 			}
-			
+
 			log.Printf("Created product in %s: %s", category, product.name)
 		}
 	}
@@ -467,14 +467,14 @@ func createProductCategories(ctx context.Context, deps *DemoDependencies) error 
 func simulateProductSales(ctx context.Context, deps *DemoDependencies) error {
 	// This would simulate sales for the products created above
 	// In a real implementation, you'd track product IDs and create realistic orders
-	
+
 	log.Printf("Simulating product sales...")
-	
+
 	// Create multiple orders with different products to simulate popularity
 	for i := 0; i < 10; i++ {
 		orderID := uuid.New().String()
 		customerID := fmt.Sprintf("customer-%d", i%3) // Rotate between 3 customers
-		
+
 		items := []domain.OrderItem{
 			{
 				ProductID: fmt.Sprintf("product-%d", i%5), // Rotate between 5 products
@@ -484,14 +484,14 @@ func simulateProductSales(ctx context.Context, deps *DemoDependencies) error {
 				SubTotal:  decimal.NewFromInt(int64((50 + i*10) * (1 + i%3))),
 			},
 		}
-		
+
 		cmd := domain.NewCreateOrderCommand(orderID, customerID, items)
 		_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			log.Printf("Warning: failed to create simulated order %d: %v", i, err)
 			continue
 		}
-		
+
 		// Complete most orders
 		if i%4 != 0 { // Complete 75% of orders
 			completeCmd := domain.NewCompleteOrderCommand(orderID)
@@ -521,13 +521,13 @@ func updateProductInfo(ctx context.Context, deps *DemoDependencies) error {
 
 	for _, update := range updates {
 		cmd := domain.NewUpdateProductCommand(update.productID, update.name, update.price, update.category, update.desc)
-		
+
 		_, err := deps.ProductCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			log.Printf("Warning: failed to update product %s: %v", update.productID, err)
 			continue
 		}
-		
+
 		log.Printf("Updated product: %s", update.name)
 	}
 
@@ -560,13 +560,13 @@ func createComplexOrders(ctx context.Context, deps *DemoDependencies) error {
 	for i, order := range complexOrders {
 		orderID := uuid.New().String()
 		cmd := domain.NewCreateOrderCommand(orderID, order.customerID, order.items)
-		
+
 		_, err := deps.OrderCommandHandler.Handle(ctx, cmd)
 		if err != nil {
 			log.Printf("Warning: failed to create complex order %d: %v", i+1, err)
 			continue
 		}
-		
+
 		log.Printf("Created complex order %d with %d items", i+1, len(order.items))
 	}
 
@@ -576,14 +576,14 @@ func createComplexOrders(ctx context.Context, deps *DemoDependencies) error {
 func modifyOrders(ctx context.Context, deps *DemoDependencies) error {
 	// This would modify existing orders by adding/removing items
 	// For demo purposes, we'll just log the operations
-	
+
 	log.Printf("Simulating order modifications...")
-	
+
 	// In a real implementation, you'd:
 	// 1. Get existing order IDs
 	// 2. Add items using AddOrderItemCommand
 	// 3. Remove items using RemoveOrderItemCommand
-	
+
 	log.Printf("Order modifications completed")
 	return nil
 }
@@ -591,14 +591,14 @@ func modifyOrders(ctx context.Context, deps *DemoDependencies) error {
 func processOrders(ctx context.Context, deps *DemoDependencies) error {
 	// This would process existing orders (complete/cancel)
 	// For demo purposes, we'll just log the operations
-	
+
 	log.Printf("Processing orders...")
-	
+
 	// In a real implementation, you'd:
 	// 1. Get existing order IDs
 	// 2. Complete some orders
 	// 3. Cancel some orders
-	
+
 	log.Printf("Order processing completed")
 	return nil
 }

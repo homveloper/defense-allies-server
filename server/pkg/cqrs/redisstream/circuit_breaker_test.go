@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // TestCircuitBreaker_Creation tests circuit breaker creation
@@ -102,7 +102,7 @@ func TestCircuitBreaker_StateTransitions(t *testing.T) {
 	t.Run("should transition from Open to HalfOpen after timeout", func(t *testing.T) {
 		// Create new circuit breaker with short timeout
 		cb, _ := NewCircuitBreaker("test_service", config)
-		
+
 		// Trip the circuit
 		for i := 0; i < 3; i++ {
 			cb.RecordFailure("test error")
@@ -122,12 +122,12 @@ func TestCircuitBreaker_StateTransitions(t *testing.T) {
 
 	t.Run("should transition from HalfOpen to Closed on success", func(t *testing.T) {
 		cb, _ := NewCircuitBreaker("test_service", config)
-		
+
 		// Trip the circuit
 		for i := 0; i < 3; i++ {
 			cb.RecordFailure("test error")
 		}
-		
+
 		// Wait for recovery timeout
 		time.Sleep(150 * time.Millisecond)
 
@@ -141,12 +141,12 @@ func TestCircuitBreaker_StateTransitions(t *testing.T) {
 
 	t.Run("should transition from HalfOpen to Open on failure", func(t *testing.T) {
 		cb, _ := NewCircuitBreaker("test_service", config)
-		
+
 		// Trip the circuit
 		for i := 0; i < 3; i++ {
 			cb.RecordFailure("test error")
 		}
-		
+
 		// Wait for recovery timeout
 		time.Sleep(150 * time.Millisecond)
 
@@ -174,7 +174,7 @@ func TestCircuitBreaker_CallExecution(t *testing.T) {
 			callExecuted = true
 			return nil
 		})
-		
+
 		assert.NoError(t, err)
 		assert.True(t, callExecuted)
 		assert.Equal(t, CircuitBreakerStateClosed, cb.GetState())
@@ -184,7 +184,7 @@ func TestCircuitBreaker_CallExecution(t *testing.T) {
 		err := cb.Call(func() error {
 			return nil
 		})
-		
+
 		assert.NoError(t, err)
 		metrics := cb.GetMetrics()
 		assert.Greater(t, metrics.TotalCalls, int64(0))
@@ -193,14 +193,14 @@ func TestCircuitBreaker_CallExecution(t *testing.T) {
 
 	t.Run("should record failure and update metrics", func(t *testing.T) {
 		initialFailures := cb.GetMetrics().FailedCalls
-		
+
 		err := cb.Call(func() error {
 			return assert.AnError
 		})
-		
+
 		assert.Error(t, err)
 		assert.Equal(t, assert.AnError, err)
-		
+
 		metrics := cb.GetMetrics()
 		assert.Equal(t, initialFailures+1, metrics.FailedCalls)
 	})
@@ -209,10 +209,10 @@ func TestCircuitBreaker_CallExecution(t *testing.T) {
 		err := cb.Call(func() error {
 			panic("test panic")
 		})
-		
+
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "panic")
-		
+
 		// Circuit should record this as a failure
 		metrics := cb.GetMetrics()
 		assert.Greater(t, metrics.FailedCalls, int64(0))
@@ -248,7 +248,7 @@ func TestCircuitBreaker_Metrics(t *testing.T) {
 
 	t.Run("should track state transition metrics", func(t *testing.T) {
 		cb, _ := NewCircuitBreaker("test_service", config)
-		
+
 		// Trip the circuit
 		for i := 0; i < 5; i++ {
 			cb.RecordFailure("test error")
@@ -262,7 +262,7 @@ func TestCircuitBreaker_Metrics(t *testing.T) {
 
 	t.Run("should calculate failure rate correctly", func(t *testing.T) {
 		cb, _ := NewCircuitBreaker("test_service", config)
-		
+
 		// 7 successes, 3 failures = 30% failure rate
 		for i := 0; i < 7; i++ {
 			cb.RecordSuccess()
@@ -320,7 +320,7 @@ func TestCircuitBreaker_EventHandlerIntegration(t *testing.T) {
 		}
 
 		protectedHandler := NewCircuitBreakerProtectedHandler(failingHandler, config)
-		
+
 		baseOptions := cqrs.Options().
 			WithAggregateID("fail-test-123").
 			WithAggregateType("FailTestAggregate")
@@ -334,7 +334,7 @@ func TestCircuitBreaker_EventHandlerIntegration(t *testing.T) {
 		// First two failures should execute
 		err1 := protectedHandler.Handle(context.Background(), event)
 		assert.Error(t, err1)
-		
+
 		err2 := protectedHandler.Handle(context.Background(), event)
 		assert.Error(t, err2)
 
@@ -349,8 +349,8 @@ func TestCircuitBreaker_EventHandlerIntegration(t *testing.T) {
 func TestCircuitBreaker_Configuration(t *testing.T) {
 	t.Run("should handle different failure thresholds", func(t *testing.T) {
 		testCases := []struct {
-			threshold int
-			failures  int
+			threshold  int
+			failures   int
 			shouldOpen bool
 		}{
 			{1, 1, true},
@@ -394,9 +394,9 @@ func TestCircuitBreaker_Configuration(t *testing.T) {
 		config.Monitoring.RecoveryTimeout = shortTimeout
 		cb1, _ := NewCircuitBreaker("test_service_1", config)
 		cb1.RecordFailure("test error")
-		
+
 		time.Sleep(shortTimeout + 10*time.Millisecond)
-		
+
 		// Should allow call after short timeout
 		err := cb1.Call(func() error { return nil })
 		assert.NoError(t, err)
@@ -405,9 +405,9 @@ func TestCircuitBreaker_Configuration(t *testing.T) {
 		config.Monitoring.RecoveryTimeout = longTimeout
 		cb2, _ := NewCircuitBreaker("test_service_2", config)
 		cb2.RecordFailure("test error")
-		
+
 		time.Sleep(shortTimeout) // Wait less than long timeout
-		
+
 		// Should still reject calls
 		err = cb2.Call(func() error { return nil })
 		assert.Error(t, err)
@@ -445,7 +445,7 @@ func TestCircuitBreaker_DisabledMode(t *testing.T) {
 
 	t.Run("should still track metrics when disabled", func(t *testing.T) {
 		initialMetrics := cb.GetMetrics()
-		
+
 		cb.Call(func() error { return nil })
 		cb.Call(func() error { return assert.AnError })
 

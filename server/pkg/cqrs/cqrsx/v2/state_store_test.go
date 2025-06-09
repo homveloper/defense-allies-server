@@ -57,7 +57,7 @@ func TestStateStore_Save(t *testing.T) {
 	// 저장된 상태를 확인
 	loaded, err := store.Load(context.Background(), aggregateID)
 	assert.NoError(t, err)
-	assert.Equal(t, state.AggregateID, loaded.AggregateID)
+	assert.Equal(t, state.string, loaded.string)
 	assert.Equal(t, state.AggregateType, loaded.AggregateType)
 	assert.Equal(t, state.Version, loaded.Version)
 	assert.Equal(t, state.Data, loaded.Data)
@@ -79,7 +79,7 @@ func TestStateStore_Load(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assert.Equal(t, state.AggregateID, loaded.AggregateID)
+	assert.Equal(t, state.string, loaded.string)
 	assert.Equal(t, state.Version, loaded.Version)
 	assert.Equal(t, string(state.Data), string(loaded.Data))
 }
@@ -337,7 +337,7 @@ func TestAggregateState_Validation(t *testing.T) {
 		{
 			name: "Valid state",
 			state: &AggregateState{
-				AggregateID:   uuid.New(),
+				string:        uuid.New(),
 				AggregateType: "TestAggregate",
 				Version:       1,
 				Data:          []byte("test"),
@@ -349,7 +349,7 @@ func TestAggregateState_Validation(t *testing.T) {
 		{
 			name: "Invalid aggregate ID",
 			state: &AggregateState{
-				AggregateID:   uuid.Nil,
+				string:        uuid.Nil,
 				AggregateType: "TestAggregate",
 				Version:       1,
 				Data:          []byte("test"),
@@ -360,7 +360,7 @@ func TestAggregateState_Validation(t *testing.T) {
 		{
 			name: "Empty aggregate type",
 			state: &AggregateState{
-				AggregateID:   uuid.New(),
+				string:        uuid.New(),
 				AggregateType: "",
 				Version:       1,
 				Data:          []byte("test"),
@@ -371,7 +371,7 @@ func TestAggregateState_Validation(t *testing.T) {
 		{
 			name: "Negative version",
 			state: &AggregateState{
-				AggregateID:   uuid.New(),
+				string:        uuid.New(),
 				AggregateType: "TestAggregate",
 				Version:       -1,
 				Data:          []byte("test"),

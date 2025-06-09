@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // SerializationFormat represents different serialization formats
@@ -36,7 +36,7 @@ type SerializationRegistry interface {
 type SerializedEventData struct {
 	EventID       string                 `json:"event_id"`
 	EventType     string                 `json:"event_type"`
-	AggregateID   string                 `json:"aggregate_id"`
+	string        string                 `json:"aggregate_id"`
 	AggregateType string                 `json:"aggregate_type"`
 	Version       int                    `json:"version"`
 	EventData     interface{}            `json:"event_data"`
@@ -79,7 +79,7 @@ func (s *JSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error)
 	serializedData := &SerializedEventData{
 		EventID:              event.EventID(),
 		EventType:            event.EventType(),
-		AggregateID:          event.ID(),
+		string:               event.ID(),
 		AggregateType:        event.Type(),
 		Version:              event.Version(),
 		EventData:            event.EventData(),
@@ -128,7 +128,7 @@ func (s *JSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error
 	// Create base event options
 	baseOptions := cqrs.Options().
 		WithEventID(serializedData.EventID).
-		WithAggregateID(serializedData.AggregateID).
+		WithAggregateID(serializedData.string).
 		WithAggregateType(serializedData.AggregateType).
 		WithVersion(serializedData.Version).
 		WithTimestamp(serializedData.Timestamp).
@@ -199,7 +199,7 @@ func (s *JSONEventSerializer) validateSerializedData(data *SerializedEventData) 
 	if data.EventType == "" {
 		return fmt.Errorf("event_type is required")
 	}
-	if data.AggregateID == "" {
+	if data.string == "" {
 		return fmt.Errorf("aggregate_id is required")
 	}
 	if data.AggregateType == "" {

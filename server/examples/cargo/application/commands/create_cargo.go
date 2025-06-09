@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 
 	"github.com/google/uuid"
 )

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/guild/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // GuildView represents a read model for guild data

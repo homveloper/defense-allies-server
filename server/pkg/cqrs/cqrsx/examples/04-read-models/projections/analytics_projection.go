@@ -2,9 +2,9 @@ package projections
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/readmodels"
+	"cqrs"
+	"cqrs/cqrsx/examples/04-read-models/domain"
+	"cqrs/cqrsx/examples/04-read-models/readmodels"
 	"fmt"
 	"log"
 	"time"

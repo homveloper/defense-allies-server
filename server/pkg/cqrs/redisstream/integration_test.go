@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // IntegrationTestSuite runs comprehensive integration tests
@@ -60,7 +60,7 @@ func TestIntegrationTestSuite(t *testing.T) {
 // testFullSystemIntegration tests all components working together
 func testFullSystemIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	// Setup configuration with all features enabled
 	config := testContainer.config
 	config.Stream.EnablePriorityStreams = true
@@ -133,7 +133,7 @@ func testFullSystemIntegration(t *testing.T, testContainer *TestRedisContainer) 
 
 	// Test scenario: Publish events with different priorities
 	priorities := []cqrs.EventPriority{cqrs.Critical, cqrs.High, cqrs.Normal, cqrs.Low}
-	
+
 	for i, priority := range priorities {
 		baseOptions := cqrs.Options().
 			WithAggregateID(fmt.Sprintf("integration-test-%d", i)).
@@ -155,7 +155,7 @@ func testFullSystemIntegration(t *testing.T, testContainer *TestRedisContainer) 
 
 		err := eventBus.Publish(ctx, event)
 		require.NoError(t, err)
-		
+
 		time.Sleep(100 * time.Millisecond) // Allow processing
 	}
 
@@ -164,7 +164,7 @@ func testFullSystemIntegration(t *testing.T, testContainer *TestRedisContainer) 
 
 	// Verify results
 	assert.Greater(t, successHandler.GetProcessedCount(), 0, "Success handler should have processed events")
-	
+
 	// Check EventBus metrics
 	busMetrics := eventBus.GetMetrics()
 	assert.Greater(t, busMetrics.PublishedEvents, int64(0))
@@ -196,7 +196,7 @@ func testFullSystemIntegration(t *testing.T, testContainer *TestRedisContainer) 
 // testSerializationIntegration tests serialization with complex data
 func testSerializationIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	// Test different serialization formats
 	serializers := map[string]EventSerializer{
 		"json": NewJSONEventSerializer(),
@@ -217,21 +217,21 @@ func testSerializationIntegration(t *testing.T, testContainer *TestRedisContaine
 					"id":   "user-123",
 					"name": "Complex User",
 					"profile": map[string]interface{}{
-						"age":        30,
+						"age":         30,
 						"preferences": []string{"tech", "gaming", "music"},
 						"metadata": map[string]interface{}{
-							"last_login":    time.Now().Format(time.RFC3339),
-							"login_count":   42,
-							"premium_user":  true,
-							"balance":       123.45,
+							"last_login":   time.Now().Format(time.RFC3339),
+							"login_count":  42,
+							"premium_user": true,
+							"balance":      123.45,
 						},
 					},
 				},
 				"action": map[string]interface{}{
-					"type":        "profile_update",
-					"timestamp":   time.Now().Unix(),
-					"changes":     []string{"email", "preferences"},
-					"ip_address":  "192.168.1.100",
+					"type":       "profile_update",
+					"timestamp":  time.Now().Unix(),
+					"changes":    []string{"email", "preferences"},
+					"ip_address": "192.168.1.100",
 				},
 			}
 
@@ -270,7 +270,7 @@ func testSerializationIntegration(t *testing.T, testContainer *TestRedisContaine
 			// Verify complex data was preserved
 			processedEvent := testHandler.GetLastProcessedEvent()
 			assert.NotNil(t, processedEvent)
-			
+
 			processedData := processedEvent.EventData().(map[string]interface{})
 			user := processedData["user"].(map[string]interface{})
 			assert.Equal(t, "Complex User", user["name"])
@@ -281,7 +281,7 @@ func testSerializationIntegration(t *testing.T, testContainer *TestRedisContaine
 // testPriorityStreamIntegration tests priority stream functionality
 func testPriorityStreamIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	config := testContainer.config
 	config.Stream.EnablePriorityStreams = true
 
@@ -354,7 +354,7 @@ func testPriorityStreamIntegration(t *testing.T, testContainer *TestRedisContain
 // testDLQIntegration tests DLQ functionality
 func testDLQIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	config := testContainer.config
 	config.Stream.DLQEnabled = true
 	config.Retry.MaxAttempts = 2
@@ -416,7 +416,7 @@ func testDLQIntegration(t *testing.T, testContainer *TestRedisContainer) {
 // testRetryPolicyIntegration tests retry policy functionality
 func testRetryPolicyIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	config := testContainer.config
 	config.Retry.MaxAttempts = 3
 	config.Retry.InitialDelay = 50 * time.Millisecond
@@ -466,7 +466,7 @@ func testRetryPolicyIntegration(t *testing.T, testContainer *TestRedisContainer)
 // testCircuitBreakerIntegration tests circuit breaker functionality
 func testCircuitBreakerIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	config := testContainer.config
 	config.Monitoring.CircuitBreakerEnabled = true
 	config.Monitoring.FailureThreshold = 2
@@ -512,7 +512,7 @@ func testCircuitBreakerIntegration(t *testing.T, testContainer *TestRedisContain
 // testHealthCheckIntegration tests health check functionality
 func testHealthCheckIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	config := testContainer.config
 	config.Monitoring.HealthCheckInterval = 100 * time.Millisecond
 
@@ -521,7 +521,7 @@ func testHealthCheckIntegration(t *testing.T, testContainer *TestRedisContainer)
 
 	// Add various health checks
 	healthChecker.AddCheck("redis", NewRedisHealthCheck(testContainer.client))
-	
+
 	healthChecker.AddCheck("custom_healthy", NewCustomHealthCheck("custom_healthy", func(ctx context.Context) HealthCheckResult {
 		return HealthCheckResult{
 			Status:  HealthStatusHealthy,
@@ -538,7 +538,7 @@ func testHealthCheckIntegration(t *testing.T, testContainer *TestRedisContainer)
 
 	// Perform health check
 	summary := healthChecker.CheckHealth(ctx)
-	
+
 	assert.Equal(t, HealthStatusDegraded, summary.OverallStatus) // Worst of all checks
 	assert.Len(t, summary.Checks, 3)
 	assert.Equal(t, HealthStatusHealthy, summary.Checks["redis"].Status)
@@ -561,7 +561,7 @@ func testHealthCheckIntegration(t *testing.T, testContainer *TestRedisContainer)
 // testPerformanceIntegration tests system performance under load
 func testPerformanceIntegration(t *testing.T, testContainer *TestRedisContainer) {
 	ctx := context.Background()
-	
+
 	config := testContainer.config
 	config.Stream.EnablePriorityStreams = true
 
@@ -592,7 +592,7 @@ func testPerformanceIntegration(t *testing.T, testContainer *TestRedisContainer)
 	// Publish events in batches
 	for batch := 0; batch < numEvents/batchSize; batch++ {
 		events := make([]cqrs.EventMessage, batchSize)
-		
+
 		for i := 0; i < batchSize; i++ {
 			eventIndex := batch*batchSize + i
 			baseOptions := cqrs.Options().
@@ -649,20 +649,20 @@ func testPerformanceIntegration(t *testing.T, testContainer *TestRedisContainer)
 
 type IntegrationTestHandler struct {
 	*cqrs.BaseEventHandler
-	processedEvents   []cqrs.EventMessage
-	processedCount    int
-	shouldFail        bool
-	mu               sync.RWMutex
+	processedEvents []cqrs.EventMessage
+	processedCount  int
+	shouldFail      bool
+	mu              sync.RWMutex
 }
 
 func (h *IntegrationTestHandler) Handle(ctx context.Context, event cqrs.EventMessage) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	
+
 	if h.shouldFail {
 		return fmt.Errorf("intentional failure for event %s", event.EventID())
 	}
-	
+
 	h.processedEvents = append(h.processedEvents, event)
 	h.processedCount++
 	return nil
@@ -692,12 +692,12 @@ type PriorityAwareHandler struct {
 func (h *PriorityAwareHandler) Handle(ctx context.Context, event cqrs.EventMessage) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	
+
 	if domainEvent, ok := event.(cqrs.DomainEventMessage); ok {
 		priority := domainEvent.GetPriority()
 		h.processedByPriority[priority]++
 	}
-	
+
 	return nil
 }
 
@@ -721,13 +721,13 @@ func (h *PriorityAwareHandler) GetProcessedCountByPriority(priority cqrs.EventPr
 
 type PerformanceTestHandler struct {
 	processedEvents map[string]int
-	mu             sync.RWMutex
+	mu              sync.RWMutex
 }
 
 func (h *PerformanceTestHandler) Handle(ctx context.Context, event cqrs.EventMessage) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	
+
 	h.processedEvents[event.EventType()]++
 	return nil
 }
@@ -747,7 +747,7 @@ func (h *PerformanceTestHandler) GetHandlerType() cqrs.HandlerType {
 func (h *PerformanceTestHandler) GetTotalProcessed() int {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
-	
+
 	total := 0
 	for _, count := range h.processedEvents {
 		total += count

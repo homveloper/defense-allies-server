@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"cqrs"
 	"defense-allies-server/examples/cargo/application/commands"
 	"defense-allies-server/examples/cargo/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // CargoCommandHandler handles cargo-related commands

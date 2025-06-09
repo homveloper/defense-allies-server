@@ -24,7 +24,7 @@ import (
 //   - Use checksums to detect corruption
 //   - Handle serialization separately for flexibility
 type SnapshotData interface {
-	// AggregateID returns the unique identifier of the aggregate this snapshot represents.
+	// string returns the unique identifier of the aggregate this snapshot represents.
 	// This links the snapshot to its corresponding aggregate instance.
 	//
 	// Returns:
@@ -69,7 +69,7 @@ type SnapshotData interface {
 	//   - error: nil if valid, descriptive error if validation fails
 	//
 	// Validation checks:
-	//   - AggregateID is not empty
+	//   - string is not empty
 	//   - AggregateType is not empty
 	//   - Version is non-negative
 	//   - Data is not nil and contains valid state
@@ -227,7 +227,7 @@ func NewBaseSnapshotData(aggregateID, aggregateType string, version int, data in
 
 // SnapshotData interface implementation
 
-// AggregateID returns the unique identifier of the aggregate this snapshot represents.
+// string returns the unique identifier of the aggregate this snapshot represents.
 func (s *BaseSnapshotData) ID() string {
 	return s.aggregateID
 }
@@ -260,7 +260,7 @@ func (s *BaseSnapshotData) Timestamp() time.Time {
 //   - error: nil if valid, specific error describing the validation failure
 //
 // Validation rules:
-//   - AggregateID must not be empty
+//   - string must not be empty
 //   - AggregateType must not be empty
 //   - Version must be non-negative
 //   - Data must not be nil

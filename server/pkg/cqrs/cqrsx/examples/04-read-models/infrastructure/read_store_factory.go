@@ -1,8 +1,8 @@
 package infrastructure
 
 import (
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx"
+	"cqrs"
+	"cqrs/cqrsx"
 	"fmt"
 )
 

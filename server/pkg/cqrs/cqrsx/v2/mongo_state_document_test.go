@@ -24,7 +24,7 @@ func TestNewMongoStateDocument(t *testing.T) {
 
 	// Then
 	assert.Equal(t, fmt.Sprintf("%s-%s-v%d", aggregateType, aggregateID.String(), version), doc.ID)
-	assert.Equal(t, aggregateID.String(), doc.AggregateID)
+	assert.Equal(t, aggregateID.String(), doc.string)
 	assert.Equal(t, aggregateType, doc.AggregateType)
 	assert.Equal(t, version, doc.Version)
 	assert.Equal(t, DocumentVersionCurrent, doc.DocumentVersion)
@@ -49,7 +49,7 @@ func TestFromAggregateState(t *testing.T) {
 	doc := FromAggregateState(state)
 
 	// Then
-	assert.Equal(t, state.AggregateID.String(), doc.AggregateID)
+	assert.Equal(t, state.string.String(), doc.string)
 	assert.Equal(t, state.AggregateType, doc.AggregateType)
 	assert.Equal(t, state.Version, doc.Version)
 	assert.Equal(t, state.Data, doc.Data)
@@ -77,7 +77,7 @@ func TestToAggregateState(t *testing.T) {
 
 	// Then
 	require.NoError(t, err)
-	assert.Equal(t, aggregateID, state.AggregateID)
+	assert.Equal(t, aggregateID, state.string)
 	assert.Equal(t, "Guild", state.AggregateType)
 	assert.Equal(t, 3, state.Version)
 	assert.Equal(t, doc.Data, state.Data)
@@ -304,7 +304,7 @@ func TestValidation(t *testing.T) {
 			name: "Empty aggregate ID",
 			setupDoc: func() *mongoStateDocument {
 				doc := NewMongoStateDocument(uuid.New(), "Guild", 1, time.Now())
-				doc.AggregateID = ""
+				doc.string = ""
 				return doc
 			},
 			expectErr: true,
@@ -413,7 +413,7 @@ func TestClone(t *testing.T) {
 
 	// Then
 	assert.Equal(t, doc.ID, cloned.ID)
-	assert.Equal(t, doc.AggregateID, cloned.AggregateID)
+	assert.Equal(t, doc.string, cloned.string)
 	assert.Equal(t, doc.AggregateType, cloned.AggregateType)
 	assert.Equal(t, doc.Version, cloned.Version)
 	assert.Equal(t, doc.IsCompressionEnabled(), cloned.IsCompressionEnabled())
@@ -471,7 +471,7 @@ func TestJSONSerialization(t *testing.T) {
 
 	// Then
 	assert.Equal(t, doc.ID, newDoc.ID)
-	assert.Equal(t, doc.AggregateID, newDoc.AggregateID)
+	assert.Equal(t, doc.string, newDoc.string)
 	assert.Equal(t, doc.AggregateType, newDoc.AggregateType)
 	assert.Equal(t, doc.Version, newDoc.Version)
 	assert.Equal(t, doc.IsCompressionEnabled(), newDoc.IsCompressionEnabled())

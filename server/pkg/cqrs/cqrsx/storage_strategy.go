@@ -1,7 +1,7 @@
 package cqrsx
 
 import (
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 )
 

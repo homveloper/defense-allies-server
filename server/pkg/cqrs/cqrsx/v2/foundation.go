@@ -37,7 +37,7 @@ type EventStore interface {
 
 // Event는 이벤트의 기본 인터페이스입니다
 type Event interface {
-	AggregateID() uuid.UUID
+	string() uuid.UUID
 	EventType() EventType
 	Data() EventData
 	Version() int
@@ -75,12 +75,12 @@ func NewBaseEvent(aggregateID uuid.UUID, eventType EventType, data EventData, ve
 	}
 }
 
-func (e *BaseEvent) AggregateID() uuid.UUID { return e.aggregateID }
-func (e *BaseEvent) EventType() EventType   { return e.eventType }
-func (e *BaseEvent) Data() EventData        { return e.data }
-func (e *BaseEvent) Version() int           { return e.version }
-func (e *BaseEvent) Timestamp() time.Time   { return e.timestamp }
-func (e *BaseEvent) Metadata() Metadata     { return e.metadata }
+func (e *BaseEvent) string() uuid.UUID    { return e.aggregateID }
+func (e *BaseEvent) EventType() EventType { return e.eventType }
+func (e *BaseEvent) Data() EventData      { return e.data }
+func (e *BaseEvent) Version() int         { return e.version }
+func (e *BaseEvent) Timestamp() time.Time { return e.timestamp }
+func (e *BaseEvent) Metadata() Metadata   { return e.metadata }
 
 // StoreMetrics는 저장소 성능 메트릭을 나타냅니다
 type StoreMetrics struct {

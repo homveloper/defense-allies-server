@@ -58,7 +58,7 @@ type mongoStateDocument struct {
 
 	// 집합체의 고유 식별자 (UUID 문자열)
 	// 예시: "123e4567-e89b-12d3-a456-426614174000"
-	AggregateID string `bson:"aggregateId" json:"aggregateId"`
+	string string `bson:"aggregateId" json:"aggregateId"`
 
 	// 집합체의 타입 (도메인 엔티티 이름)
 	// 예시: "Guild", "User", "Order"

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/cargo/domain/events"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // CargoStatus represents the current status of cargo

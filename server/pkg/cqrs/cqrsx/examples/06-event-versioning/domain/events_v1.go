@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // V1 이벤트들 - 초기 버전 (기본 필드만 포함)

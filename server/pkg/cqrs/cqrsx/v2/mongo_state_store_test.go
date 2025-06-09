@@ -155,7 +155,7 @@ func TestMongoStateStore_Save(t *testing.T) {
 			name: "Invalid state - nil UUID",
 			setupState: func() *AggregateState {
 				state := createTestMongoState(uuid.New(), 1)
-				state.AggregateID = uuid.Nil
+				state.string = uuid.Nil
 				return state
 			},
 			expectError:   true,
@@ -205,7 +205,7 @@ func TestMongoStateStore_Save(t *testing.T) {
 				assert.NoError(t, err)
 
 				// 저장 성공 시 실제로 저장되었는지 확인
-				exists, err := store.Exists(ctx, state.AggregateID, state.Version)
+				exists, err := store.Exists(ctx, state.string, state.Version)
 				assert.NoError(t, err)
 				assert.True(t, exists)
 			}
@@ -266,7 +266,7 @@ func TestMongoStateStore_Load(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, loadedState)
-				assert.Equal(t, tt.aggregateID, loadedState.AggregateID)
+				assert.Equal(t, tt.aggregateID, loadedState.string)
 				assert.Equal(t, tt.expectedVersion, loadedState.Version)
 				assert.Equal(t, "TestEntity", loadedState.AggregateType)
 
@@ -346,7 +346,7 @@ func TestMongoStateStore_LoadVersion(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, loadedState)
-				assert.Equal(t, tt.aggregateID, loadedState.AggregateID)
+				assert.Equal(t, tt.aggregateID, loadedState.string)
 				assert.Equal(t, tt.version, loadedState.Version)
 				assert.Equal(t, "TestEntity", loadedState.AggregateType)
 
@@ -521,7 +521,7 @@ func TestMongoStateStore_List(t *testing.T) {
 				expectedVersions := []int{1, 2, 3, 5, 7}
 				for i, state := range states {
 					assert.Equal(t, expectedVersions[i], state.Version)
-					assert.Equal(t, tt.aggregateID, state.AggregateID)
+					assert.Equal(t, tt.aggregateID, state.string)
 					assert.Equal(t, "TestEntity", state.AggregateType)
 				}
 			}
@@ -702,7 +702,7 @@ func TestMongoStateStore_CRUD_Integration(t *testing.T) {
 	// 4. 로드 테스트
 	loadedState, err := store.Load(ctx, aggregateID)
 	assert.NoError(t, err)
-	assert.Equal(t, state1.AggregateID, loadedState.AggregateID)
+	assert.Equal(t, state1.string, loadedState.string)
 	assert.Equal(t, state1.Version, loadedState.Version)
 	assert.Equal(t, state1.Data, loadedState.Data)
 

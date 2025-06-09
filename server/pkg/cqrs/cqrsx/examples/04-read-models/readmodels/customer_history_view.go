@@ -2,7 +2,7 @@ package readmodels
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -23,22 +23,22 @@ type OrderHistoryItem struct {
 // CustomerOrderHistoryView represents a denormalized view of customer order history
 type CustomerOrderHistoryView struct {
 	*cqrs.BaseReadModel
-	CustomerID       string             `json:"customer_id"`
-	CustomerName     string             `json:"customer_name"`
-	CustomerEmail    string             `json:"customer_email"`
-	Orders           []OrderHistoryItem `json:"orders"`
-	TotalOrders      int                `json:"total_orders"`
-	CompletedOrders  int                `json:"completed_orders"`
-	CancelledOrders  int                `json:"cancelled_orders"`
-	TotalSpent       decimal.Decimal    `json:"total_spent"`
-	AverageOrder     decimal.Decimal    `json:"average_order"`
-	LastOrderDate    *time.Time         `json:"last_order_date,omitempty"`
-	FirstOrderDate   *time.Time         `json:"first_order_date,omitempty"`
-	Tags             []string           `json:"tags"` // VIP, Frequent, etc.
-	CustomerTier     string             `json:"customer_tier"`
-	IsActive         bool               `json:"is_active"`
-	CreatedAt        time.Time          `json:"created_at"`
-	UpdatedAt        time.Time          `json:"updated_at"`
+	CustomerID      string             `json:"customer_id"`
+	CustomerName    string             `json:"customer_name"`
+	CustomerEmail   string             `json:"customer_email"`
+	Orders          []OrderHistoryItem `json:"orders"`
+	TotalOrders     int                `json:"total_orders"`
+	CompletedOrders int                `json:"completed_orders"`
+	CancelledOrders int                `json:"cancelled_orders"`
+	TotalSpent      decimal.Decimal    `json:"total_spent"`
+	AverageOrder    decimal.Decimal    `json:"average_order"`
+	LastOrderDate   *time.Time         `json:"last_order_date,omitempty"`
+	FirstOrderDate  *time.Time         `json:"first_order_date,omitempty"`
+	Tags            []string           `json:"tags"` // VIP, Frequent, etc.
+	CustomerTier    string             `json:"customer_tier"`
+	IsActive        bool               `json:"is_active"`
+	CreatedAt       time.Time          `json:"created_at"`
+	UpdatedAt       time.Time          `json:"updated_at"`
 }
 
 // NewCustomerOrderHistoryView creates a new CustomerOrderHistoryView
@@ -114,9 +114,9 @@ func (chv *CustomerOrderHistoryView) recalculateStats() {
 	chv.CompletedOrders = 0
 	chv.CancelledOrders = 0
 	chv.TotalSpent = decimal.Zero
-	
+
 	var firstOrderDate, lastOrderDate *time.Time
-	
+
 	for _, order := range chv.Orders {
 		switch order.Status {
 		case "completed":
@@ -125,7 +125,7 @@ func (chv *CustomerOrderHistoryView) recalculateStats() {
 		case "cancelled":
 			chv.CancelledOrders++
 		}
-		
+
 		// Track first and last order dates
 		if firstOrderDate == nil || order.OrderDate.Before(*firstOrderDate) {
 			firstOrderDate = &order.OrderDate
@@ -134,20 +134,20 @@ func (chv *CustomerOrderHistoryView) recalculateStats() {
 			lastOrderDate = &order.OrderDate
 		}
 	}
-	
+
 	chv.FirstOrderDate = firstOrderDate
 	chv.LastOrderDate = lastOrderDate
-	
+
 	// Calculate average order value
 	if chv.CompletedOrders > 0 {
 		chv.AverageOrder = chv.TotalSpent.Div(decimal.NewFromInt(int64(chv.CompletedOrders)))
 	} else {
 		chv.AverageOrder = decimal.Zero
 	}
-	
+
 	// Update customer tier
 	chv.updateCustomerTier()
-	
+
 	// Update active status (ordered within 30 days)
 	chv.updateActiveStatus()
 }
@@ -171,7 +171,7 @@ func (chv *CustomerOrderHistoryView) updateActiveStatus() {
 		chv.IsActive = false
 		return
 	}
-	
+
 	thirtyDaysAgo := time.Now().AddDate(0, 0, -30)
 	chv.IsActive = chv.LastOrderDate.After(thirtyDaysAgo)
 }
@@ -179,27 +179,27 @@ func (chv *CustomerOrderHistoryView) updateActiveStatus() {
 // updateTags updates customer tags based on behavior
 func (chv *CustomerOrderHistoryView) updateTags() {
 	chv.Tags = make([]string, 0)
-	
+
 	// VIP tag
 	if chv.TotalSpent.GreaterThan(decimal.NewFromInt(1000)) {
 		chv.Tags = append(chv.Tags, "VIP")
 	}
-	
+
 	// Frequent customer tag (more than 10 orders)
 	if chv.TotalOrders > 10 {
 		chv.Tags = append(chv.Tags, "Frequent")
 	}
-	
+
 	// High value tag (average order > $100)
 	if chv.AverageOrder.GreaterThan(decimal.NewFromInt(100)) {
 		chv.Tags = append(chv.Tags, "HighValue")
 	}
-	
+
 	// Active tag
 	if chv.IsActive {
 		chv.Tags = append(chv.Tags, "Active")
 	}
-	
+
 	// New customer tag (first order within 30 days)
 	if chv.FirstOrderDate != nil {
 		thirtyDaysAgo := time.Now().AddDate(0, 0, -30)
@@ -287,26 +287,26 @@ func (chv *CustomerOrderHistoryView) IncrementVersion() {
 func (chv *CustomerOrderHistoryView) GetRecentOrders(days int) []OrderHistoryItem {
 	cutoffDate := time.Now().AddDate(0, 0, -days)
 	recentOrders := make([]OrderHistoryItem, 0)
-	
+
 	for _, order := range chv.Orders {
 		if order.OrderDate.After(cutoffDate) {
 			recentOrders = append(recentOrders, order)
 		}
 	}
-	
+
 	return recentOrders
 }
 
 // GetOrdersByStatus returns orders with specific status
 func (chv *CustomerOrderHistoryView) GetOrdersByStatus(status string) []OrderHistoryItem {
 	filteredOrders := make([]OrderHistoryItem, 0)
-	
+
 	for _, order := range chv.Orders {
 		if order.Status == status {
 			filteredOrders = append(filteredOrders, order)
 		}
 	}
-	
+
 	return filteredOrders
 }
 
@@ -348,22 +348,22 @@ func (chv *CustomerOrderHistoryView) Validate() error {
 type CustomerOrderHistoryViewRepository interface {
 	// Save saves a CustomerOrderHistoryView
 	Save(ctx context.Context, historyView *CustomerOrderHistoryView) error
-	
+
 	// GetByID retrieves a CustomerOrderHistoryView by customer ID
 	GetByID(ctx context.Context, customerID string) (*CustomerOrderHistoryView, error)
-	
+
 	// GetByTier retrieves CustomerOrderHistoryViews by tier
 	GetByTier(ctx context.Context, tier string) ([]*CustomerOrderHistoryView, error)
-	
+
 	// GetByTag retrieves CustomerOrderHistoryViews by tag
 	GetByTag(ctx context.Context, tag string) ([]*CustomerOrderHistoryView, error)
-	
+
 	// GetActiveCustomers retrieves active customers
 	GetActiveCustomers(ctx context.Context) ([]*CustomerOrderHistoryView, error)
-	
+
 	// GetTopCustomers retrieves top customers by total spent
 	GetTopCustomers(ctx context.Context, limit int) ([]*CustomerOrderHistoryView, error)
-	
+
 	// Delete removes a CustomerOrderHistoryView
 	Delete(ctx context.Context, customerID string) error
 }

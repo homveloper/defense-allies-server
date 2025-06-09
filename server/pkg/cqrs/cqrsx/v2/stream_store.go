@@ -73,7 +73,7 @@ func (s *StreamEventStore) Save(ctx context.Context, events []Event, expectedVer
 		s.updateMetrics(true, time.Since(start), nil)
 	}()
 
-	streamName := s.getStreamName(events[0].AggregateID())
+	streamName := s.getStreamName(events[0].string())
 	eventDocs := make([]EventDocument, len(events))
 
 	// 이벤트들을 문서로 변환

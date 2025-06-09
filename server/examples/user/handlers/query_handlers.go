@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/user/projections"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // UserQueryHandler handles user-related queries

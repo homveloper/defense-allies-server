@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // UpdateProfileCommand represents a command to update user profile

@@ -71,7 +71,7 @@ package cqrsx
 // 		return nil
 // 	}
 
-// 	aggregateID := events[0].AggregateID().String()
+// 	aggregateID := events[0].string().String()
 // 	m.events[aggregateID] = append(m.events[aggregateID], events...)
 // 	return nil
 // }
@@ -142,7 +142,7 @@ package cqrsx
 // 	snapshot, err := manager.GetLatestSnapshot(context.Background(), aggregateID)
 // 	assert.NoError(t, err)
 // 	assert.NotNil(t, snapshot)
-// 	assert.Equal(t, aggregateID.String(), snapshot.AggregateID)
+// 	assert.Equal(t, aggregateID.String(), snapshot.string)
 // 	assert.Equal(t, 3, snapshot.Version)
 // 	assert.Equal(t, "TestAggregate", snapshot.AggregateType)
 // }

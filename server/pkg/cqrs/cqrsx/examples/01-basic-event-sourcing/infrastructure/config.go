@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs/cqrsx"
+	"cqrs/cqrsx"
 	"fmt"
 	"log"
 	"time"

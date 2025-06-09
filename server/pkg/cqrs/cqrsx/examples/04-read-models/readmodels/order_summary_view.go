@@ -2,7 +2,7 @@ package readmodels
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -20,21 +20,21 @@ type OrderItemView struct {
 // OrderSummaryView represents an order read model with calculated totals
 type OrderSummaryView struct {
 	*cqrs.BaseReadModel
-	CustomerID     string            `json:"customer_id"`
-	CustomerName   string            `json:"customer_name"`
-	CustomerEmail  string            `json:"customer_email"`
-	Items          []OrderItemView   `json:"items"`
-	SubTotal       decimal.Decimal   `json:"sub_total"`
-	TaxAmount      decimal.Decimal   `json:"tax_amount"`
-	DiscountAmount decimal.Decimal   `json:"discount_amount"`
-	TotalAmount    decimal.Decimal   `json:"total_amount"`
-	Status         string            `json:"status"`
-	OrderDate      time.Time         `json:"order_date"`
-	CompletedAt    *time.Time        `json:"completed_at,omitempty"`
-	CancelledAt    *time.Time        `json:"cancelled_at,omitempty"`
-	CancelReason   string            `json:"cancel_reason,omitempty"`
-	CreatedAt      time.Time         `json:"created_at"`
-	UpdatedAt      time.Time         `json:"updated_at"`
+	CustomerID     string          `json:"customer_id"`
+	CustomerName   string          `json:"customer_name"`
+	CustomerEmail  string          `json:"customer_email"`
+	Items          []OrderItemView `json:"items"`
+	SubTotal       decimal.Decimal `json:"sub_total"`
+	TaxAmount      decimal.Decimal `json:"tax_amount"`
+	DiscountAmount decimal.Decimal `json:"discount_amount"`
+	TotalAmount    decimal.Decimal `json:"total_amount"`
+	Status         string          `json:"status"`
+	OrderDate      time.Time       `json:"order_date"`
+	CompletedAt    *time.Time      `json:"completed_at,omitempty"`
+	CancelledAt    *time.Time      `json:"cancelled_at,omitempty"`
+	CancelReason   string          `json:"cancel_reason,omitempty"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
 }
 
 // NewOrderSummaryView creates a new OrderSummaryView
@@ -118,11 +118,11 @@ func (osv *OrderSummaryView) recalculateTotals() {
 	for _, item := range osv.Items {
 		osv.SubTotal = osv.SubTotal.Add(item.SubTotal)
 	}
-	
+
 	// Calculate tax (10% tax rate)
 	taxRate := decimal.NewFromFloat(0.1)
 	osv.TaxAmount = osv.SubTotal.Mul(taxRate)
-	
+
 	// Calculate total
 	osv.TotalAmount = osv.SubTotal.Add(osv.TaxAmount).Sub(osv.DiscountAmount)
 }
@@ -254,22 +254,22 @@ func (osv *OrderSummaryView) Validate() error {
 type OrderSummaryViewRepository interface {
 	// Save saves an OrderSummaryView
 	Save(ctx context.Context, orderView *OrderSummaryView) error
-	
+
 	// GetByID retrieves an OrderSummaryView by ID
 	GetByID(ctx context.Context, orderID string) (*OrderSummaryView, error)
-	
+
 	// GetByCustomerID retrieves OrderSummaryViews by customer ID
 	GetByCustomerID(ctx context.Context, customerID string) ([]*OrderSummaryView, error)
-	
+
 	// GetByStatus retrieves OrderSummaryViews by status
 	GetByStatus(ctx context.Context, status string) ([]*OrderSummaryView, error)
-	
+
 	// GetByDateRange retrieves OrderSummaryViews within date range
 	GetByDateRange(ctx context.Context, startDate, endDate time.Time) ([]*OrderSummaryView, error)
-	
+
 	// GetRecentOrders retrieves recent orders (last N orders)
 	GetRecentOrders(ctx context.Context, limit int) ([]*OrderSummaryView, error)
-	
+
 	// Delete removes an OrderSummaryView
 	Delete(ctx context.Context, orderID string) error
 }

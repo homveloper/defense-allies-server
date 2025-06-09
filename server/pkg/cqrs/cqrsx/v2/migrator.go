@@ -204,7 +204,7 @@ func (m *EventStoreMigrator) collectStreams(ctx context.Context) ([]uuid.UUID, e
 		// 고유한 집합체 ID 수집
 		streamMap := make(map[uuid.UUID]bool)
 		for _, event := range events {
-			streamMap[event.AggregateID()] = true
+			streamMap[event.string()] = true
 		}
 
 		streams := make([]uuid.UUID, 0, len(streamMap))

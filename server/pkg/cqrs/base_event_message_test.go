@@ -16,7 +16,7 @@ func TestNewBaseEventMessage(t *testing.T) {
 	eventData := "test data"
 
 	// Act
-	event := NewBaseEventMessage(eventType, aggregateID, aggregateType, version, eventData)
+	event := NewBaseEventMessage(eventType, eventData)
 
 	// Assert
 	assert.NotNil(t, event)
@@ -32,7 +32,7 @@ func TestNewBaseEventMessage(t *testing.T) {
 
 func TestBaseEventMessage_Metadata(t *testing.T) {
 	// Arrange
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 
 	// Act & Assert - Add metadata
 	event.AddMetadata("key1", "value1")
@@ -55,7 +55,7 @@ func TestBaseEventMessage_Metadata(t *testing.T) {
 
 func TestBaseEventMessage_SetTimestamp(t *testing.T) {
 	// Arrange
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 	newTimestamp := time.Now().Add(-1 * time.Hour)
 
 	// Act
@@ -67,7 +67,7 @@ func TestBaseEventMessage_SetTimestamp(t *testing.T) {
 
 func TestBaseEventMessage_SetEventID(t *testing.T) {
 	// Arrange
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 	newEventID := "custom-event-id"
 
 	// Act
@@ -86,7 +86,9 @@ func TestNewBaseDomainEvent(t *testing.T) {
 	eventData := "test data"
 
 	// Act
-	event := NewBaseDomainEventMessage(eventType, aggregateID, aggregateType, version, eventData)
+	event := NewBaseDomainEventMessage(eventType, eventData, []*BaseEventMessageOptions{
+		Options().WithAggregateID(aggregateID).WithAggregateType(aggregateType).WithVersion(version),
+	})
 
 	// Assert
 	assert.NotNil(t, event)
@@ -99,7 +101,7 @@ func TestNewBaseDomainEvent(t *testing.T) {
 
 	// Domain event specific fields
 	assert.Equal(t, DomainEvent, event.GetEventCategory())
-	assert.Equal(t, Priority, event.GetPriority())
+	assert.Equal(t, PriorityNormal, event.GetPriority())
 	assert.Equal(t, UserIssuer, event.IssuerType()) // Default issuer type
 	assert.Empty(t, event.CausationID())
 	assert.Empty(t, event.CorrelationID())
@@ -108,7 +110,9 @@ func TestNewBaseDomainEvent(t *testing.T) {
 
 func TestBaseDomainEvent_SetFields(t *testing.T) {
 	// Arrange
-	event := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseDomainEventMessage("TestEvent", "test data", []*BaseEventMessageOptions{
+		Options().WithAggregateID("test-id").WithAggregateType("TestAggregate").WithVersion(1),
+	})
 
 	// Act
 	event.SetCausationID("causation-123")
@@ -168,7 +172,7 @@ func TestBaseDomainEvent_ValidateEvent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange
-			event := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+			event := NewBaseDomainEventMessage(TestedEventDataType, &testedEventData{}, []*BaseEventMessageOptions{Options()})
 			event.SetEventID(tt.eventID)
 			event.BaseEventMessage.eventType = tt.eventType
 			event.BaseEventMessage.aggregateID = tt.aggregateID
@@ -188,9 +192,9 @@ func TestBaseDomainEvent_ValidateEvent(t *testing.T) {
 
 func TestBaseDomainEvent_GetChecksum(t *testing.T) {
 	// Arrange
-	event1 := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
-	event2 := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
-	event3 := NewBaseDomainEventMessage("TestEvent", "test-id", "TestAggregate", 1, "different data")
+	event1 := NewBaseDomainEventMessage(TestedEventDataType, &testedEventData{Field1: "test", Field2: 123}, []*BaseEventMessageOptions{Options()})
+	event2 := NewBaseDomainEventMessage(TestedEventDataType, &testedEventData{Field1: "test", Field2: 123}, []*BaseEventMessageOptions{Options()})
+	event3 := NewBaseDomainEventMessage(TestedEventDataType, &testedEventData{Field1: "test", Field2: 456}, []*BaseEventMessageOptions{Options()})
 
 	// Set same event IDs for consistent checksums
 	event1.SetEventID("same-id")
@@ -233,7 +237,7 @@ func TestEventPriority_String(t *testing.T) {
 		expected string
 	}{
 		{PriorityLow, "low"},
-		{Priority, "normal"},
+		{PriorityNormal, "normal"},
 		{PriorityHigh, "high"},
 		{PriorityCritical, "critical"},
 		{EventPriority(999), "unknown"},
@@ -277,9 +281,13 @@ func TestNewBaseDomainEventMessageWithIssuer(t *testing.T) {
 	issuerType := SystemIssuer
 
 	// Act
-	event := NewBaseDomainEventMessageWithIssuer(
-		eventType, aggregateID, aggregateType, version, eventData,
-		issuerID, issuerType,
+	event := NewBaseDomainEventMessage(
+		eventType, eventData, []*BaseEventMessageOptions{
+			Options().WithAggregateID(aggregateID).WithAggregateType(aggregateType).WithVersion(version),
+		}, &BaseDomainEventMessageOptions{
+			IssuerID:   &issuerID,
+			IssuerType: &issuerType,
+		},
 	)
 
 	// Assert
@@ -295,7 +303,7 @@ func TestNewBaseDomainEventMessageWithIssuer(t *testing.T) {
 	assert.Equal(t, issuerID, event.IssuerID())
 	assert.Equal(t, issuerType, event.IssuerType())
 	assert.Equal(t, DomainEvent, event.GetEventCategory())
-	assert.Equal(t, Priority, event.GetPriority())
+	assert.Equal(t, PriorityNormal, event.GetPriority())
 }
 
 func TestBaseDomainEvent_IssuerTypes(t *testing.T) {
@@ -334,9 +342,11 @@ func TestBaseDomainEvent_IssuerTypes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Arrange & Act
-			event := NewBaseDomainEventMessageWithIssuer(
-				"TestEvent", "test-id", "TestAggregate", 1, "test data",
-				tt.issuerID, tt.issuerType,
+			event := NewBaseDomainEventMessage(
+				"TestEvent", "test data", []*BaseEventMessageOptions{Options()}, &BaseDomainEventMessageOptions{
+					IssuerID:   &tt.issuerID,
+					IssuerType: &tt.issuerType,
+				},
 			)
 
 			// Assert

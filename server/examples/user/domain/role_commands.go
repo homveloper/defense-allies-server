@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // AssignRoleCommand represents a command to assign a role to a user

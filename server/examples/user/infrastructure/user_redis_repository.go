@@ -2,10 +2,9 @@ package infrastructure
 
 import (
 	"context"
+	"cqrs"
 
 	"defense-allies-server/examples/user/domain"
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx"
 
 	"github.com/pkg/errors"
 )

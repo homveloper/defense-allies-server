@@ -3,8 +3,8 @@ package infrastructure
 import (
 	"time"
 
-	"defense-allies-server/pkg/cqrs/cqrsx"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/snapshots"
+	"cqrs/cqrsx"
+	"cqrs/cqrsx/examples/03-snapshots/snapshots"
 )
 
 // Infrastructure 인프라 구성 요소들

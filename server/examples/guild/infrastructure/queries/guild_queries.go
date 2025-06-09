@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"cqrs"
 	"defense-allies-server/examples/guild/infrastructure/projections"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // Query type constants

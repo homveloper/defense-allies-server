@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
+	"cqrs"
 	"defense-allies-server/examples/user/domain"
-	"defense-allies-server/pkg/cqrs"
 
 	"go.mongodb.org/mongo-driver/bson"
 )

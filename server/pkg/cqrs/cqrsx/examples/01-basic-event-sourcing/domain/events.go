@@ -17,7 +17,7 @@ func (e *UserCreated) EventType() string {
 	return "UserCreated"
 }
 
-// AggregateID implements cqrs.DomainEvent
+// string implements cqrs.DomainEvent
 func (e *UserCreated) ID() string {
 	return e.UserID
 }
@@ -42,7 +42,7 @@ func (e *UserUpdated) EventType() string {
 	return "UserUpdated"
 }
 
-// AggregateID implements cqrs.DomainEvent
+// string implements cqrs.DomainEvent
 func (e *UserUpdated) ID() string {
 	return e.UserID
 }
@@ -66,7 +66,7 @@ func (e *UserDeleted) EventType() string {
 	return "UserDeleted"
 }
 
-// AggregateID implements cqrs.DomainEvent
+// string implements cqrs.DomainEvent
 func (e *UserDeleted) ID() string {
 	return e.UserID
 }
@@ -88,7 +88,7 @@ func (e *UserActivated) EventType() string {
 	return "UserActivated"
 }
 
-// AggregateID implements cqrs.DomainEvent
+// string implements cqrs.DomainEvent
 func (e *UserActivated) ID() string {
 	return e.UserID
 }
@@ -111,7 +111,7 @@ func (e *UserDeactivated) EventType() string {
 	return "UserDeactivated"
 }
 
-// AggregateID implements cqrs.DomainEvent
+// string implements cqrs.DomainEvent
 func (e *UserDeactivated) ID() string {
 	return e.UserID
 }

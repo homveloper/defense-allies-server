@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // TestDLQManager_Creation tests DLQ manager creation
@@ -161,12 +161,12 @@ func TestDLQManager_EventEnrichment(t *testing.T) {
 
 	t.Run("should enrich event with DLQ metadata", func(t *testing.T) {
 		originalError := &ProcessingError{
-			Error:       "database connection failed",
-			Handler:     "UserProjectionHandler",
-			Timestamp:   time.Now(),
-			RetryCount:  3,
-			StreamName:  "events:domain:normal:user",
-			MessageID:   "1234567890-0",
+			Error:      "database connection failed",
+			Handler:    "UserProjectionHandler",
+			Timestamp:  time.Now(),
+			RetryCount: 3,
+			StreamName: "events:domain:normal:user",
+			MessageID:  "1234567890-0",
 		}
 
 		baseOptions := cqrs.Options().
@@ -301,7 +301,7 @@ func TestDLQManager_Statistics(t *testing.T) {
 	t.Run("should identify top error reasons", func(t *testing.T) {
 		manager = &dlqManager{
 			config: config,
-			stats:  &DLQStatistics{
+			stats: &DLQStatistics{
 				EventsByReason: make(map[string]int64),
 			},
 		}
@@ -321,7 +321,7 @@ func TestDLQManager_Statistics(t *testing.T) {
 		}
 
 		topReasons := manager.GetTopErrorReasons(3)
-		
+
 		assert.Len(t, topReasons, 3)
 		assert.Equal(t, "connection_error", topReasons[0].Reason)
 		assert.Equal(t, int64(10), topReasons[0].Count)

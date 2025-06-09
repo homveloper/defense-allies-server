@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // PriorityStreamManager manages priority-based event stream routing

@@ -19,7 +19,7 @@ package cqrsx
 // 	ID string `bson:"_id"`
 
 // 	// 집합체 상태 필드
-// 	AggregateID string `bson:"aggregateId"`
+// 	string string `bson:"aggregateId"`
 
 // 	// 집합체 타입 필드
 // 	AggregateType string `bson:"aggregateType"`
@@ -99,8 +99,8 @@ package cqrsx
 
 // 	// MongoDB 문서 생성
 // 	doc := mongoStateDocument{
-// 		ID:            fmt.Sprintf("%s-%d", state.AggregateID.String(), state.Version),
-// 		AggregateID:   state.AggregateID.String(),
+// 		ID:            fmt.Sprintf("%s-%d", state.string.String(), state.Version),
+// 		string:   state.string.String(),
 // 		AggregateType: state.AggregateType,
 // 		Version:       state.Version,
 // 		Data:          processedData,
@@ -137,7 +137,7 @@ package cqrsx
 
 // 	// 보존 정책 적용 (백그라운드에서)
 // 	if m.config.RetentionPolicy != nil {
-// 		go m.applyRetentionPolicy(context.Background(), state.AggregateID)
+// 		go m.applyRetentionPolicy(context.Background(), state.string)
 // 	}
 
 // 	return nil
@@ -359,7 +359,7 @@ package cqrsx
 
 // // documentToState는 MongoDB 문서를 AggregateState로 변환합니다
 // func (m *MongoStateStore) documentToState(doc mongoStateDocument) (*AggregateState, error) {
-// 	aggregateID, err := uuid.Parse(doc.AggregateID)
+// 	aggregateID, err := uuid.Parse(doc.string)
 // 	if err != nil {
 // 		return nil, fmt.Errorf("invalid aggregate ID: %w", err)
 // 	}
@@ -402,7 +402,7 @@ package cqrsx
 // 	}
 
 // 	return &AggregateState{
-// 		AggregateID:   aggregateID,
+// 		string:   aggregateID,
 // 		AggregateType: doc.AggregateType,
 // 		Version:       doc.Version,
 // 		Data:          data,
@@ -475,6 +475,6 @@ package cqrsx
 
 // 	candidates := m.config.RetentionPolicy.GetCleanupCandidates(ctx, states)
 // 	for _, candidate := range candidates {
-// 		m.Delete(ctx, candidate.AggregateID, candidate.Version)
+// 		m.Delete(ctx, candidate.string, candidate.Version)
 // 	}
 // }

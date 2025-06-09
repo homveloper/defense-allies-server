@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/06-event-versioning/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/06-event-versioning/versioning"
+	"cqrs"
+	"cqrs/cqrsx/examples/06-event-versioning/domain"
+	"cqrs/cqrsx/examples/06-event-versioning/versioning"
 )
 
 func main() {

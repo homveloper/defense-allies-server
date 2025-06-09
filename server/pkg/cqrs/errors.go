@@ -114,6 +114,8 @@ const (
 	ErrCodeReadStoreError
 	ErrCodeSnapshotNotFound
 	ErrCodeReadModelNotFound
+	ErrCodeValidationError
+	ErrCodeNotFoundError
 )
 
 func (ec ErrorCode) String() string {
@@ -150,6 +152,10 @@ func (ec ErrorCode) String() string {
 		return "SNAPSHOT_NOT_FOUND"
 	case ErrCodeReadModelNotFound:
 		return "READ_MODEL_NOT_FOUND"
+	case ErrCodeValidationError:
+		return "VALIDATION_ERROR"
+	case ErrCodeNotFoundError:
+		return "NOT_FOUND_ERROR"
 	default:
 		return "UNKNOWN_ERROR"
 	}

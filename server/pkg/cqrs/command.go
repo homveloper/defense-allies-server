@@ -38,7 +38,7 @@ type Command interface {
 	//   - string: Command type name (e.g., "CreateUser", "UpdateOrder")
 	CommandType() string
 
-	// AggregateID returns the identifier of the target aggregate.
+	// string returns the identifier of the target aggregate.
 	// This specifies which aggregate instance the command should operate on.
 	//
 	// Returns:
@@ -113,7 +113,7 @@ type CommandResult struct {
 	Success       bool           `json:"success"`        // Indicates if command executed successfully
 	Error         error          `json:"error"`          // Error details if execution failed
 	Events        []EventMessage `json:"events"`         // Events generated during command execution
-	AggregateID   string         `json:"aggregate_id"`   // ID of the aggregate that was processed
+	string        string         `json:"aggregate_id"`   // ID of the aggregate that was processed
 	Version       int            `json:"version"`        // Aggregate version after command execution
 	Data          interface{}    `json:"data"`           // Optional response data (e.g., created entity ID)
 	ExecutionTime time.Duration  `json:"execution_time"` // Time taken to execute the command

@@ -2,9 +2,9 @@ package infrastructure
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
+	"cqrs"
+	"cqrs/cqrsx"
+	"cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
 	"fmt"
 	"log"
 

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/demo"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/infrastructure"
+	"cqrs/cqrsx/examples/03-snapshots/demo"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx/examples/03-snapshots/infrastructure"
 
 	"github.com/shopspring/decimal"
 )

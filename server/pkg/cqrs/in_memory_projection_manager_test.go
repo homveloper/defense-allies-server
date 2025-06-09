@@ -245,7 +245,7 @@ func TestProjectionManager_ProcessEvent_Success(t *testing.T) {
 	projection.SetState(ProjectionRunning)
 	pm.RegisterProjection(projection)
 
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	// Act
 	err := pm.ProcessEvent(context.Background(), event)
@@ -271,7 +271,7 @@ func TestProjectionManager_ProcessEvent_ProjectionError(t *testing.T) {
 
 	pm.RegisterProjection(projection)
 
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := newTestedEventMessage()
 
 	// Act
 	err := pm.ProcessEvent(context.Background(), event)

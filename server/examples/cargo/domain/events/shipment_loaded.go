@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // ShipmentData represents shipment data in events (to avoid circular imports)

@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs/cqrsx"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/demo"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/04-read-models/infrastructure"
+	"cqrs/cqrsx"
+	"cqrs/cqrsx/examples/04-read-models/demo"
+	"cqrs/cqrsx/examples/04-read-models/domain"
+	"cqrs/cqrsx/examples/04-read-models/infrastructure"
 	"fmt"
 	"log"
 	"os"

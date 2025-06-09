@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/06-event-versioning/domain"
+	"cqrs"
+	"cqrs/cqrsx/examples/06-event-versioning/domain"
 )
 
 // UserEventDowncaster handles downcasting User events to lower versions
@@ -30,29 +30,29 @@ func NewUserEventDowncaster() *UserEventDowncaster {
 func (d *UserEventDowncaster) DowncastToVersion(event cqrs.EventMessage, targetVersion int) (cqrs.EventMessage, error) {
 	// Detect current version from event
 	currentVersion := d.detectEventVersion(event)
-	
+
 	if currentVersion == targetVersion {
 		return event, nil
 	}
-	
+
 	if currentVersion < targetVersion {
 		return nil, fmt.Errorf("cannot downcast from lower version %d to higher version %d", currentVersion, targetVersion)
 	}
-	
+
 	// Perform step-by-step downcasting
 	currentEvent := event
 	for currentVersion > targetVersion {
 		nextVersion := currentVersion - 1
-		
+
 		var err error
 		currentEvent, err = d.downcastToNextVersion(currentEvent, currentVersion, nextVersion)
 		if err != nil {
 			return nil, fmt.Errorf("failed to downcast from v%d to v%d: %w", currentVersion, nextVersion, err)
 		}
-		
+
 		currentVersion = nextVersion
 	}
-	
+
 	return currentEvent, nil
 }
 
@@ -61,13 +61,13 @@ func (d *UserEventDowncaster) CanDowncast(fromVersion, toVersion int) bool {
 	if fromVersion <= toVersion {
 		return false
 	}
-	
+
 	// Check if direct path exists
 	path := fmt.Sprintf("%d->%d", fromVersion, toVersion)
 	if d.supportedPaths[path] {
 		return true
 	}
-	
+
 	// Check if step-by-step path exists
 	for version := fromVersion; version > toVersion; version-- {
 		stepPath := fmt.Sprintf("%d->%d", version, version-1)
@@ -75,7 +75,7 @@ func (d *UserEventDowncaster) CanDowncast(fromVersion, toVersion int) bool {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
@@ -89,7 +89,7 @@ func (d *UserEventDowncaster) detectEventVersion(event cqrs.EventMessage) int {
 			}
 		}
 	}
-	
+
 	// Fallback: analyze event type
 	switch event.(type) {
 	case *domain.UserCreatedV1, *domain.UserUpdatedV1, *domain.UserDeletedV1:
@@ -204,17 +204,17 @@ func (d *UserEventDowncaster) downcastUserCreatedV3ToV2(v3Event *domain.UserCrea
 		Avatar:      "", // Not available in V3 structure
 		Bio:         "", // Not available in V3 structure
 	}
-	
+
 	// Extract primary email from V3 contact info
 	email := v3Event.ContactInfo.PrimaryEmail
 	if email == "" && len(v3Event.ContactInfo.PhoneNumbers) > 0 {
 		// Fallback: use secondary email if primary is empty
 		email = v3Event.ContactInfo.SecondaryEmail
 	}
-	
+
 	// Construct name from V3 full name
 	name := d.constructFullName(v3Event.PersonalInfo.FullName)
-	
+
 	return domain.NewUserCreatedV2(
 		v3Event.UserID,
 		name,
@@ -236,22 +236,22 @@ func (d *UserEventDowncaster) downcastUserUpdatedV3ToV2(v3Event *domain.UserUpda
 		Avatar:      "",
 		Bio:         "",
 	}
-	
+
 	// Extract primary email from V3 contact info
 	email := v3Event.ContactInfo.PrimaryEmail
 	if email == "" {
 		email = v3Event.ContactInfo.SecondaryEmail
 	}
-	
+
 	// Construct name from V3 full name
 	name := d.constructFullName(v3Event.PersonalInfo.FullName)
-	
+
 	// Extract updater from V3 metadata or changes
 	updatedBy := "system" // Default
 	if v3Event.EventMetadata.Source != "" {
 		updatedBy = v3Event.EventMetadata.Source
 	}
-	
+
 	return domain.NewUserUpdatedV2(
 		v3Event.UserID,
 		name,
@@ -267,17 +267,17 @@ func (d *UserEventDowncaster) downcastUserUpdatedV3ToV2(v3Event *domain.UserUpda
 func (d *UserEventDowncaster) downcastUserDeletedV3ToV2(v3Event *domain.UserDeletedV3) *domain.UserDeletedV2 {
 	// Extract simple metadata from V3 structured deletion reason
 	metadata := map[string]interface{}{
-		"category":     v3Event.DeletionReason.Category,
-		"details":      v3Event.DeletionReason.Details,
-		"approved_by":  v3Event.DeletionReason.ApprovedBy,
+		"category":      v3Event.DeletionReason.Category,
+		"details":       v3Event.DeletionReason.Details,
+		"approved_by":   v3Event.DeletionReason.ApprovedBy,
 		"downcast_from": "v3",
 	}
-	
+
 	// Merge V3 context into metadata
 	for key, value := range v3Event.DeletionReason.Context {
 		metadata[key] = value
 	}
-	
+
 	return domain.NewUserDeletedV2(
 		v3Event.UserID,
 		v3Event.DeletionReason.Reason,
@@ -289,7 +289,7 @@ func (d *UserEventDowncaster) downcastUserDeletedV3ToV2(v3Event *domain.UserDele
 // constructFullName constructs a full name from V3 FullName structure
 func (d *UserEventDowncaster) constructFullName(fullName domain.FullName) string {
 	parts := []string{}
-	
+
 	if fullName.Prefix != "" {
 		parts = append(parts, fullName.Prefix)
 	}
@@ -305,6 +305,6 @@ func (d *UserEventDowncaster) constructFullName(fullName domain.FullName) string
 	if fullName.Suffix != "" {
 		parts = append(parts, fullName.Suffix)
 	}
-	
+
 	return strings.Join(parts, " ")
 }

@@ -9,7 +9,7 @@ import (
 
 // PerformanceMetrics 성능 측정 지표
 type PerformanceMetrics struct {
-	AggregateID       string        `json:"aggregate_id"`
+	string            string        `json:"aggregate_id"`
 	OperationType     string        `json:"operation_type"`
 	StartTime         time.Time     `json:"start_time"`
 	EndTime           time.Time     `json:"end_time"`
@@ -87,7 +87,7 @@ func (m *InMemoryPerformanceMonitor) StartOperation(ctx context.Context, aggrega
 	operationID := fmt.Sprintf("%s_%s_%d", aggregateID, operationType, time.Now().UnixNano())
 
 	metric := &PerformanceMetrics{
-		AggregateID:   aggregateID,
+		string:        aggregateID,
 		OperationType: operationType,
 		StartTime:     time.Now(),
 	}
@@ -142,7 +142,7 @@ func (m *InMemoryPerformanceMonitor) GetMetrics(ctx context.Context, aggregateID
 
 	var result []PerformanceMetrics
 	for _, metric := range m.metrics {
-		if aggregateID == "" || metric.AggregateID == aggregateID {
+		if aggregateID == "" || metric.string == aggregateID {
 			result = append(result, metric)
 		}
 	}

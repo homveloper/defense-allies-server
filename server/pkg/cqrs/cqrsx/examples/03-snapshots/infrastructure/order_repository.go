@@ -6,10 +6,10 @@ import (
 	"log"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/snapshots"
+	"cqrs"
+	"cqrs/cqrsx"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx/examples/03-snapshots/snapshots"
 )
 
 // OrderRepository 스냅샷 지원 주문 리포지토리
@@ -44,7 +44,7 @@ func (r *OrderRepository) Save(ctx context.Context, order *domain.Order) error {
 	log.Printf("Attempting to save %d events for order %s with expectedVersion %d (original: %d, current: %d)",
 		len(uncommittedChanges), order.ID(), expectedVersion, order.OriginalVersion(), order.Version())
 
-	err := r.eventStore.SaveEvents(ctx, order.ID(), uncommittedChanges, expectedVersion)
+	err := r.eventStore.SaveEvents(ctx, uncommittedChanges, expectedVersion)
 	if err != nil {
 		return fmt.Errorf("failed to save events for order %s: %w", order.ID(), err)
 	}

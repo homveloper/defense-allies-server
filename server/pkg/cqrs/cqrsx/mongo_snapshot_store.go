@@ -2,8 +2,8 @@ package cqrsx
 
 import (
 	"context"
+	"cqrs"
 	"crypto/sha256"
-	"defense-allies-server/pkg/cqrs"
 	"fmt"
 	"time"
 
@@ -25,7 +25,7 @@ type MongoSnapshotStore struct {
 // This is a pre-designed schema that developers don't need to worry about
 type MongoSnapshotDocument struct {
 	ID            primitive.ObjectID     `bson:"_id,omitempty"`
-	AggregateID   string                 `bson:"aggregate_id"`   // Aggregate identifier
+	string        cqrs.string            `bson:"aggregate_id"`   // Aggregate identifier
 	AggregateType string                 `bson:"aggregate_type"` // Type of aggregate
 	SnapshotData  bson.Raw               `bson:"snapshot_data"`  // Serialized aggregate state
 	Version       int                    `bson:"version"`        // Version at which snapshot was taken
@@ -49,8 +49,8 @@ type MongoSnapshotData struct {
 	doc *MongoSnapshotDocument
 }
 
-func (s *MongoSnapshotData) ID() string {
-	return s.doc.AggregateID
+func (s *MongoSnapshotData) ID() cqrs.string {
+	return s.doc.string
 }
 
 func (s *MongoSnapshotData) Type() string {
@@ -145,7 +145,7 @@ func (ss *MongoSnapshotStore) SaveSnapshot(ctx context.Context, aggregate cqrs.A
 
 		// Create enhanced snapshot document
 		doc := MongoSnapshotDocument{
-			AggregateID:   aggregate.ID(),
+			string:        aggregate.ID(),
 			AggregateType: aggregate.Type(),
 			SnapshotData:  bson.Raw(snapshotData),
 			Version:       aggregate.Version(),

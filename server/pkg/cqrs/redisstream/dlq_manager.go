@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // DLQManager manages Dead Letter Queue operations

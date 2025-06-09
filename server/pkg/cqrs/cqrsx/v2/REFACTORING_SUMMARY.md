@@ -67,7 +67,7 @@ err = manager.LoadFromSnapshot(ctx, aggregateID, aggregate)
 ```go
 // 순수한 데이터 구조
 type AggregateState struct {
-    AggregateID   uuid.UUID
+    string   uuid.UUID
     AggregateType string
     Version       int
     Data          []byte          // 순수한 바이트 데이터

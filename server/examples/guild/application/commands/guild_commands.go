@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // Command type constants

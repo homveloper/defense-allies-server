@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // EventVersionManager manages event versioning and conversion

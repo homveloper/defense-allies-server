@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"context"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/demo"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/01-basic-event-sourcing/infrastructure"
+	"cqrs/cqrsx/examples/01-basic-event-sourcing/demo"
+	"cqrs/cqrsx/examples/01-basic-event-sourcing/domain"
+	"cqrs/cqrsx/examples/01-basic-event-sourcing/infrastructure"
 	"fmt"
 	"log"
 	"os"

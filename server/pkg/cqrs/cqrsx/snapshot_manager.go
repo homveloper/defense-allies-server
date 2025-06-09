@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // SnapshotConfiguration holds snapshot management configuration
@@ -124,7 +124,7 @@ const (
 type AdvancedSnapshotStore interface {
 	// Basic operations
 	SaveSnapshot(ctx context.Context, aggregate cqrs.AggregateRoot) error
-	LoadSnapshot(ctx context.Context, aggregateID, aggregateType string) (cqrs.AggregateRoot, error)
+	LoadSnapshot(ctx context.Context, aggregateID string, aggregateType string) (cqrs.AggregateRoot, error)
 
 	// Advanced operations
 	GetSnapshot(ctx context.Context, aggregateID string, maxVersion int) (SnapshotData, error)

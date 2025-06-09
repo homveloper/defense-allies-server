@@ -2,7 +2,7 @@ package domain
 
 import (
 	"context"
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 	"fmt"
 	"time"
 

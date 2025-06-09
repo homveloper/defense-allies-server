@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // V2 이벤트들 - 확장 버전 (추가 필드 포함)

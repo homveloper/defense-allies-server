@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/infrastructure"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx/examples/03-snapshots/infrastructure"
 )
 
 // DemoRunner 데모 실행기

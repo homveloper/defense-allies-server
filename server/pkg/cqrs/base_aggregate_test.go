@@ -59,7 +59,7 @@ func TestNewBaseAggregateWithOptions(t *testing.T) {
 func TestBaseAggregate_ApplyEvent(t *testing.T) {
 	// Arrange
 	aggregate := NewBaseAggregate("test-id", "TestAggregate")
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 	initialVersion := aggregate.Version()
 	initialUpdatedAt := aggregate.updatedAt
 
@@ -81,7 +81,7 @@ func TestBaseAggregate_ApplyEvent(t *testing.T) {
 func TestBaseAggregate_ReplayEvent(t *testing.T) {
 	// Arrange
 	aggregate := NewBaseAggregate("test-id", "TestAggregate")
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 	initialVersion := aggregate.Version()
 	initialUpdatedAt := aggregate.updatedAt
 
@@ -102,7 +102,7 @@ func TestBaseAggregate_ReplayEvent(t *testing.T) {
 func TestBaseAggregate_ClearChanges(t *testing.T) {
 	// Arrange
 	aggregate := NewBaseAggregate("test-id", "TestAggregate")
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 
 	// Apply event to track it
 	err := aggregate.ApplyEvent(event)
@@ -195,7 +195,7 @@ func TestBaseAggregate_HasUncommittedChanges(t *testing.T) {
 	assert.False(t, aggregate.HasUncommittedChanges())
 
 	// Add a change by applying an event
-	event := NewBaseEventMessage("TestEvent", "test-id", "TestAggregate", 1, "test data")
+	event := NewBaseEventMessage("TestEvent", "test data")
 	err := aggregate.ApplyEvent(event)
 	assert.NoError(t, err)
 
@@ -215,9 +215,9 @@ func TestBaseAggregate_LoadFromHistory(t *testing.T) {
 	// Arrange
 	aggregate := NewBaseAggregate("test-id", "TestAggregate")
 	events := []EventMessage{
-		NewBaseEventMessage("Event1", "test-id", "TestAggregate", 1, "data1"),
-		NewBaseEventMessage("Event2", "test-id", "TestAggregate", 2, "data2"),
-		NewBaseEventMessage("Event3", "test-id", "TestAggregate", 3, "data3"),
+		NewBaseEventMessage("Event1", "data1"),
+		NewBaseEventMessage("Event2", "data2"),
+		NewBaseEventMessage("Event3", "data3"),
 	}
 
 	// Act

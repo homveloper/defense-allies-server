@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/03-snapshots/domain"
+	"cqrs/cqrsx/examples/03-snapshots/domain"
 )
 
 // DefaultSnapshotManager 기본 스냅샷 매니저 구현
@@ -196,7 +196,7 @@ func (m *DefaultSnapshotManager) GetSnapshotInfo(ctx context.Context, aggregateI
 		metadata := snapshot.Metadata()
 
 		info := SnapshotInfo{
-			AggregateID:   snapshot.ID(),
+			string:        snapshot.ID(),
 			AggregateType: snapshot.Type(),
 			Version:       snapshot.Version(),
 			Size:          int64(len(snapshot.Data())),
@@ -230,7 +230,7 @@ func (m *DefaultSnapshotManager) logSnapshotEvent(eventType string, aggregate Ag
 	}
 
 	if aggregate != nil {
-		event.AggregateID = aggregate.ID()
+		event.string = aggregate.ID()
 		event.AggregateType = aggregate.Type()
 		event.Version = aggregate.Version()
 	} else {
@@ -249,10 +249,10 @@ func (m *DefaultSnapshotManager) logSnapshotEvent(eventType string, aggregate Ag
 	// 로그 출력
 	if err != nil {
 		log.Printf("Snapshot %s failed for %s v%d: %v (took %v)",
-			eventType, event.AggregateID, event.Version, err, duration)
+			eventType, event.string, event.Version, err, duration)
 	} else {
 		log.Printf("Snapshot %s for %s v%d: %d bytes (took %v)",
-			eventType, event.AggregateID, event.Version, size, duration)
+			eventType, event.string, event.Version, size, duration)
 	}
 }
 

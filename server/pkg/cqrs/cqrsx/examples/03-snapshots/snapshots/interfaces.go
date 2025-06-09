@@ -95,7 +95,7 @@ type SnapshotManager interface {
 
 // SnapshotInfo 스냅샷 정보
 type SnapshotInfo struct {
-	AggregateID   string                 `json:"aggregate_id"`
+	string        string                 `json:"aggregate_id"`
 	AggregateType string                 `json:"aggregate_type"`
 	Version       int                    `json:"version"`
 	Size          int64                  `json:"size"`
@@ -150,7 +150,7 @@ type SnapshotConfiguration struct {
 // SnapshotEvent 스냅샷 관련 이벤트
 type SnapshotEvent struct {
 	Type          string                 `json:"type"`
-	AggregateID   string                 `json:"aggregate_id"`
+	string        string                 `json:"aggregate_id"`
 	AggregateType string                 `json:"aggregate_type"`
 	Version       int                    `json:"version"`
 	Timestamp     time.Time              `json:"timestamp"`

@@ -39,10 +39,10 @@ func (h *TestCommandHandler) Handle(ctx context.Context, command Command) (*Comm
 
 	// Default implementation
 	return &CommandResult{
-		Success:     true,
-		AggregateID: command.ID(),
-		Version:     1,
-		Events:      []EventMessage{},
+		Success: true,
+		string:  command.ID(),
+		Version: 1,
+		Events:  []EventMessage{},
 	}, nil
 }
 
@@ -154,7 +154,7 @@ func TestCommandDispatcher_Dispatch_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.True(t, result.Success)
-	assert.Equal(t, "test-id", result.AggregateID)
+	assert.Equal(t, "test-id", result.string)
 	assert.Equal(t, 1, result.Version)
 }
 

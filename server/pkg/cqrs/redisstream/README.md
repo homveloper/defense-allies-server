@@ -76,8 +76,8 @@ package main
 import (
     "context"
     "github.com/redis/go-redis/v9"
-    "defense-allies-server/pkg/cqrs"
-    "defense-allies-server/pkg/cqrs/redisstream"
+    "cqrs"
+    "cqrs/redisstream"
 )
 
 func main() {
@@ -120,8 +120,8 @@ package main
 import (
     "context"
     "github.com/redis/go-redis/v9"
-    "defense-allies-server/pkg/cqrs"
-    "defense-allies-server/pkg/cqrs/redisstream"
+    "cqrs"
+    "cqrs/redisstream"
 )
 
 func main() {

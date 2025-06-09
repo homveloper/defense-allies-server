@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"defense-allies-server/pkg/cqrs"
-	"defense-allies-server/pkg/cqrs/cqrsx/examples/06-event-versioning/domain"
+	"cqrs"
+	"cqrs/cqrsx/examples/06-event-versioning/domain"
 )
 
 // UserEventUpcaster handles upcasting User events to higher versions

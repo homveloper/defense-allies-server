@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"context"
+	"cqrs"
 	"fmt"
 	"time"
 
 	"defense-allies-server/examples/user/domain"
-	"defense-allies-server/pkg/cqrs"
 )
 
 // UserCommandHandler handles user-related commands

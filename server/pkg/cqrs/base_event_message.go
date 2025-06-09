@@ -31,7 +31,7 @@ type BaseEventMessageOptions struct {
 	EventID       *string                `json:"event_id,omitempty"`
 	Timestamp     *time.Time             `json:"timestamp,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
-	AggregateID   *string                `json:"aggregate_id,omitempty"`
+	string        *string                `json:"aggregate_id,omitempty"`
 	AggregateType *string                `json:"aggregate_type,omitempty"`
 	Version       *int                   `json:"version,omitempty"`
 }
@@ -47,7 +47,7 @@ func (opts *BaseEventMessageOptions) WithLoad(
 	opts.EventID = &eventID
 	opts.Timestamp = &timestamp
 	opts.Metadata = metadata
-	opts.AggregateID = &aggregateID
+	opts.string = &aggregateID
 	opts.AggregateType = &aggregateType
 	opts.Version = &version
 	return opts
@@ -69,7 +69,7 @@ func (opts *BaseEventMessageOptions) WithMetadata(metadata map[string]interface{
 }
 
 func (opts *BaseEventMessageOptions) WithAggregateID(aggregateID string) *BaseEventMessageOptions {
-	opts.AggregateID = &aggregateID
+	opts.string = &aggregateID
 	return opts
 }
 
@@ -98,8 +98,8 @@ func mergeOptions(options ...*BaseEventMessageOptions) *BaseEventMessageOptions 
 		if opt.Metadata != nil {
 			merged.Metadata = opt.Metadata
 		}
-		if opt.AggregateID != nil {
-			merged.AggregateID = opt.AggregateID
+		if opt.string != nil {
+			merged.string = opt.string
 		}
 		if opt.AggregateType != nil {
 			merged.AggregateType = opt.AggregateType
@@ -126,8 +126,8 @@ func applyOptions(event *BaseEventMessage, opts *BaseEventMessageOptions) {
 	if opts.Metadata != nil {
 		event.metadata = opts.Metadata
 	}
-	if opts.AggregateID != nil {
-		event.aggregateID = *opts.AggregateID
+	if opts.string != nil {
+		event.aggregateID = *opts.string
 	}
 	if opts.AggregateType != nil {
 		event.aggregateType = *opts.AggregateType

@@ -7,12 +7,12 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // OrderSnapshot Order Aggregate의 스냅샷 구조체
 type OrderSnapshot struct {
-	AggregateID  string                 `json:"aggregate_id" bson:"aggregate_id"`
+	string       string                 `json:"aggregate_id" bson:"aggregate_id"`
 	Ver          int                    `json:"version" bson:"version"`
 	CustomerID   string                 `json:"customer_id" bson:"customer_id"`
 	Items        []OrderItem            `json:"items" bson:"items"`
@@ -35,7 +35,7 @@ type OrderSnapshot struct {
 // CreateSnapshot Order에서 스냅샷을 생성하는 메서드
 func (o *Order) CreateSnapshot() (cqrs.SnapshotData, error) {
 	return &OrderSnapshot{
-		AggregateID:  o.ID(),
+		string:       o.ID(),
 		Ver:          o.Version(),
 		CustomerID:   o.CustomerID(),
 		Items:        o.Items(),
@@ -112,7 +112,7 @@ func RestoreFromSnapshot(snapshot *OrderSnapshot) (*Order, error) {
 
 // SnapshotData 인터페이스 구현
 func (s *OrderSnapshot) ID() string {
-	return s.AggregateID
+	return s.string
 }
 
 func (s *OrderSnapshot) Type() string {
@@ -160,7 +160,7 @@ func (s *OrderSnapshot) GetSize() int64 {
 // Clone 스냅샷 복사본 생성
 func (s *OrderSnapshot) Clone() *OrderSnapshot {
 	clone := &OrderSnapshot{
-		AggregateID:  s.ID(),
+		string:       s.ID(),
 		Ver:          s.Ver,
 		CustomerID:   s.CustomerID,
 		Items:        make([]OrderItem, len(s.Items)),

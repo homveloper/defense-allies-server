@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"defense-allies-server/pkg/cqrs"
+	"cqrs"
 )
 
 // Command type constants
