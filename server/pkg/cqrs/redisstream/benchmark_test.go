@@ -201,7 +201,7 @@ func BenchmarkPriorityStreamManager(b *testing.B) {
 		b.Fatalf("Failed to create priority manager: %v", err)
 	}
 
-	priorities := []cqrs.EventPriority{cqrs.Critical, cqrs.High, cqrs.Normal, cqrs.Low}
+	priorities := []cqrs.EventPriority{cqrs.PriorityCritical, cqrs.PriorityHigh, cqrs.PriorityNormal, cqrs.PriorityLow}
 	categories := []cqrs.EventCategory{cqrs.DomainEvent, cqrs.SystemEvent, cqrs.UserAction}
 	partitionKeys := []string{"user", "order", "product", "payment", "notification"}
 

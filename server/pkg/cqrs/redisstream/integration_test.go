@@ -103,17 +103,11 @@ func testFullSystemIntegration(t *testing.T, testContainer *TestRedisContainer) 
 
 	// Create test handlers
 	successHandler := &IntegrationTestHandler{
-		name:        "success-handler",
-		handlerType: cqrs.ProjectionHandler,
-		eventTypes:  []string{"IntegrationTest"},
-		shouldFail:  false,
+		shouldFail: false,
 	}
 
 	failingHandler := &IntegrationTestHandler{
-		name:        "failing-handler",
-		handlerType: cqrs.ProcessManagerHandler,
-		eventTypes:  []string{"IntegrationTest"},
-		shouldFail:  true,
+		shouldFail: true,
 	}
 
 	// Wrap with circuit breakers

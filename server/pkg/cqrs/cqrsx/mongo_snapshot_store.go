@@ -25,7 +25,7 @@ type MongoSnapshotStore struct {
 // This is a pre-designed schema that developers don't need to worry about
 type MongoSnapshotDocument struct {
 	ID            primitive.ObjectID     `bson:"_id,omitempty"`
-	string        cqrs.string            `bson:"aggregate_id"`   // Aggregate identifier
+	string        string                 `bson:"aggregate_id"`   // Aggregate identifier
 	AggregateType string                 `bson:"aggregate_type"` // Type of aggregate
 	SnapshotData  bson.Raw               `bson:"snapshot_data"`  // Serialized aggregate state
 	Version       int                    `bson:"version"`        // Version at which snapshot was taken
@@ -49,7 +49,7 @@ type MongoSnapshotData struct {
 	doc *MongoSnapshotDocument
 }
 
-func (s *MongoSnapshotData) ID() cqrs.string {
+func (s *MongoSnapshotData) ID() string {
 	return s.doc.string
 }
 
