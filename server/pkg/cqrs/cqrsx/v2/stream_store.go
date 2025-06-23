@@ -244,7 +244,7 @@ func (s *StreamEventStore) CreateIndexes(ctx context.Context) error {
 // Private helper methods
 
 func (s *StreamEventStore) getStreamName(aggregateID uuid.UUID) string {
-	return fmt.Sprintf("guild-%s", aggregateID.String())
+	return fmt.Sprintf("guild-%s", aggregateID)
 }
 
 func (s *StreamEventStore) getStreamType(event Event) string {

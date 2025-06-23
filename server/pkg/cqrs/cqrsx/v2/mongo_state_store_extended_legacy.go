@@ -82,7 +82,7 @@ package cqrsx
 
 // // GetVersions는 집합체의 모든 버전을 반환합니다
 // func (m *MongoStateStore) GetVersions(ctx context.Context, aggregateID uuid.UUID) ([]int, error) {
-// 	filter := bson.M{"aggregateId": aggregateID.String()}
+// 	filter := bson.M{"aggregateId": aggregateID}
 // 	opts := options.Find().SetProjection(bson.M{"version": 1}).SetSort(bson.M{"version": 1})
 
 // 	cursor, err := m.collection.Find(ctx, filter, opts)
@@ -165,7 +165,7 @@ package cqrsx
 // // GetAggregateMetrics는 특정 집합체의 메트릭을 반환합니다
 // func (m *MongoStateStore) GetAggregateMetrics(ctx context.Context, aggregateID uuid.UUID) (*StateMetrics, error) {
 // 	pipeline := []bson.M{
-// 		{"$match": bson.M{"aggregateId": aggregateID.String()}},
+// 		{"$match": bson.M{"aggregateId": aggregateID}},
 // 		{
 // 			"$group": bson.M{
 // 				"_id":             nil,

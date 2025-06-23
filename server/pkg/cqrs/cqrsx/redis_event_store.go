@@ -14,7 +14,7 @@ import (
 type RedisEventStore struct {
 	client     *RedisClientManager
 	keyBuilder *RedisKeyBuilder
-	serializer EventSerializer
+	serializer EventMarshaler
 }
 
 // Note: EventSerializer interface and implementations are now in event_serializer.go
@@ -24,7 +24,7 @@ func NewRedisEventStore(client *RedisClientManager, keyPrefix string) *RedisEven
 	return &RedisEventStore{
 		client:     client,
 		keyBuilder: NewRedisKeyBuilder(keyPrefix),
-		serializer: &JSONEventSerializer{},
+		serializer: &JSONEventMarshaler{},
 	}
 }
 
@@ -39,7 +39,7 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 	}
 
 	// Get aggregate type from first event
-	aggregateType := events[0].Type()
+	aggregateType := events[0].AggregateType()
 	eventKey := es.keyBuilder.EventKey(aggregateType, aggregateID)
 	metadataKey := es.keyBuilder.MetadataKey(aggregateType, aggregateID)
 
@@ -77,7 +77,7 @@ func (es *RedisEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 
 		// Serialize and save each event
 		for _, event := range events {
-			eventData, err := es.serializer.Serialize(event)
+			eventData, err := es.serializer.Marshal(event)
 			if err != nil {
 				return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to serialize event", err)
 			}
@@ -132,7 +132,7 @@ func (es *RedisEventStore) GetEventHistory(ctx context.Context, aggregateID stri
 
 		// Deserialize events
 		for _, data := range eventData {
-			event, err := es.serializer.Deserialize([]byte(data))
+			event, err := es.serializer.Unmarshal([]byte(data))
 			if err != nil {
 				return cqrs.NewCQRSError(cqrs.ErrCodeSerializationError.String(), "failed to deserialize event", err)
 			}
@@ -214,7 +214,7 @@ func (es *RedisEventStore) CompactEvents(ctx context.Context, aggregateID string
 		// Find events to keep
 		var eventsToKeep []string
 		for _, data := range eventData {
-			event, err := es.serializer.Deserialize([]byte(data))
+			event, err := es.serializer.Unmarshal([]byte(data))
 			if err != nil {
 				continue // Skip invalid events
 			}

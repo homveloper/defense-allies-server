@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"defense-allies-server/internal/serverapp"
-	"defense-allies-server/pkg/redis"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // HealthApp 헬스체크 기능을 제공하는 ServerApp
@@ -164,15 +165,15 @@ func (h *HealthApp) checkRedisHealth() serverapp.HealthStatus {
 
 	// Redis 핑 테스트
 	start := time.Now()
-	_, err := h.redisClient.Get("health:ping")
+	cmd := h.redisClient.Get(context.Background(), "health:ping")
 	latency := time.Since(start)
 
-	if err != nil && err.Error() != "redis: nil" { // nil은 키가 없다는 뜻이므로 정상
+	if cmd.Err() != nil && cmd.Err() != redis.Nil { // nil은 키가 없다는 뜻이므로 정상
 		return serverapp.HealthStatus{
 			Status:  serverapp.HealthStatusUnhealthy,
 			Message: "Redis connection failed",
 			Details: map[string]string{
-				"error": err.Error(),
+				"error": cmd.Err().Error(),
 			},
 		}
 	}
@@ -211,7 +212,7 @@ func (h *HealthApp) checkMemoryHealth() serverapp.HealthStatus {
 func (h *HealthApp) onStart(ctx context.Context) error {
 	// Redis 연결 테스트
 	if h.redisClient != nil {
-		if _, err := h.redisClient.Get("health:startup"); err != nil && err.Error() != "redis: nil" {
+		if _, err := h.redisClient.Get(ctx, "health:startup").Result(); err != nil && err != redis.Nil {
 			return err
 		}
 	}

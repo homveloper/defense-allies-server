@@ -23,8 +23,8 @@ func TestNewMongoStateDocument(t *testing.T) {
 	doc := NewMongoStateDocument(aggregateID, aggregateType, version, stateTimestamp)
 
 	// Then
-	assert.Equal(t, fmt.Sprintf("%s-%s-v%d", aggregateType, aggregateID.String(), version), doc.ID)
-	assert.Equal(t, aggregateID.String(), doc.string)
+	assert.Equal(t, fmt.Sprintf("%s-%s-v%d", aggregateType, aggregateID, version), doc.ID)
+	assert.Equal(t, aggregateID, doc.string)
 	assert.Equal(t, aggregateType, doc.AggregateType)
 	assert.Equal(t, version, doc.Version)
 	assert.Equal(t, DocumentVersionCurrent, doc.DocumentVersion)

@@ -111,21 +111,8 @@ func (a *BaseAggregate) ApplyEvent(event EventMessage) error {
 		return errors.New("event cannot be nil")
 	}
 
-	// Update version and timestamp first
-	// Auto-populate aggregate metadata in the event
-	if baseEvent, ok := event.(*BaseEventMessage); ok {
-		version := a.nextVersion()
-		timestamp := time.Now()
-
-		event = baseEvent.CloneWithOptions(
-			&BaseEventMessageOptions{
-				string:        &a.id,
-				AggregateType: &a.aggregateType,
-				Version:       &version,
-				Timestamp:     &timestamp,
-			},
-		)
-	}
+	version := a.nextVersion()
+	event.setAggregateInfo(a.id, a.aggregateType, version)
 
 	// Track new events for persistence
 	a.changes = append(a.changes, event)
@@ -141,7 +128,8 @@ func (a *BaseAggregate) ReplayEvent(event EventMessage) error {
 	}
 
 	// Update version and timestamp (but don't track as new change)
-	a.nextVersion()
+	version := a.nextVersion()
+	event.setAggregateInfo(a.id, a.aggregateType, version)
 
 	return nil
 }

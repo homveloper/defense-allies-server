@@ -33,6 +33,9 @@ type UserService interface {
 	GetUser(ctx context.Context, userID string) (*User, error)
 	CreateUser(ctx context.Context, userInfo *UserInfo) (*User, error)
 	UpdateLastLogin(ctx context.Context, userID string) error
+	GetUserGameData(ctx context.Context, userID string) (*GameData, error)
+	UpdateUserGameData(ctx context.Context, userID string, gameData *GameData) error
+	GetUsersByLastLogin(ctx context.Context, since time.Time, limit int) ([]*User, error)
 }
 
 // User 유저 정보

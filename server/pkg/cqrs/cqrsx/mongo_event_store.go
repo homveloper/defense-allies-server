@@ -17,7 +17,7 @@ import (
 type MongoEventStore struct {
 	client         *MongoClientManager
 	collectionName string
-	serializer     EventSerializer
+	serializer     EventMarshaler
 }
 
 // MongoEventDocument represents the standard Event Sourcing document schema in MongoDB
@@ -43,7 +43,7 @@ func NewMongoEventStore(client *MongoClientManager, collectionName string) *Mong
 	return &MongoEventStore{
 		client:         client,
 		collectionName: collectionName,
-		serializer:     &BSONEventSerializer{},
+		serializer:     &BSONEventMarshaler{},
 	}
 }
 
@@ -72,14 +72,14 @@ func (es *MongoEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 		_, err = session.WithTransaction(ctx, func(sessCtx mongo.SessionContext) (interface{}, error) {
 			// Check current version for optimistic concurrency control
 			if expectedVersion >= 0 {
-				currentVersion, err := es.getLastEventVersion(sessCtx, aggregateID, events[0].Type())
+				currentVersion, err := es.getLastEventVersion(sessCtx, aggregateID, events[0].AggregateType())
 				if err != nil {
 					return nil, err
 				}
 
 				if currentVersion != expectedVersion {
 					return nil, cqrs.NewCQRSError(cqrs.ErrCodeConcurrencyConflict.String(),
-						fmt.Sprintf("concurrency conflict: expected version %d, got %d", expectedVersion, currentVersion), nil)
+						fmt.Sprintf("concurrency conflict: expected version %d, got %d", expectedVersion, currentVersion), cqrs.ErrConcurrencyConflict)
 				}
 			}
 
@@ -106,7 +106,7 @@ func (es *MongoEventStore) SaveEvents(ctx context.Context, aggregateID string, e
 				// Standard Event Sourcing document structure - no duplication
 				doc := MongoEventDocument{
 					AggregateID:   aggregateID,
-					AggregateType: event.Type(),
+					AggregateType: event.AggregateType(),
 					EventID:       event.EventID(),
 					EventType:     event.EventType(),
 					EventData:     bson.Raw(eventDataBytes), // Only store the actual event data
@@ -190,21 +190,7 @@ func (es *MongoEventStore) LoadEvents(ctx context.Context, aggregateID string, a
 			}
 
 			// Reconstruct the event message
-			event := cqrs.NewBaseEventMessage(
-				doc.EventType,
-				eventData,
-				cqrs.Options().WithLoad(
-					doc.EventID,
-					doc.Timestamp,
-					doc.Metadata,
-					doc.AggregateID,
-					doc.AggregateType,
-					doc.EventVersion,
-				),
-			)
-
-			event.SetEventID(doc.EventID)
-			event.SetTimestamp(doc.Timestamp)
+			event := cqrs.NewBaseEventMessage(doc.EventType)
 
 			// Set metadata
 			for key, value := range doc.Metadata {
@@ -346,21 +332,7 @@ func (es *MongoEventStore) GetEventsByType(ctx context.Context, eventType string
 			}
 
 			// Reconstruct the event message
-			event := cqrs.NewBaseEventMessage(
-				doc.EventType,
-				eventData,
-				cqrs.Options().WithLoad(
-					doc.EventID,
-					doc.Timestamp,
-					doc.Metadata,
-					doc.AggregateID,
-					doc.AggregateType,
-					doc.EventVersion,
-				),
-			)
-
-			event.SetEventID(doc.EventID)
-			event.SetTimestamp(doc.Timestamp)
+			event := cqrs.NewBaseEventMessage(doc.EventType)
 
 			// Set metadata
 			for key, value := range doc.Metadata {

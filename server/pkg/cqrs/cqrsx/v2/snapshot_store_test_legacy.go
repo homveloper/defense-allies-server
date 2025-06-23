@@ -77,11 +77,11 @@ package cqrsx
 // }
 
 // func (m *MockEventStore) Load(ctx context.Context, aggregateID uuid.UUID) ([]Event, error) {
-// 	return m.events[aggregateID.String()], nil
+// 	return m.events[aggregateID], nil
 // }
 
 // func (m *MockEventStore) LoadFrom(ctx context.Context, aggregateID uuid.UUID, fromVersion int) ([]Event, error) {
-// 	allEvents := m.events[aggregateID.String()]
+// 	allEvents := m.events[aggregateID]
 // 	var filteredEvents []Event
 // 	for _, event := range allEvents {
 // 		if event.Version() >= fromVersion {
@@ -142,7 +142,7 @@ package cqrsx
 // 	snapshot, err := manager.GetLatestSnapshot(context.Background(), aggregateID)
 // 	assert.NoError(t, err)
 // 	assert.NotNil(t, snapshot)
-// 	assert.Equal(t, aggregateID.String(), snapshot.string)
+// 	assert.Equal(t, aggregateID, snapshot.string)
 // 	assert.Equal(t, 3, snapshot.Version)
 // 	assert.Equal(t, "TestAggregate", snapshot.AggregateType)
 // }

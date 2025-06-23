@@ -7,8 +7,8 @@ type EventMessage interface {
 	// Basic event information
 	EventID() string
 	EventType() string
-	ID() string
-	Type() string
+	AggregateID() string
+	AggregateType() string
 	Version() int
 
 	// Event data (serialization handled separately)
@@ -18,7 +18,10 @@ type EventMessage interface {
 	Metadata() map[string]interface{}
 	Timestamp() time.Time
 
-	Clone() EventMessage
+	// setAggregateInfo sets the aggregate information (ID, type, version)
+	// This is called by BaseAggregate.ApplyEvent
+	setAggregateInfo(aggregateID string, aggregateType string, version int)
+	// rehydrate(eventID string, eventType string, aggregateID string, aggregateType string, version int, metadata map[string]interface{}, timestamp time.Time)
 }
 
 // EventCategory represents different types of events

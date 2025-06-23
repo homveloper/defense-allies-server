@@ -215,7 +215,7 @@ func (doc *mongoStateDocument) SetLastError(err error) {
 // NewMongoStateDocument는 새로운 MongoDB 상태 문서를 생성합니다
 func NewMongoStateDocument(aggregateID uuid.UUID, aggregateType string, version int, stateTimestamp time.Time) *mongoStateDocument {
 	doc := &mongoStateDocument{
-		ID:              fmt.Sprintf("%s-%s-v%d", aggregateType, aggregateID.String(), version),
+		ID:              fmt.Sprintf("%s-%s-v%d", aggregateType, aggregateID, version),
 		string:          aggregateID.String(),
 		AggregateType:   aggregateType,
 		Version:         version,

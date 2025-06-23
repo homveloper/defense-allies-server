@@ -128,7 +128,7 @@ func (m *MongoStateStore) Load(ctx context.Context, aggregateID uuid.UUID) (*Agg
 		m.updateMetrics("load", time.Since(start), nil)
 	}()
 
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 	opts := options.FindOne().SetSort(bson.M{"version": -1})
 
 	var doc mongoStateDocument
@@ -163,7 +163,7 @@ func (m *MongoStateStore) LoadVersion(ctx context.Context, aggregateID uuid.UUID
 	}()
 
 	filter := bson.M{
-		"aggregateId": aggregateID.String(),
+		"aggregateId": aggregateID,
 		"version":     version,
 	}
 
@@ -326,7 +326,7 @@ func (m *MongoStateStore) Delete(ctx context.Context, aggregateID uuid.UUID, ver
 	}()
 
 	filter := bson.M{
-		"aggregateId": aggregateID.String(),
+		"aggregateId": aggregateID,
 		"version":     version,
 	}
 
@@ -350,7 +350,7 @@ func (m *MongoStateStore) DeleteAll(ctx context.Context, aggregateID uuid.UUID) 
 		m.updateMetrics("delete", time.Since(start), nil)
 	}()
 
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 
 	_, err := m.collection.DeleteMany(ctx, filter)
 	if err != nil {
@@ -368,7 +368,7 @@ func (m *MongoStateStore) List(ctx context.Context, aggregateID uuid.UUID) ([]*A
 		m.updateMetrics("query", time.Since(start), nil)
 	}()
 
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 	opts := options.Find().SetSort(bson.M{"version": 1})
 
 	cursor, err := m.collection.Find(ctx, filter, opts)
@@ -405,7 +405,7 @@ func (m *MongoStateStore) List(ctx context.Context, aggregateID uuid.UUID) ([]*A
 
 // Count는 저장된 상태 개수를 반환합니다
 func (m *MongoStateStore) Count(ctx context.Context, aggregateID uuid.UUID) (int64, error) {
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 	count, err := m.collection.CountDocuments(ctx, filter)
 	if err != nil {
 		return 0, fmt.Errorf("failed to count states: %w", err)
@@ -416,7 +416,7 @@ func (m *MongoStateStore) Count(ctx context.Context, aggregateID uuid.UUID) (int
 // Exists는 특정 상태가 존재하는지 확인합니다
 func (m *MongoStateStore) Exists(ctx context.Context, aggregateID uuid.UUID, version int) (bool, error) {
 	filter := bson.M{
-		"aggregateId": aggregateID.String(),
+		"aggregateId": aggregateID,
 		"version":     version,
 	}
 
@@ -589,7 +589,7 @@ func (m *MongoStateStore) GetMetrics(ctx context.Context) (*StateMetrics, error)
 
 // GetAggregateMetrics는 특정 집합체의 메트릭을 반환합니다
 func (m *MongoStateStore) GetAggregateMetrics(ctx context.Context, aggregateID uuid.UUID) (*StateMetrics, error) {
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 
 	// 해당 집합체의 상태 수 조회
 	totalStates, err := m.collection.CountDocuments(ctx, filter)
@@ -722,7 +722,7 @@ func (m *MongoStateStore) GetAggregateTypes(ctx context.Context) ([]string, erro
 
 // GetVersions는 집합체의 모든 버전을 반환합니다
 func (m *MongoStateStore) GetVersions(ctx context.Context, aggregateID uuid.UUID) ([]int, error) {
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 	opts := options.Find().SetProjection(bson.M{"version": 1}).SetSort(bson.M{"version": 1})
 
 	cursor, err := m.collection.Find(ctx, filter, opts)

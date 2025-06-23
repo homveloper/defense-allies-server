@@ -150,7 +150,7 @@ package cqrsx
 // 		m.updateMetrics("load", time.Since(start), nil)
 // 	}()
 
-// 	filter := bson.M{"aggregateId": aggregateID.String()}
+// 	filter := bson.M{"aggregateId": aggregateID}
 // 	opts := options.FindOne().SetSort(bson.M{"version": -1})
 
 // 	var doc mongoStateDocument
@@ -180,7 +180,7 @@ package cqrsx
 // 	}()
 
 // 	filter := bson.M{
-// 		"aggregateId": aggregateID.String(),
+// 		"aggregateId": aggregateID,
 // 		"version":     version,
 // 	}
 
@@ -211,7 +211,7 @@ package cqrsx
 // 	}()
 
 // 	filter := bson.M{
-// 		"aggregateId": aggregateID.String(),
+// 		"aggregateId": aggregateID,
 // 		"version":     version,
 // 	}
 
@@ -235,7 +235,7 @@ package cqrsx
 // 		m.updateMetrics("delete", time.Since(start), nil)
 // 	}()
 
-// 	filter := bson.M{"aggregateId": aggregateID.String()}
+// 	filter := bson.M{"aggregateId": aggregateID}
 
 // 	_, err := m.collection.DeleteMany(ctx, filter)
 // 	if err != nil {
@@ -253,7 +253,7 @@ package cqrsx
 // 		m.updateMetrics("query", time.Since(start), nil)
 // 	}()
 
-// 	filter := bson.M{"aggregateId": aggregateID.String()}
+// 	filter := bson.M{"aggregateId": aggregateID}
 // 	opts := options.Find().SetSort(bson.M{"version": 1})
 
 // 	cursor, err := m.collection.Find(ctx, filter, opts)
@@ -290,7 +290,7 @@ package cqrsx
 
 // // Count는 저장된 상태 개수를 반환합니다
 // func (m *MongoStateStore) Count(ctx context.Context, aggregateID uuid.UUID) (int64, error) {
-// 	filter := bson.M{"aggregateId": aggregateID.String()}
+// 	filter := bson.M{"aggregateId": aggregateID}
 // 	count, err := m.collection.CountDocuments(ctx, filter)
 // 	if err != nil {
 // 		return 0, fmt.Errorf("failed to count states: %w", err)
@@ -301,7 +301,7 @@ package cqrsx
 // // Exists는 특정 상태가 존재하는지 확인합니다
 // func (m *MongoStateStore) Exists(ctx context.Context, aggregateID uuid.UUID, version int) (bool, error) {
 // 	filter := bson.M{
-// 		"aggregateId": aggregateID.String(),
+// 		"aggregateId": aggregateID,
 // 		"version":     version,
 // 	}
 

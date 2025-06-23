@@ -35,16 +35,16 @@ type documentMetrics struct {
 
 // SingleEventDocument는 MongoDB에 저장되는 개별 이벤트 문서입니다
 type SingleEventDocument struct {
-	ID         string      `bson:"_id"`
-	StreamName string      `bson:"streamName"`
-	StreamType string      `bson:"streamType"`
-	string     string      `bson:"aggregateId"`
-	EventType  string      `bson:"eventType"`
-	Version    int         `bson:"version"`
-	Timestamp  time.Time   `bson:"timestamp"`
-	Data       interface{} `bson:"data"`
-	Metadata   interface{} `bson:"metadata"`
-	CreatedAt  time.Time   `bson:"createdAt"`
+	ID          string      `bson:"_id"`
+	StreamName  string      `bson:"streamName"`
+	StreamType  string      `bson:"streamType"`
+	AggregateID string      `bson:"aggregateId"`
+	EventType   string      `bson:"eventType"`
+	Version     int         `bson:"version"`
+	Timestamp   time.Time   `bson:"timestamp"`
+	Data        interface{} `bson:"data"`
+	Metadata    interface{} `bson:"metadata"`
+	CreatedAt   time.Time   `bson:"createdAt"`
 }
 
 // NewDocumentEventStore는 새로운 문서 이벤트 저장소를 생성합니다
@@ -100,16 +100,16 @@ func (d *DocumentEventStore) Save(ctx context.Context, events []Event, expectedV
 		docs := make([]interface{}, len(events))
 		for i, event := range events {
 			docs[i] = SingleEventDocument{
-				ID:         fmt.Sprintf("%s-%d", aggregateID.String(), expectedVersion+i+1),
-				StreamName: d.getStreamName(aggregateID),
-				StreamType: d.getStreamType(event),
-				string:     aggregateID.String(),
-				EventType:  string(event.EventType()),
-				Version:    expectedVersion + i + 1,
-				Timestamp:  event.Timestamp(),
-				Data:       event.Data(),
-				Metadata:   event.Metadata(),
-				CreatedAt:  time.Now(),
+				ID:          fmt.Sprintf("%s-%d", aggregateID.String(), expectedVersion+i+1),
+				StreamName:  d.getStreamName(aggregateID),
+				StreamType:  d.getStreamType(event),
+				AggregateID: aggregateID.String(),
+				EventType:   string(event.EventType()),
+				Version:     expectedVersion + i + 1,
+				Timestamp:   event.Timestamp(),
+				Data:        event.Data(),
+				Metadata:    event.Metadata(),
+				CreatedAt:   time.Now(),
 			}
 		}
 
@@ -227,7 +227,7 @@ func (d *DocumentEventStore) FindEvents(ctx context.Context, query EventQuery) (
 			return nil, fmt.Errorf("failed to decode event: %w", err)
 		}
 
-		aggregateID, _ := uuid.Parse(doc.string)
+		aggregateID, _ := uuid.Parse(doc.AggregateID)
 		event := d.documentToEvent(doc, aggregateID)
 		events = append(events, event)
 	}

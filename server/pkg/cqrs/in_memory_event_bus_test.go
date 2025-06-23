@@ -60,10 +60,7 @@ type testedEventData struct {
 }
 
 func newTestedEventMessage() *BaseEventMessage {
-	return NewBaseEventMessage(TestedEventDataType, &testedEventData{
-		Field1: "test",
-		Field2: 123,
-	})
+	return NewBaseEventMessage(TestedEventDataType)
 }
 
 func TestNewInMemoryEventBus(t *testing.T) {
@@ -178,12 +175,7 @@ func TestEventBus_Publish_Success(t *testing.T) {
 	bus := NewInMemoryEventBus()
 	handler := NewTestEventHandler("TestHandler", []string{"TestEvent"})
 
-	eventdata := map[string]interface{}{
-		"field1": "value1",
-		"field2": 42,
-	}
-
-	event := NewBaseEventMessage("TestEvent", eventdata)
+	event := NewBaseEventMessage("TestEvent")
 
 	bus.Subscribe("TestEvent", handler)
 

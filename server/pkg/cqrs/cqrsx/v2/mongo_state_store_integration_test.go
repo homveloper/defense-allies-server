@@ -524,7 +524,7 @@ func TestIntegration_DocumentVersionCompatibility(t *testing.T) {
 	mongoStore := store.(*MongoStateStore)
 
 	var doc mongoStateDocument
-	filter := bson.M{"aggregateId": aggregateID.String()}
+	filter := bson.M{"aggregateId": aggregateID}
 	err = mongoStore.collection.FindOne(ctx, filter).Decode(&doc)
 	require.NoError(t, err)
 

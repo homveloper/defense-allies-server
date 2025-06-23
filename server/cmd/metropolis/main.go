@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"defense-allies-server/configs"
-	"defense-allies-server/pkg/redis"
 	"defense-allies-server/serverapp/timesquare"
 )
 
@@ -19,18 +18,23 @@ func main() {
 	fmt.Println("🏙️ Welcome to Metropolis - TimeSquare Server")
 	fmt.Println("The city that never sleeps is starting up...")
 
-	// 설정 로드
-	config := configs.LoadConfig()
-
-	// Redis 클라이언트 초기화
-	redisClient, err := redis.NewClient(&config.Redis)
-	if err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
+	// 설정 파일 경로 결정
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "configs/config.json"
 	}
-	defer redisClient.Close()
+
+	// 전역 설정 로드 (서버 정보용)
+	globalConfig, err := configs.LoadConfigFromPath(configPath)
+	if err != nil {
+		log.Fatalf("Failed to load global config: %v", err)
+	}
 
 	// TimeSquareApp 생성
-	timeSquareApp := timesquare.NewTimeSquareApp(redisClient)
+	timeSquareApp, err := timesquare.NewTimeSquareApp(configPath)
+	if err != nil {
+		log.Fatalf("Failed to create TimeSquareApp: %v", err)
+	}
 
 	// HTTP Mux 생성
 	mux := http.NewServeMux()
@@ -49,13 +53,13 @@ func main() {
 
 	// HTTP 서버 설정
 	server := &http.Server{
-		Addr:    ":" + config.Server.Port,
+		Addr:    fmt.Sprintf("%s:%d", globalConfig.Server.Host, globalConfig.Server.Port),
 		Handler: mux,
 	}
 
 	// 서버 시작
 	go func() {
-		fmt.Printf("🚀 Metropolis TimeSquare Server starting on port %s\n", config.Server.Port)
+		fmt.Printf("🚀 Metropolis TimeSquare Server starting on port %d\n", globalConfig.Server.Port)
 		fmt.Println("🎮 Ready to welcome players to the square!")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
@@ -71,7 +75,8 @@ func main() {
 	log.Println("Shutting down TimeSquare server...")
 
 	// 서버 종료
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	shutdownTimeout := time.Duration(globalConfig.Server.GracefulTimeout) * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {

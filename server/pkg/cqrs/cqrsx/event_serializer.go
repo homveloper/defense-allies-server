@@ -2,163 +2,35 @@ package cqrsx
 
 import (
 	"cqrs"
-	"encoding/json"
-	"time"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
-// EventSerializer interface for event serialization
+// EventMarshaler interface for event serialization
 // This interface provides a clean abstraction for different event serialization strategies
-type EventSerializer interface {
-	Serialize(event cqrs.EventMessage) ([]byte, error)
-	Deserialize(data []byte) (cqrs.EventMessage, error)
+type EventMarshaler interface {
+	Marshal(event cqrs.EventMessage) ([]byte, error)
+	Unmarshal(data []byte) (cqrs.EventMessage, error)
 }
 
-// Note: EventSerializerWithType was removed as it's unnecessary - event type is stored within the serialized data
-
-// EventData represents serialized event data structure
-// This is the standard format used for JSON serialization of events
-type EventData struct {
-	EventID       string                 `json:"event_id"`
-	EventType     string                 `json:"event_type"`
-	AggregateID   string                 `json:"aggregate_id"`
-	AggregateType string                 `json:"aggregate_type"`
-	Version       int                    `json:"version"`
-	Data          interface{}            `json:"data"`
-	Metadata      map[string]interface{} `json:"metadata"`
-	Timestamp     time.Time              `json:"timestamp"`
-}
-
-// JSONEventSerializer implements EventSerializer using JSON format
+// JSONEventMarshaler implements EventSerializer using JSON format
 // This serializer stores the event type within the serialized data
-type JSONEventSerializer struct{}
-
-// Serialize serializes an event to JSON bytes
-func (s *JSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error) {
-	eventData := EventData{
-		EventID:       event.EventID(),
-		EventType:     event.EventType(),
-		AggregateID:   event.ID(),
-		AggregateType: event.Type(),
-		Version:       event.Version(),
-		Data:          event.EventData(),
-		Metadata:      event.Metadata(),
-		Timestamp:     event.Timestamp(),
-	}
-
-	return json.Marshal(eventData)
+type JSONEventMarshaler struct {
+	registry EventRegistry
 }
 
-// Deserialize deserializes JSON bytes to an event
-func (s *JSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error) {
-	var eventData EventData
-	if err := json.Unmarshal(data, &eventData); err != nil {
-		return nil, err
+func NewJSONEventMarshaler(registry EventRegistry) *JSONEventMarshaler {
+	return &JSONEventMarshaler{
+		registry: registry,
 	}
-
-	event := cqrs.NewBaseEventMessage(
-		eventData.EventType,
-		eventData.Data,
-		cqrs.Options().WithLoad(
-			eventData.EventID,
-			eventData.Timestamp,
-			eventData.Metadata,
-			eventData.AggregateID,
-			eventData.AggregateType,
-			eventData.Version,
-		),
-	)
-
-	// Set metadata
-	for key, value := range eventData.Metadata {
-		event.AddMetadata(key, value)
-	}
-
-	return event, nil
 }
 
-// Note: JSONEventSerializerWithType was removed as it's unnecessary
-
-// CompactEventSerializer implements a more compact JSON serialization
-// This serializer reduces the size of serialized events by using shorter field names
-type CompactEventSerializer struct{}
-
-// CompactEventData represents a more compact event data structure
-type CompactEventData struct {
-	ID  string                 `json:"i"`  // event_id
-	T   string                 `json:"t"`  // event_type
-	AID string                 `json:"ai"` // aggregate_id
-	AT  string                 `json:"at"` // aggregate_type
-	V   int                    `json:"v"`  // version
-	D   interface{}            `json:"d"`  // data
-	M   map[string]interface{} `json:"m"`  // metadata
-	TS  time.Time              `json:"ts"` // timestamp
+// Marshal serializes an event to JSON bytes
+func (s *JSONEventMarshaler) Marshal(event cqrs.EventMessage) ([]byte, error) {
+	return MarshalEventJSON(event)
 }
 
-// Serialize serializes an event to compact JSON bytes
-func (s *CompactEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error) {
-	eventData := CompactEventData{
-		ID:  event.EventID(),
-		T:   event.EventType(),
-		AID: event.ID(),
-		AT:  event.Type(),
-		V:   event.Version(),
-		D:   event.EventData(),
-		M:   event.Metadata(),
-		TS:  event.Timestamp(),
-	}
-
-	return json.Marshal(eventData)
-}
-
-// Deserialize deserializes compact JSON bytes to an event
-func (s *CompactEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error) {
-	var eventData CompactEventData
-	if err := json.Unmarshal(data, &eventData); err != nil {
-		return nil, err
-	}
-
-	event := cqrs.NewBaseEventMessage(
-		eventData.T,
-		eventData.D,
-		cqrs.Options().WithLoad(
-			eventData.ID,
-			eventData.TS,
-			eventData.M,
-			eventData.AID,
-			eventData.AT,
-			eventData.V,
-		),
-	)
-
-	event.SetEventID(eventData.ID)
-	event.SetTimestamp(eventData.TS)
-
-	// Set metadata
-	for key, value := range eventData.M {
-		event.AddMetadata(key, value)
-	}
-
-	return event, nil
-}
-
-// BinaryEventSerializer implements binary serialization for events
-// This can be implemented later for performance-critical scenarios
-type BinaryEventSerializer struct{}
-
-// Serialize serializes an event to binary format (placeholder implementation)
-func (s *BinaryEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error) {
-	// For now, fallback to JSON
-	jsonSerializer := &JSONEventSerializer{}
-	return jsonSerializer.Serialize(event)
-}
-
-// Deserialize deserializes binary data to an event (placeholder implementation)
-func (s *BinaryEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error) {
-	// For now, fallback to JSON
-	jsonSerializer := &JSONEventSerializer{}
-	return jsonSerializer.Deserialize(data)
+// Unmarshal deserializes JSON bytes to an event
+func (s *JSONEventMarshaler) Unmarshal(data []byte) (cqrs.EventMessage, error) {
+	return UnmarshalEventJSON(data, s.registry)
 }
 
 // EventSerializerFactory creates event serializers based on format
@@ -168,22 +40,19 @@ type EventSerializerFactory struct{}
 type SerializerFormat string
 
 const (
-	JSONFormat    SerializerFormat = "json"
-	CompactFormat SerializerFormat = "compact"
-	BinaryFormat  SerializerFormat = "binary"
+	JSONFormat SerializerFormat = "json"
+	BSONFormat SerializerFormat = "bson"
 )
 
 // CreateEventSerializer creates an event serializer for the specified format
-func (f *EventSerializerFactory) CreateEventSerializer(format SerializerFormat) EventSerializer {
+func (f *EventSerializerFactory) CreateEventSerializer(format SerializerFormat) EventMarshaler {
 	switch format {
 	case JSONFormat:
-		return &JSONEventSerializer{}
-	case CompactFormat:
-		return &CompactEventSerializer{}
-	case BinaryFormat:
-		return &BinaryEventSerializer{}
+		return &JSONEventMarshaler{}
+	case BSONFormat:
+		return &BSONEventMarshaler{}
 	default:
-		return &JSONEventSerializer{} // Default to JSON
+		return &JSONEventMarshaler{} // Default to JSON
 	}
 }
 
@@ -191,55 +60,26 @@ func (f *EventSerializerFactory) CreateEventSerializer(format SerializerFormat) 
 
 // GetSupportedFormats returns all supported serialization formats
 func (f *EventSerializerFactory) GetSupportedFormats() []SerializerFormat {
-	return []SerializerFormat{JSONFormat, CompactFormat, BinaryFormat}
+	return []SerializerFormat{JSONFormat, BSONFormat}
 }
 
-// BSONEventSerializer implements EventSerializer using BSON format for MongoDB
-type BSONEventSerializer struct{}
-
-// Serialize serializes an event to BSON bytes
-func (s *BSONEventSerializer) Serialize(event cqrs.EventMessage) ([]byte, error) {
-	eventData := EventData{
-		EventID:       event.EventID(),
-		EventType:     event.EventType(),
-		AggregateID:   event.ID(),
-		AggregateType: event.Type(),
-		Version:       event.Version(),
-		Data:          event.EventData(),
-		Metadata:      event.Metadata(),
-		Timestamp:     event.Timestamp(),
-	}
-
-	return bson.Marshal(eventData)
+// BSONEventMarshaler implements EventSerializer using BSON format for MongoDB
+type BSONEventMarshaler struct {
+	registry EventRegistry
 }
 
-// Deserialize deserializes BSON bytes to an event
-func (s *BSONEventSerializer) Deserialize(data []byte) (cqrs.EventMessage, error) {
-	var eventData EventData
-	if err := bson.Unmarshal(data, &eventData); err != nil {
-		return nil, err
+func NewBSONEventMarshaler(registry EventRegistry) *BSONEventMarshaler {
+	return &BSONEventMarshaler{
+		registry: registry,
 	}
+}
 
-	event := cqrs.NewBaseEventMessage(
-		eventData.EventType,
-		eventData.Data,
-		cqrs.Options().WithLoad(
-			eventData.EventID,
-			eventData.Timestamp,
-			eventData.Metadata,
-			eventData.AggregateID,
-			eventData.AggregateType,
-			eventData.Version,
-		),
-	)
+// Marshal serializes an event to BSON bytes
+func (s *BSONEventMarshaler) Marshal(event cqrs.EventMessage) ([]byte, error) {
+	return MarshalEventBSON(event)
+}
 
-	event.SetEventID(eventData.EventID)
-	event.SetTimestamp(eventData.Timestamp)
-
-	// Set metadata
-	for key, value := range eventData.Metadata {
-		event.AddMetadata(key, value)
-	}
-
-	return event, nil
+// Unmarshal deserializes BSON bytes to an event
+func (s *BSONEventMarshaler) Unmarshal(data []byte) (cqrs.EventMessage, error) {
+	return UnmarshalEventBSON(data, s.registry)
 }

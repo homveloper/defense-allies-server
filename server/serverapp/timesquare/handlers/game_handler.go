@@ -8,71 +8,18 @@ import (
 	"time"
 
 	"defense-allies-server/serverapp/timesquare/middleware"
-	"defense-allies-server/serverapp/timesquare/service"
 )
 
 // GameHandler 게임 관련 핸들러
 type GameHandler struct {
-	userService *service.RedisUserService
+	userService middleware.UserService
 }
 
 // NewGameHandler 새로운 게임 핸들러 생성
-func NewGameHandler(userService *service.RedisUserService) *GameHandler {
+func NewGameHandler(userService middleware.UserService) *GameHandler {
 	return &GameHandler{
 		userService: userService,
 	}
-}
-
-// GetProfile 유저 프로필 조회
-func (gh *GameHandler) GetProfile(ctx context.Context) (map[string]interface{}, error) {
-	user, ok := middleware.GetUserFromContext(ctx)
-	if !ok {
-		return nil, fmt.Errorf("user not found in context")
-	}
-
-	return map[string]interface{}{
-		"id":         user.ID,
-		"username":   user.Username,
-		"email":      user.Email,
-		"created_at": user.CreatedAt,
-		"last_login": user.LastLogin,
-		"game_data":  user.GameData,
-	}, nil
-}
-
-// UpdateGameData 게임 데이터 업데이트
-func (gh *GameHandler) UpdateGameData(ctx context.Context, params UpdateGameDataParams) error {
-	userID, ok := middleware.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user ID not found in context")
-	}
-
-	// 현재 게임 데이터 조회
-	currentData, err := gh.userService.GetUserGameData(ctx, userID)
-	if err != nil {
-		return fmt.Errorf("failed to get current game data: %w", err)
-	}
-
-	// 데이터 업데이트
-	if params.Level != nil {
-		currentData.Level = *params.Level
-	}
-	if params.Score != nil {
-		currentData.Score = *params.Score
-	}
-	if params.Resources != nil {
-		for resource, amount := range params.Resources {
-			currentData.Resources[resource] = amount
-		}
-	}
-	if params.Settings != nil {
-		for setting, value := range params.Settings {
-			currentData.Settings[setting] = value
-		}
-	}
-
-	// 데이터베이스 업데이트
-	return gh.userService.UpdateUserGameData(ctx, userID, currentData)
 }
 
 // GetGameData 게임 데이터 조회
@@ -83,36 +30,6 @@ func (gh *GameHandler) GetGameData(ctx context.Context) (*middleware.GameData, e
 	}
 
 	return gh.userService.GetUserGameData(ctx, userID)
-}
-
-// GetLeaderboard 리더보드 조회
-func (gh *GameHandler) GetLeaderboard(ctx context.Context, params LeaderboardParams) ([]LeaderboardEntry, error) {
-	// 최근 활성 유저들 조회
-	since := time.Now().AddDate(0, 0, -30) // 최근 30일
-	limit := 100
-	if params.Limit != nil && *params.Limit > 0 && *params.Limit <= 1000 {
-		limit = *params.Limit
-	}
-
-	users, err := gh.userService.GetUsersByLastLogin(ctx, since, limit)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get users: %w", err)
-	}
-
-	// 리더보드 엔트리 생성
-	var entries []LeaderboardEntry
-	for _, user := range users {
-		if user.GameData != nil {
-			entries = append(entries, LeaderboardEntry{
-				UserID:   user.ID,
-				Username: user.Username,
-				Level:    user.GameData.Level,
-				Score:    user.GameData.Score,
-			})
-		}
-	}
-
-	return entries, nil
 }
 
 // JoinGame 게임 참가
@@ -180,8 +97,8 @@ type GameSession struct {
 
 // HTTP 핸들러들 (RPC 핸들러와 별도)
 
-// HTTPGetProfile HTTP GET 프로필 조회
-func (gh *GameHandler) HTTPGetProfile(w http.ResponseWriter, r *http.Request) {
+// GetProfile HTTP GET 프로필 조회
+func (gh *GameHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	user, ok := middleware.GetUserFromContext(r.Context())
 	if !ok {
 		http.Error(w, "User not found", http.StatusUnauthorized)
@@ -204,8 +121,8 @@ func (gh *GameHandler) HTTPGetProfile(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// HTTPUpdateGameData HTTP POST 게임 데이터 업데이트
-func (gh *GameHandler) HTTPUpdateGameData(w http.ResponseWriter, r *http.Request) {
+// UpdateGameData HTTP POST 게임 데이터 업데이트
+func (gh *GameHandler) UpdateGameData(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusUnauthorized)
@@ -252,6 +169,134 @@ func (gh *GameHandler) HTTPUpdateGameData(w http.ResponseWriter, r *http.Request
 	response := map[string]interface{}{
 		"success": true,
 		"message": "Game data updated successfully",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// GetLeaderboard HTTP GET 리더보드 조회
+func (gh *GameHandler) GetLeaderboard(w http.ResponseWriter, r *http.Request) {
+	// 쿼리 파라미터에서 limit 가져오기
+	limitStr := r.URL.Query().Get("limit")
+	limit := 100
+	if limitStr != "" {
+		if parsedLimit, err := fmt.Sscanf(limitStr, "%d", &limit); err == nil && parsedLimit > 0 && parsedLimit <= 1000 {
+			limit = parsedLimit
+		}
+	}
+
+	// 최근 30일 활성 유저 조회
+	since := time.Now().AddDate(0, 0, -30)
+	users, err := gh.userService.GetUsersByLastLogin(r.Context(), since, limit)
+	if err != nil {
+		http.Error(w, "Failed to get leaderboard", http.StatusInternalServerError)
+		return
+	}
+
+	// 리더보드 엔트리 생성
+	var entries []LeaderboardEntry
+	for _, user := range users {
+		if user.GameData != nil {
+			entries = append(entries, LeaderboardEntry{
+				UserID:   user.ID,
+				Username: user.Username,
+				Level:    user.GameData.Level,
+				Score:    user.GameData.Score,
+			})
+		}
+	}
+
+	response := map[string]interface{}{
+		"success": true,
+		"data":    entries,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// StartSession HTTP POST 게임 세션 시작
+func (gh *GameHandler) StartSession(w http.ResponseWriter, r *http.Request) {
+	user, ok := middleware.GetUserFromContext(r.Context())
+	if !ok {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+
+	var params JoinGameParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// 게임 세션 생성
+	session := &GameSession{
+		ID:        fmt.Sprintf("game_%s_%d", user.ID, time.Now().Unix()),
+		UserID:    user.ID,
+		Username:  user.Username,
+		GameType:  params.GameType,
+		Status:    "active",
+		CreatedAt: time.Now(),
+	}
+
+	// 실제로는 게임 세션 관리 서비스에 저장해야 함
+	// 여기서는 간단히 응답만 반환
+
+	response := map[string]interface{}{
+		"success": true,
+		"data":    session,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// EndSession HTTP POST 게임 세션 종료
+func (gh *GameHandler) EndSession(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusUnauthorized)
+		return
+	}
+
+	var params struct {
+		SessionID string `json:"session_id"`
+		Score     *int64 `json:"score,omitempty"`
+		Level     *int   `json:"level,omitempty"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// 게임 결과 업데이트
+	if params.Score != nil || params.Level != nil {
+		gameData, err := gh.userService.GetUserGameData(r.Context(), userID)
+		if err != nil {
+			http.Error(w, "Failed to get game data", http.StatusInternalServerError)
+			return
+		}
+
+		if params.Score != nil && *params.Score > gameData.Score {
+			gameData.Score = *params.Score
+		}
+		if params.Level != nil && *params.Level > gameData.Level {
+			gameData.Level = *params.Level
+		}
+
+		if err := gh.userService.UpdateUserGameData(r.Context(), userID, gameData); err != nil {
+			http.Error(w, "Failed to update game data", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// 실제로는 게임 세션 관리 서비스에서 세션을 종료해야 함
+
+	response := map[string]interface{}{
+		"success": true,
+		"message": "Game session ended successfully",
 	}
 
 	w.Header().Set("Content-Type", "application/json")

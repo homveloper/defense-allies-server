@@ -1,0 +1,32 @@
+{
+  "server": {
+    "host": "localhost",
+    "port": 8080,
+    "graceful_timeout": 30
+  },
+  "redis": {
+    "default": "redis://localhost:6379/0",
+    "topics": {
+      "users": "redis://localhost:6379/1",
+      "sessions": "redis://localhost:6379/2",
+      "game_data": "redis://localhost:6379/3",
+      "leaderboard": "redis://localhost:6379/4",
+      "analytics": "redis://localhost:6379/5"
+    }
+  },
+  "timesquare": {
+    "enabled": true,
+    "guardian_url": "http://localhost:8081",
+    "jwt_public_key": ""
+  },
+  "guardian": {
+    "enabled": false,
+    "mongodb_uri": "mongodb://localhost:27017",
+    "jwt_private_key": "",
+    "jwt_public_key": ""
+  },
+  "logging": {
+    "level": "info",
+    "format": "json"
+  }
+}
