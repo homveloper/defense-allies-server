@@ -22,9 +22,63 @@ func NewGameHandler(userService middleware.UserService) *GameHandler {
 	}
 }
 
+// ensureUser 유저 존재를 보장하고 반환 (없으면 생성)
+func (gh *GameHandler) ensureUser(ctx context.Context) (*middleware.User, error) {
+	userID, ok := middleware.GetCurrentUserID(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user not authenticated")
+	}
+
+	// 기존 유저 조회
+	user, err := gh.userService.GetUser(ctx, userID)
+	if err == nil {
+		// 기존 유저 존재 - 마지막 로그인 시간 업데이트
+		if updateErr := gh.userService.UpdateLastLogin(ctx, userID); updateErr != nil {
+			fmt.Printf("Failed to update last login for user %s: %v\n", userID, updateErr)
+		}
+		return user, nil
+	}
+
+	// 유저가 없는 경우 인증 타입에 따라 생성
+	authType, _ := middleware.GetAuthTypeFromContext(ctx)
+
+	var userInfo *middleware.UserInfo
+
+	if authType == "gameauth" {
+		// gameauth 인증: game_account_id를 사용하여 게임 계정 생성
+		userInfo = &middleware.UserInfo{
+			ID:       userID,
+			Username: userID,             // 게스트는 ID를 username으로 사용
+			Email:    "",                 // 게스트는 이메일 없음
+			Roles:    []string{"player"}, // 게임 플레이어 역할
+		}
+	} else if authType == "jwt" {
+		// JWT 인증: JWT 클레임 정보 사용
+		username, _ := middleware.GetUsernameFromContext(ctx)
+		email, _ := middleware.GetEmailFromContext(ctx)
+
+		userInfo = &middleware.UserInfo{
+			ID:       userID,
+			Username: username,
+			Email:    email,
+			Roles:    []string{"user"}, // 일반 사용자 역할
+		}
+	} else {
+		return nil, fmt.Errorf("unknown authentication type: %s", authType)
+	}
+
+	// 신규 유저 생성
+	newUser, err := gh.userService.CreateUser(ctx, userInfo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new user: %w", err)
+	}
+
+	return newUser, nil
+}
+
 // GetGameData 게임 데이터 조회
 func (gh *GameHandler) GetGameData(ctx context.Context) (*middleware.GameData, error) {
-	userID, ok := middleware.GetUserIDFromContext(ctx)
+	userID, ok := middleware.GetCurrentUserID(ctx)
 	if !ok {
 		return nil, fmt.Errorf("user ID not found in context")
 	}
@@ -34,9 +88,10 @@ func (gh *GameHandler) GetGameData(ctx context.Context) (*middleware.GameData, e
 
 // JoinGame 게임 참가
 func (gh *GameHandler) JoinGame(ctx context.Context, params JoinGameParams) (*GameSession, error) {
-	user, ok := middleware.GetUserFromContext(ctx)
-	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+	// 유저 존재 보장 (없으면 생성)
+	user, err := gh.ensureUser(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to ensure user: %w", err)
 	}
 
 	// 게임 세션 생성
@@ -99,9 +154,10 @@ type GameSession struct {
 
 // GetProfile HTTP GET 프로필 조회
 func (gh *GameHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
-	user, ok := middleware.GetUserFromContext(r.Context())
-	if !ok {
-		http.Error(w, "User not found", http.StatusUnauthorized)
+	// 유저 존재 보장 (없으면 생성)
+	user, err := gh.ensureUser(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -218,9 +274,10 @@ func (gh *GameHandler) GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 
 // StartSession HTTP POST 게임 세션 시작
 func (gh *GameHandler) StartSession(w http.ResponseWriter, r *http.Request) {
-	user, ok := middleware.GetUserFromContext(r.Context())
-	if !ok {
-		http.Error(w, "User not found", http.StatusUnauthorized)
+	// 유저 존재 보장 (없으면 생성)
+	user, err := gh.ensureUser(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 

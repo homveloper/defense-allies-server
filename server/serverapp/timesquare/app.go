@@ -109,8 +109,8 @@ func NewTimeSquareApp(configPath string) (*TimeSquareApp, error) {
 	// 유저 서비스 초기화 (Redis 기반)
 	app.userService = service.NewRedisUserService(redisClient, userCreationHandler)
 
-	// 인증 미들웨어 초기화
-	app.authMiddleware = middleware.NewAuthMiddleware(publicKey, config.GetGuardianURL(), app.userService)
+	// 인증 미들웨어 초기화 (gameauth 서비스 포함)
+	app.authMiddleware = middleware.NewAuthMiddleware(publicKey, config.GetGuardianURL(), app.userService, app.authService)
 
 	// 게임 핸들러 초기화
 	app.gameHandler = handlers.NewGameHandler(app.userService)
