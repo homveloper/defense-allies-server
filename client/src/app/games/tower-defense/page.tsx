@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import GameHUD from '@/components/game/GameHUD'
-import PixiGameScene from '@/components/game/PixiGameScene'
+import GameHUD from '@/components/games/tower-defense/GameHUD'
+import ClassBasedGameScene from '@/components/games/tower-defense/ClassBasedGameScene'
 import { useGameState } from '@/hooks/useGameState'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 
-export default function GamePage() {
+export default function TowerDefensePage() {
   const [selectedTowerType, setSelectedTowerType] = useState<string | null>(null)
   const gameStateHook = useGameState()
   const { gameState, startWave } = gameStateHook
@@ -14,13 +14,13 @@ export default function GamePage() {
   return (
     <ThemeProvider>
       <div className="relative w-full h-screen overflow-hidden">
-        {/* PixiJS Game Scene - 클린 아키텍처 OOP 엔진과 통합 */}
-        <PixiGameScene 
+        {/* Class-based Game Scene */}
+        <ClassBasedGameScene 
           selectedTowerType={selectedTowerType}
           gameStateHook={gameStateHook}
         />
         
-        {/* HUD Overlay - React UI 유지 */}
+        {/* HUD Overlay - 유지됨 */}
         <GameHUD 
           gameState={gameState}
           selectedTowerType={selectedTowerType}

@@ -28,7 +28,7 @@ export default function HomePage() {
 
         {/* Main Action Button */}
         <button 
-          onClick={() => router.push('/game')}
+          onClick={() => router.push('/games')}
           className="w-full bg-blue-600 text-white font-medium py-4 rounded-full mb-6 hover:bg-blue-700 transition-colors"
         >
           게임 시작

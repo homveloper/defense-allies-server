@@ -77,15 +77,15 @@ export function useGameState() {
   const spawnEnemy = useCallback((type: Enemy['type']) => {
     console.log('Spawning enemy:', type)
     const enemyStats = {
-      basic: { health: 50, speed: 0.02, value: 10 },
-      fast: { health: 30, speed: 0.04, value: 15 },
-      tank: { health: 150, speed: 0.01, value: 25 }
+      basic: { health: 50, speed: 2.5, value: 10 },
+      fast: { health: 30, speed: 4, value: 15 },
+      tank: { health: 150, speed: 1.5, value: 25 }
     }
 
     const stats = enemyStats[type]
     const newEnemy: Enemy = {
       id: `enemy-${Date.now()}-${Math.random()}`,
-      position: [-4.5, 0.3, -4.5], // Start position
+      position: [0, 0, 10], // 시작점 좌표 (0, 10) - Three.js 좌표계
       health: stats.health,
       maxHealth: stats.health,
       speed: stats.speed,
