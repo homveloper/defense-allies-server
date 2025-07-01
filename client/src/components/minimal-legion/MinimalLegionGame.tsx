@@ -1,16 +1,20 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Phaser from 'phaser';
 import { MainScene } from './scenes/MainScene';
 import { useMinimalLegionStore } from '@/store/minimalLegionStore';
 import { GameHUD } from './GameHUD';
+import { DebugPanel } from './DebugPanel';
+import { GameOverModal } from './GameOverModal';
 
 const MinimalLegionGame = () => {
   const router = useRouter();
   const gameRef = useRef<Phaser.Game | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const mainSceneRef = useRef<MainScene | null>(null);
+  const [debugData, setDebugData] = useState<Record<string, unknown>>({});
   const { setGame, togglePause, resetGame } = useMinimalLegionStore();
 
   useEffect(() => {
@@ -34,8 +38,22 @@ const MinimalLegionGame = () => {
 
     gameRef.current = new Phaser.Game(config);
     setGame(gameRef.current);
+    
+    // Get reference to main scene for debugging
+    gameRef.current.events.on('ready', () => {
+      mainSceneRef.current = gameRef.current?.scene.getScene('MainScene') as MainScene;
+    });
+
+    // Debug data update interval
+    const debugInterval = setInterval(() => {
+      if (mainSceneRef.current) {
+        const debugInfo = mainSceneRef.current.getDebugInfo();
+        setDebugData(debugInfo);
+      }
+    }, 100);
 
     return () => {
+      clearInterval(debugInterval);
       if (gameRef.current) {
         gameRef.current.destroy(true);
         gameRef.current = null;
@@ -53,11 +71,31 @@ const MinimalLegionGame = () => {
     router.push('/games');
   };
 
+  const handleRestartGame = () => {
+    console.log('Restarting game...');
+    resetGame();
+    
+    // Restart the current scene
+    if (mainSceneRef.current) {
+      mainSceneRef.current.scene.restart();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
       <div className="relative">
         <div ref={containerRef} className="game-container" />
         <GameHUD onResumeGame={handleResumeGame} onExitGame={handleExitGame} />
+        <DebugPanel 
+          player={debugData.player}
+          enemies={(debugData.enemies as unknown[]) || []}
+          allies={(debugData.allies as unknown[]) || []}
+          rotatingOrbs={(debugData.rotatingOrbs as unknown[]) || []}
+        />
+        <GameOverModal 
+          onRestart={handleRestartGame}
+          onExit={handleExitGame}
+        />
       </div>
     </div>
   );

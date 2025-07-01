@@ -12,25 +12,49 @@ export class Projectile extends Phaser.GameObjects.Graphics {
     this.fillStyle(0xf1c40f);
     this.fillCircle(0, 0, 4);
 
-    // Physics
-    scene.physics.world.enable(this);
-    this.body.setCircle(4);
-
+    // Add to scene first
     scene.add.existing(this);
+    
+    // Then enable physics - wait for next frame to ensure proper initialization
+    scene.physics.world.enable(this);
+    
+    // Ensure body exists before configuring it
+    if (this.body) {
+      this.body.setCircle(4);
+      this.body.setCollideWorldBounds(false);
+      console.log('Projectile physics body initialized at:', x, y);
+    } else {
+      console.error('Failed to create physics body for projectile');
+    }
+    
+    console.log('Projectile created at:', x, y, 'Body exists:', !!this.body);
   }
 
   fire(targetX: number, targetY: number, damage: number) {
     this.damage = damage;
 
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, targetX, targetY);
-    this.body.setVelocity(
-      Math.cos(angle) * this.speed,
-      Math.sin(angle) * this.speed
-    );
+    if (!this.body) {
+      console.error('Projectile body not found when firing!');
+      return;
+    }
 
-    // Destroy after 2 seconds if it doesn't hit anything
-    this.scene.time.delayedCall(2000, () => {
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, targetX, targetY);
+    const velocityX = Math.cos(angle) * this.speed;
+    const velocityY = Math.sin(angle) * this.speed;
+    
+    // Set velocity and verify it was applied
+    this.body.setVelocity(velocityX, velocityY);
+    
+    // Verify velocity was set
+    console.log(`Projectile fired from (${this.x.toFixed(1)}, ${this.y.toFixed(1)}) to (${targetX.toFixed(1)}, ${targetY.toFixed(1)})`);
+    console.log(`Calculated velocity: (${velocityX.toFixed(1)}, ${velocityY.toFixed(1)})`);
+    console.log(`Actual body velocity: (${this.body.velocity.x.toFixed(1)}, ${this.body.velocity.y.toFixed(1)})`);
+    console.log(`Body position: (${this.body.x.toFixed(1)}, ${this.body.y.toFixed(1)})`);
+
+    // Destroy after 3 seconds if it doesn't hit anything
+    this.scene.time.delayedCall(3000, () => {
       if (this.active) {
+        console.log('Projectile auto-destroyed after timeout');
         this.destroy();
       }
     });

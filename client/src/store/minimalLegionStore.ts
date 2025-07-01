@@ -70,21 +70,47 @@ export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
   setGame: (game) => set({ game }),
 
   updatePlayer: (updates) =>
-    set((state) => ({
-      player: { ...state.player, ...updates },
-    })),
+    set((state) => {
+      const updatedPlayer = { ...state.player, ...updates };
+      
+      // Validate health values
+      if (updates.health !== undefined) {
+        updatedPlayer.health = Math.max(0, Math.min(updatedPlayer.maxHealth, updates.health));
+        if (isNaN(updatedPlayer.health)) {
+          console.error('Invalid health value:', updates.health);
+          updatedPlayer.health = state.player.health; // Keep previous value
+        }
+      }
+      
+      return { player: updatedPlayer };
+    }),
 
   addExperience: (amount) =>
     set((state) => {
+      if (!amount || isNaN(amount) || amount < 0) {
+        console.warn('Invalid experience amount:', amount);
+        return state;
+      }
+      
       const newExperience = state.player.experience + amount;
       const shouldLevelUp = newExperience >= state.player.experienceToNext;
+
+      if (shouldLevelUp) {
+        console.log('Level up!');
+        return {
+          player: {
+            ...state.player,
+            level: state.player.level + 1,
+            experience: newExperience - state.player.experienceToNext,
+            experienceToNext: 100 * (state.player.level + 1),
+          },
+        };
+      }
 
       return {
         player: {
           ...state.player,
-          experience: shouldLevelUp
-            ? newExperience - state.player.experienceToNext
-            : newExperience,
+          experience: newExperience,
         },
       };
     }),
@@ -125,11 +151,17 @@ export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
       isPaused: !state.isPaused,
     })),
 
-  gameOver: () => set({ isGameOver: true }),
+  gameOver: () => {
+    console.log('Game Over called');
+    set({ isGameOver: true });
+  },
 
   resetGame: () =>
-    set((state) => ({
-      ...initialState,
-      game: state.game,
-    })),
+    set((state) => {
+      console.log('Store resetGame() called');
+      return {
+        ...initialState,
+        game: state.game,
+      };
+    }),
 }));

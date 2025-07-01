@@ -18,14 +18,34 @@ export class Ally extends Phaser.GameObjects.Container {
   private fireRate: number = 700;
   private followDistance: number = 80;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene, 
+    x: number, 
+    y: number, 
+    modifiers?: {
+      healthMultiplier?: number;
+      attackMultiplier?: number;
+      speedMultiplier?: number;
+    }
+  ) {
     super(scene, x, y);
 
-    // Ally stats
-    this.maxHealth = 50;
+    // Base ally stats
+    const baseHealth = 50;
+    const baseAttack = 8;
+    const baseSpeed = 4;
+    
+    // Apply modifiers if provided
+    const healthMod = modifiers?.healthMultiplier || 1;
+    const attackMod = modifiers?.attackMultiplier || 1;
+    const speedMod = modifiers?.speedMultiplier || 1;
+    
+    this.maxHealth = Math.floor(baseHealth * healthMod);
     this.health = this.maxHealth;
-    this.moveSpeed = 4;
-    this.attackPower = 8;
+    this.moveSpeed = baseSpeed * speedMod;
+    this.attackPower = Math.floor(baseAttack * attackMod);
+    
+    console.log(`Ally created with stats: HP=${this.maxHealth}, ATK=${this.attackPower}, SPD=${this.moveSpeed.toFixed(1)}`);
 
     // Create ally sprite (light blue circle)
     this.sprite = scene.add.graphics();
@@ -126,6 +146,9 @@ export class Ally extends Phaser.GameObjects.Container {
     if (!this.target || !this.target.active) return;
 
     const mainScene = this.scene as MainScene;
+    
+    console.log(`Ally firing projectile from (${this.x}, ${this.y}) to target (${this.target.x}, ${this.target.y})`);
+    
     mainScene.fireProjectile(
       this.x,
       this.y,

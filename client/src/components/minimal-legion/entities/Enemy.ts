@@ -116,21 +116,28 @@ export class Enemy extends Phaser.GameObjects.Container {
   }
 
   private meleeAttack() {
-    if (!this.target || !this.target.active) return;
+    if (!this.target || !this.target.active || !this.attackPower) return;
 
     const mainScene = this.scene as MainScene;
-    mainScene.dealMeleeDamage(this.target, this.attackPower);
+    const damage = this.attackPower || 5; // Default damage if undefined
+    
+    console.log(`Enemy dealing ${damage} melee damage`);
+    mainScene.dealMeleeDamage(this.target, damage);
 
     // Visual feedback for melee attack
-    this.sprite.clear();
-    this.sprite.fillStyle(0xffffff);
-    this.sprite.fillCircle(0, 0, 18);
-
-    this.scene.time.delayedCall(100, () => {
+    if (this.sprite && this.active) {
       this.sprite.clear();
-      this.sprite.fillStyle(0xe74c3c);
-      this.sprite.fillCircle(0, 0, 15);
-    });
+      this.sprite.fillStyle(0xffffff);
+      this.sprite.fillCircle(0, 0, 18);
+
+      this.scene.time.delayedCall(100, () => {
+        if (this.sprite && this.active) {
+          this.sprite.clear();
+          this.sprite.fillStyle(0xe74c3c);
+          this.sprite.fillCircle(0, 0, 15);
+        }
+      });
+    }
   }
 
   private fire() {
