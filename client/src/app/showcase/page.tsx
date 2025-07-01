@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Input, SearchInput } from '@/components/ui/Input'
@@ -11,6 +12,7 @@ import { Progress } from '@/components/ui/Progress'
 import { Toast } from '@/components/ui/Toast'
 
 export default function ShowcasePage() {
+  const router = useRouter()
   const [toggleStates, setToggleStates] = useState({
     sound: true,
     vibration: false,
@@ -33,6 +35,21 @@ export default function ShowcasePage() {
 
       {/* Content */}
       <main className="px-6 py-6 space-y-8">
+        {/* Game Start Section */}
+        <section>
+          <h2 className="text-base font-semibold text-slate-900 mb-3">Game Selection</h2>
+          <div className="space-y-3">
+            <Card variant="interactive" onClick={() => router.push('/minimal-legion')}>
+              <CardHeader>
+                <CardTitle>미니멀 군단 (Minimal Legion)</CardTitle>
+                <CardDescription>
+                  혼자서 시작해 거대한 군단을 만들어가는 액션 로그라이크 게임
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </section>
+
         {/* Color Palette */}
         <section>
           <h2 className="text-base font-semibold text-slate-900 mb-3">Color Palette</h2>
