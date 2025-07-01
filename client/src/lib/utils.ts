@@ -35,7 +35,7 @@ export function generateId(): string {
 /**
  * Utility function to debounce function calls
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -49,7 +49,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * Utility function to throttle function calls
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {

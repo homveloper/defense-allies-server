@@ -9,6 +9,7 @@ interface GameButtonProps {
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function GameButton({ 
@@ -17,7 +18,8 @@ export default function GameButton({
   variant = 'primary',
   size = 'medium',
   disabled = false,
-  className = ''
+  className = '',
+  style
 }: GameButtonProps) {
   const baseClasses = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
   
@@ -40,6 +42,7 @@ export default function GameButton({
       onClick={onClick}
       disabled={disabled}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${className}`}
+      style={style}
     >
       {children}
     </button>

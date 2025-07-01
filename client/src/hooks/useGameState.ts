@@ -58,7 +58,6 @@ const WAVE_CONFIGS = [
 
 export function useGameState() {
   const [gameState, setGameState] = useState<GameState>(INITIAL_STATE)
-  const [spawnTimer, setSpawnTimer] = useState(0)
   const [enemiesSpawned, setEnemiesSpawned] = useState(0)
 
   // Start a new wave
@@ -70,7 +69,6 @@ export function useGameState() {
       waveTimer: 0
     }))
     setEnemiesSpawned(0)
-    setSpawnTimer(0)
   }, [gameState.wave])
 
   // Spawn enemy
@@ -200,24 +198,21 @@ export function useGameState() {
     const currentWave = WAVE_CONFIGS[Math.min(gameState.wave - 1, WAVE_CONFIGS.length - 1)]
     console.log('Current wave config:', currentWave, 'Enemies spawned:', enemiesSpawned)
     
+    let spawnTimer = 0
     const interval = setInterval(() => {
-      setSpawnTimer(prev => {
-        const newTimer = prev + 100
+      spawnTimer += 100
+      
+      // Spawn enemies
+      if (enemiesSpawned < currentWave.enemies && spawnTimer >= currentWave.spawnInterval) {
+        const enemyType = currentWave.enemyTypes[
+          Math.floor(Math.random() * currentWave.enemyTypes.length)
+        ] as Enemy['type']
         
-        // Spawn enemies
-        if (enemiesSpawned < currentWave.enemies && newTimer >= currentWave.spawnInterval) {
-          const enemyType = currentWave.enemyTypes[
-            Math.floor(Math.random() * currentWave.enemyTypes.length)
-          ] as Enemy['type']
-          
-          console.log('Spawning enemy at timer:', newTimer, 'type:', enemyType)
-          spawnEnemy(enemyType)
-          setEnemiesSpawned(prev => prev + 1)
-          return 0
-        }
-        
-        return newTimer
-      })
+        console.log('Spawning enemy at timer:', spawnTimer, 'type:', enemyType)
+        spawnEnemy(enemyType)
+        setEnemiesSpawned(prev => prev + 1)
+        spawnTimer = 0
+      }
     }, 100)
 
     return () => clearInterval(interval)

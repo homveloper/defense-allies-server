@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Input, SearchInput } from '@/components/ui/Input'
 import { Toggle } from '@/components/ui/Toggle'
 import { Checkbox } from '@/components/ui/Checkbox'

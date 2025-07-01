@@ -194,7 +194,7 @@
 ## 기술 구현 계획
 
 ### 프론트엔드 (React + TypeScript)
-1. **게임 엔진**: Canvas API 또는 WebGL
+1. **게임 엔진**: Phaser
 2. **상태 관리**: Zustand
 3. **애니메이션**: React Spring 또는 Framer Motion
 4. **렌더링 최적화**: React.memo, useMemo 활용
