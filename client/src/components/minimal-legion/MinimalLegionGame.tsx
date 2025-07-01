@@ -8,6 +8,7 @@ import { useMinimalLegionStore } from '@/store/minimalLegionStore';
 import { GameHUD } from './GameHUD';
 import { DebugPanel } from './DebugPanel';
 import { GameOverModal } from './GameOverModal';
+import { LevelUpModal } from './LevelUpModal';
 
 const MinimalLegionGame = () => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const MinimalLegionGame = () => {
         },
       },
       scene: [MainScene],
-      backgroundColor: '#1a1a2e',
+      backgroundColor: '#ffffff',
     };
 
     gameRef.current = new Phaser.Game(config);
@@ -82,9 +83,9 @@ const MinimalLegionGame = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
-      <div className="relative">
-        <div ref={containerRef} className="game-container" />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="relative border-2 border-gray-300 rounded-lg shadow-lg">
+        <div ref={containerRef} className="game-container rounded-lg overflow-hidden" />
         <GameHUD onResumeGame={handleResumeGame} onExitGame={handleExitGame} />
         <DebugPanel 
           player={debugData.player}
@@ -96,6 +97,7 @@ const MinimalLegionGame = () => {
           onRestart={handleRestartGame}
           onExit={handleExitGame}
         />
+        <LevelUpModal />
       </div>
     </div>
   );

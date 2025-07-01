@@ -27,7 +27,7 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
       <div className="absolute top-4 left-4 right-4 pointer-events-none">
         <div className="flex justify-between items-start">
           {/* Left side stats */}
-          <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3 text-white text-sm space-y-1 pointer-events-auto">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 text-gray-800 text-sm space-y-1 pointer-events-auto border border-gray-200 shadow-lg">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-red-500 rounded-full"></div>
               <span>HP: {player.health}/{player.maxHealth}</span>
@@ -49,7 +49,7 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
           {/* Right side info and settings */}
           <div className="space-y-2">
             {/* Game info */}
-            <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3 text-white text-sm space-y-1 pointer-events-auto">
+            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 text-gray-800 text-sm space-y-1 pointer-events-auto border border-gray-200 shadow-lg">
               <div>Wave: {wave}</div>
               <div>Score: {score.toLocaleString()}</div>
               <div>Enemies: {enemiesRemaining}</div>
@@ -58,7 +58,7 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
             {/* Settings button */}
             <button
               onClick={toggleSettings}
-              className="bg-black/60 backdrop-blur-sm rounded-lg p-3 text-white hover:bg-black/80 transition-colors pointer-events-auto"
+              className="bg-white/90 backdrop-blur-sm rounded-lg p-3 text-gray-700 hover:bg-white hover:text-gray-900 transition-colors pointer-events-auto border border-gray-200 shadow-lg"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -84,9 +84,9 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
       {/* Settings Popup */}
       {showSettings && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
-          <Card className="w-80 bg-gray-800 border-gray-700">
+          <Card className="w-80 bg-white border-gray-300 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-white text-center">게임 설정</CardTitle>
+              <CardTitle className="text-gray-800 text-center">게임 설정</CardTitle>
               
               <div className="space-y-4 mt-4">
                 <div className="space-y-3">
@@ -103,8 +103,8 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-300">게임 정보</h4>
-                  <div className="text-xs text-gray-400 space-y-1">
+                  <h4 className="text-sm font-medium text-gray-700">게임 정보</h4>
+                  <div className="text-xs text-gray-600 space-y-1">
                     <div>WASD 또는 방향키: 이동</div>
                     <div>자동 공격: 가장 가까운 적</div>
                     <div>적 처치 시 아군으로 전환</div>
@@ -119,6 +119,7 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
                       setShowSettings(false);
                       onResumeGame();
                     }}
+                    className="bg-gray-500 hover:bg-gray-600 text-white"
                   >
                     계속하기
                   </Button>
@@ -129,6 +130,7 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
                       setShowSettings(false);
                       onExitGame();
                     }}
+                    className="bg-red-500 hover:bg-red-600 text-white"
                   >
                     나가기
                   </Button>
@@ -142,7 +144,7 @@ export const GameHUD = ({ onResumeGame, onExitGame }: GameHUDProps) => {
       {/* Pause overlay */}
       {isPaused && !showSettings && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
-          <div className="text-white text-2xl font-bold">게임 일시정지</div>
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 text-gray-800 text-2xl font-bold border border-gray-300 shadow-xl">게임 일시정지</div>
         </div>
       )}
     </>

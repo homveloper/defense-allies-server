@@ -28,6 +28,7 @@ export class MainScene extends Phaser.Scene {
   private playerDamageCooldown: number = 1000; // 1초 쿨다운
   private combatCooldowns: Map<string, number> = new Map(); // 전투 쿨다운 관리
   private combatCooldownTime: number = 800; // 0.8초 쿨다운
+  private gridGraphics!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -39,6 +40,9 @@ export class MainScene extends Phaser.Scene {
     // Reset game state
     const store = useMinimalLegionStore.getState();
     store.resetGame();
+    
+    // Create grid background
+    this.createGridBackground();
     
     // Input setup
     this.cursors = this.input.keyboard!.createCursorKeys();
@@ -129,6 +133,12 @@ export class MainScene extends Phaser.Scene {
       return;
     }
     
+    // Check if game is paused (for level up modal)
+    const store = useMinimalLegionStore.getState();
+    if (store.isPaused) {
+      return;
+    }
+    
     // Debug: Check player state
     if (this.player) {
       this.debugInfo = {
@@ -187,9 +197,13 @@ export class MainScene extends Phaser.Scene {
       this.player.setTarget(nearestEnemy);
     }
 
-    // Enemy spawning
+    // Enemy spawning - 웨이브가 올라갈수록 더 빠르게 생성
     this.enemySpawnTimer += delta;
-    if (this.enemySpawnTimer > 2000 && this.enemies.countActive() < 20) {
+    const gameStore = useMinimalLegionStore.getState();
+    const spawnRate = Math.max(800, 1800 - (gameStore.wave - 1) * 80); // 더 빠른 생성 (최소 0.8초)
+    const maxEnemies = 20 + gameStore.wave * 3; // 더 많은 최대 적 수
+    
+    if (this.enemySpawnTimer > spawnRate && this.enemies.countActive() < maxEnemies) {
       this.spawnEnemy();
       this.enemySpawnTimer = 0;
     }
@@ -204,16 +218,42 @@ export class MainScene extends Phaser.Scene {
     this.updateHUD();
 
     // Check wave completion
-    const store = useMinimalLegionStore.getState();
-    if (store.enemiesRemaining === 0 && this.enemies.countActive() === 0) {
+    const waveStore = useMinimalLegionStore.getState();
+    if (waveStore.enemiesRemaining === 0 && this.enemies.countActive() === 0) {
       this.nextWave();
     }
+  }
+
+  private createGridBackground() {
+    this.gridGraphics = this.add.graphics();
+    this.gridGraphics.lineStyle(1, 0xe0e0e0, 0.3); // 연한 회색 그리드
+    
+    const gridSize = 50;
+    const width = 1200;
+    const height = 800;
+    
+    // 세로선 그리기
+    for (let x = 0; x <= width; x += gridSize) {
+      this.gridGraphics.moveTo(x, 0);
+      this.gridGraphics.lineTo(x, height);
+    }
+    
+    // 가로선 그리기
+    for (let y = 0; y <= height; y += gridSize) {
+      this.gridGraphics.moveTo(0, y);
+      this.gridGraphics.lineTo(width, y);
+    }
+    
+    this.gridGraphics.strokePath();
+    
+    // 그리드를 맨 뒤로 보내기
+    this.gridGraphics.setDepth(-1);
   }
 
   private createHUD() {
     const style = {
       font: '16px Arial',
-      fill: '#ffffff',
+      fill: '#333333', // 어두운 회색으로 변경
     };
 
     this.hudText = this.add.text(10, 10, '', style);
@@ -237,20 +277,31 @@ export class MainScene extends Phaser.Scene {
 
   private startWave() {
     const store = useMinimalLegionStore.getState();
-    const enemyCount = 5 + store.wave * 2;
+    // 웨이브별 적 수 증가: 기본 8마리에서 웨이브당 4마리씩 증가
+    const enemyCount = 8 + (store.wave - 1) * 4;
     store.setEnemiesRemaining(enemyCount);
     this.waveStartTime = this.time.now;
+    
+    console.log(`Wave ${store.wave} started with ${enemyCount} enemies`);
   }
 
   private nextWave() {
     const store = useMinimalLegionStore.getState();
+    
+    // 웨이브 완료 보너스 경험치 및 점수
+    const waveBonus = store.wave * 50;
+    store.addExperience(waveBonus);
+    store.updateScore(waveBonus);
+    
+    console.log(`Wave ${store.wave} completed! Bonus: ${waveBonus} XP & Score`);
+    
     store.nextWave();
     this.time.delayedCall(3000, () => this.startWave());
   }
 
   private spawnEnemy() {
-    const store = useMinimalLegionStore.getState();
-    if (store.enemiesRemaining <= 0) return;
+    const spawnStore = useMinimalLegionStore.getState();
+    if (spawnStore.enemiesRemaining <= 0) return;
 
     const side = Phaser.Math.Between(0, 3);
     let x, y;
@@ -273,11 +324,12 @@ export class MainScene extends Phaser.Scene {
         y = Phaser.Math.Between(0, 800);
     }
 
-    const enemy = new Enemy(this, x, y);
+    const enemyStore = useMinimalLegionStore.getState();
+    const enemy = new Enemy(this, x, y, enemyStore.wave);
     this.enemies.add(enemy);
     enemy.setTarget(this.player);
 
-    store.setEnemiesRemaining(store.enemiesRemaining - 1);
+    spawnStore.setEnemiesRemaining(spawnStore.enemiesRemaining - 1);
   }
 
   private findNearestEnemy(x: number, y: number): Enemy | null {

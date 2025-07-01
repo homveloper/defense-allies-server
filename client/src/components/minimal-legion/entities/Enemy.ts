@@ -17,14 +17,23 @@ export class Enemy extends Phaser.GameObjects.Container {
   private fireRate: number = 1500;
   private meleeRate: number = 1200;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, wave: number = 1) {
     super(scene, x, y);
 
-    // Enemy stats
-    this.maxHealth = 30;
+    // Base enemy stats
+    const baseHealth = 20; // 30에서 20으로 감소
+    const baseAttack = 5;
+    const baseSpeed = 3;
+    
+    // Wave scaling: 15% increase per wave
+    const waveMultiplier = 1 + (wave - 1) * 0.15;
+    
+    this.maxHealth = Math.floor(baseHealth * waveMultiplier);
     this.health = this.maxHealth;
-    this.moveSpeed = 3;
-    this.attackPower = 5;
+    this.moveSpeed = baseSpeed * Math.min(waveMultiplier, 2); // 속도는 최대 2배까지만
+    this.attackPower = Math.floor(baseAttack * waveMultiplier);
+    
+    console.log(`Enemy spawned for wave ${wave}: HP=${this.maxHealth}, ATK=${this.attackPower}, SPD=${this.moveSpeed.toFixed(1)}`);
 
     // Create enemy sprite (red circle)
     this.sprite = scene.add.graphics();

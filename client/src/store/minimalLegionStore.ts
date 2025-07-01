@@ -13,6 +13,13 @@ interface Player {
   experienceToNext: number;
 }
 
+interface Upgrade {
+  id: string;
+  name: string;
+  description: string;
+  apply: (player: Player) => Partial<Player>;
+}
+
 interface GameState {
   game: Phaser.Game | null;
   player: Player;
@@ -23,6 +30,8 @@ interface GameState {
   enemiesRemaining: number;
   isPaused: boolean;
   isGameOver: boolean;
+  isLevelUpModalOpen: boolean;
+  availableUpgrades: Upgrade[];
 }
 
 interface MinimalLegionStore extends GameState {
@@ -38,6 +47,9 @@ interface MinimalLegionStore extends GameState {
   togglePause: () => void;
   gameOver: () => void;
   resetGame: () => void;
+  showLevelUpModal: (upgrades: Upgrade[]) => void;
+  hideLevelUpModal: () => void;
+  selectUpgrade: (upgrade: Upgrade) => void;
 }
 
 const initialPlayer: Player = {
@@ -52,6 +64,49 @@ const initialPlayer: Player = {
   experienceToNext: 100,
 };
 
+// 업그레이드 옵션들
+const UPGRADES: Upgrade[] = [
+  {
+    id: 'health_boost',
+    name: '생명력 증가',
+    description: '최대 체력이 20 증가하고 체력이 모두 회복됩니다',
+    apply: (player) => ({ 
+      maxHealth: player.maxHealth + 20, 
+      health: player.maxHealth + 20 
+    })
+  },
+  {
+    id: 'attack_power',
+    name: '공격력 강화',
+    description: '공격력이 5 증가합니다',
+    apply: (player) => ({ attackPower: player.attackPower + 5 })
+  },
+  {
+    id: 'attack_speed',
+    name: '공격 속도 증가',
+    description: '공격 속도가 20% 증가합니다',
+    apply: (player) => ({ attackSpeed: player.attackSpeed * 1.2 })
+  },
+  {
+    id: 'move_speed',
+    name: '이동 속도 증가',
+    description: '이동 속도가 15% 증가합니다',
+    apply: (player) => ({ moveSpeed: player.moveSpeed * 1.15 })
+  },
+  {
+    id: 'range_boost',
+    name: '사거리 확장',
+    description: '공격 사거리가 30 증가합니다',
+    apply: (player) => ({ range: player.range + 30 })
+  },
+  {
+    id: 'max_allies',
+    name: '군단 확장',
+    description: '최대 동료 수가 2 증가합니다',
+    apply: () => ({}) // 특별 처리 필요
+  }
+];
+
 const initialState: GameState = {
   game: null,
   player: initialPlayer,
@@ -62,6 +117,8 @@ const initialState: GameState = {
   enemiesRemaining: 0,
   isPaused: false,
   isGameOver: false,
+  isLevelUpModalOpen: false,
+  availableUpgrades: [],
 };
 
 export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
@@ -96,7 +153,12 @@ export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
       const shouldLevelUp = newExperience >= state.player.experienceToNext;
 
       if (shouldLevelUp) {
-        console.log('Level up!');
+        console.log('Level up! Showing upgrade selection');
+        
+        // 랜덤한 3개 업그레이드 선택
+        const shuffled = [...UPGRADES].sort(() => Math.random() - 0.5);
+        const randomUpgrades = shuffled.slice(0, 3);
+        
         return {
           player: {
             ...state.player,
@@ -104,6 +166,9 @@ export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
             experience: newExperience - state.player.experienceToNext,
             experienceToNext: 100 * (state.player.level + 1),
           },
+          isLevelUpModalOpen: true,
+          availableUpgrades: randomUpgrades,
+          isPaused: true, // 게임 일시정지
         };
       }
 
@@ -163,5 +228,41 @@ export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
         ...initialState,
         game: state.game,
       };
+    }),
+
+  showLevelUpModal: (upgrades) =>
+    set({
+      isLevelUpModalOpen: true,
+      availableUpgrades: upgrades,
+      isPaused: true,
+    }),
+
+  hideLevelUpModal: () =>
+    set({
+      isLevelUpModalOpen: false,
+      availableUpgrades: [],
+      isPaused: false,
+    }),
+
+  selectUpgrade: (upgrade) =>
+    set((state) => {
+      const playerUpdates = upgrade.apply(state.player);
+      let newState = {
+        player: { ...state.player, ...playerUpdates },
+        isLevelUpModalOpen: false,
+        availableUpgrades: [],
+        isPaused: false,
+      };
+
+      // 군단 확장 업그레이드 특별 처리
+      if (upgrade.id === 'max_allies') {
+        newState = {
+          ...newState,
+          maxAllies: state.maxAllies + 2,
+        };
+      }
+
+      console.log(`Upgrade selected: ${upgrade.name}`, playerUpdates);
+      return newState;
     }),
 }));
