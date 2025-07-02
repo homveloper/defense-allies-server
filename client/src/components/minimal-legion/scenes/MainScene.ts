@@ -5,6 +5,9 @@ import { Projectile } from '../entities/Projectile';
 import { Ally } from '../entities/Ally';
 import { RotatingOrb } from '../entities/RotatingOrb';
 import { useMinimalLegionStore } from '@/store/minimalLegionStore';
+import { SpawnManager } from '../systems/SpawnManager';
+import { DifficultyManager } from '../systems/DifficultyManager';
+import { getRandomEnemyType, getEnemyTypesForDifficulty, ENEMY_TYPES } from '../systems/EnemyTypes';
 
 export class MainScene extends Phaser.Scene {
   private player!: Player;
@@ -29,6 +32,8 @@ export class MainScene extends Phaser.Scene {
   private combatCooldowns: Map<string, number> = new Map(); // 전투 쿨다운 관리
   private combatCooldownTime: number = 800; // 0.8초 쿨다운
   private gridGraphics!: Phaser.GameObjects.Graphics;
+  private spawnManager!: SpawnManager;
+  private difficultyManager!: DifficultyManager;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -43,6 +48,10 @@ export class MainScene extends Phaser.Scene {
     
     // Create grid background
     this.createGridBackground();
+    
+    // Initialize spawn manager and difficulty manager
+    this.spawnManager = new SpawnManager();
+    this.difficultyManager = new DifficultyManager();
     
     // Input setup
     this.cursors = this.input.keyboard!.createCursorKeys();
@@ -197,13 +206,12 @@ export class MainScene extends Phaser.Scene {
       this.player.setTarget(nearestEnemy);
     }
 
-    // Enemy spawning - 웨이브가 올라갈수록 더 빠르게 생성
+    // Enemy spawning - 난이도에 따른 생성
     this.enemySpawnTimer += delta;
     const gameStore = useMinimalLegionStore.getState();
-    const spawnRate = Math.max(800, 1800 - (gameStore.wave - 1) * 80); // 더 빠른 생성 (최소 0.8초)
-    const maxEnemies = 20 + gameStore.wave * 3; // 더 많은 최대 적 수
+    const difficulty = this.difficultyManager.getWaveDifficulty(gameStore.wave);
     
-    if (this.enemySpawnTimer > spawnRate && this.enemies.countActive() < maxEnemies) {
+    if (this.enemySpawnTimer > difficulty.spawnRate && this.enemies.countActive() < difficulty.maxConcurrentEnemies) {
       this.spawnEnemy();
       this.enemySpawnTimer = 0;
     }
@@ -262,14 +270,17 @@ export class MainScene extends Phaser.Scene {
 
   private updateHUD() {
     const store = useMinimalLegionStore.getState();
+    const patternInfo = this.spawnManager.getPatternInfo();
+    const difficultyDesc = this.difficultyManager.getDifficultyDescription(store.wave);
     const hudInfo = [
-      `Wave: ${store.wave}`,
+      `Wave: ${store.wave} - ${difficultyDesc}`,
       `Health: ${store.player.health}/${store.player.maxHealth}`,
       `Level: ${store.player.level}`,
       `EXP: ${store.player.experience}/${store.player.experienceToNext}`,
       `Allies: ${store.allies}/${store.maxAllies}`,
       `Score: ${store.score}`,
       `Enemies: ${this.enemies.countActive()}`,
+      `Pattern: ${patternInfo.current}`,
     ];
 
     this.hudText.setText(hudInfo.join('\n'));
@@ -277,23 +288,81 @@ export class MainScene extends Phaser.Scene {
 
   private startWave() {
     const store = useMinimalLegionStore.getState();
-    // 웨이브별 적 수 증가: 기본 8마리에서 웨이브당 4마리씩 증가
-    const enemyCount = 8 + (store.wave - 1) * 4;
+    
+    // 난이도 매니저로부터 웨이브 설정 가져오기
+    const difficulty = this.difficultyManager.getWaveDifficulty(store.wave);
+    const enemyCount = difficulty.enemyCount;
+    
     store.setEnemiesRemaining(enemyCount);
     this.waveStartTime = this.time.now;
     
-    console.log(`Wave ${store.wave} started with ${enemyCount} enemies`);
+    // 난이도 경고 표시
+    if (this.difficultyManager.shouldShowWarning(store.wave)) {
+      this.showWaveWarning(store.wave);
+    }
+    
+    // 난이도에 따른 적 타입 결정
+    const availableTypes = getEnemyTypesForDifficulty(difficulty.difficultyType);
+    
+    // 패턴을 사용하여 적 생성
+    const initialSpawnCount = Math.min(enemyCount, Math.floor(difficulty.maxConcurrentEnemies * 0.6));
+    
+    // 다양한 타입의 적들을 생성
+    for (let i = 0; i < initialSpawnCount; i++) {
+      const positions = this.spawnManager.getSpawnPositions(
+        1,
+        this.cameras.main.centerX,
+        this.cameras.main.centerY,
+        this.cameras.main.width,
+        this.cameras.main.height
+      );
+      
+      if (positions.length > 0) {
+        const pos = positions[0];
+        
+        // 랜덤 타입 선택 또는 난이도 기반 선택
+        let enemyType;
+        if (difficulty.isBossWave && i === 0) {
+          enemyType = ENEMY_TYPES.boss;
+        } else {
+          const typeId = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+          enemyType = ENEMY_TYPES[typeId];
+        }
+        
+        const enemy = new Enemy(
+          this,
+          pos.x,
+          pos.y,
+          store.wave,
+          difficulty.enemyHealthMultiplier,
+          difficulty.enemyDamageMultiplier,
+          difficulty.enemySpeedMultiplier,
+          enemyType
+        );
+        
+        this.enemies.add(enemy);
+        enemy.setTarget(this.player);
+        
+        // 딜레이를 두고 생성
+        this.time.delayedCall(i * 100, () => {
+          // 적이 이미 생성되었으므로 추가 작업 없음
+        });
+      }
+    }
+    
+    const difficultyDesc = this.difficultyManager.getDifficultyDescription(store.wave);
+    console.log(`Wave ${store.wave} started: ${difficultyDesc} - ${enemyCount} enemies`);
   }
 
   private nextWave() {
     const store = useMinimalLegionStore.getState();
     
-    // 웨이브 완료 보너스 경험치 및 점수
-    const waveBonus = store.wave * 50;
-    store.addExperience(waveBonus);
-    store.updateScore(waveBonus);
+    // 난이도에 따른 웨이브 완료 보너스
+    const reward = this.difficultyManager.getWaveReward(store.wave);
+    store.addExperience(reward.experience);
+    store.updateScore(reward.score);
     
-    console.log(`Wave ${store.wave} completed! Bonus: ${waveBonus} XP & Score`);
+    console.log(`Wave ${store.wave} completed! Bonus: ${reward.experience} XP & ${reward.score} Score`);
     
     store.nextWave();
     this.time.delayedCall(3000, () => this.startWave());
@@ -303,33 +372,38 @@ export class MainScene extends Phaser.Scene {
     const spawnStore = useMinimalLegionStore.getState();
     if (spawnStore.enemiesRemaining <= 0) return;
 
-    const side = Phaser.Math.Between(0, 3);
-    let x, y;
+    // 난이도 설정 가져오기
+    const difficulty = this.difficultyManager.getWaveDifficulty(spawnStore.wave);
+    
+    // 웨이브에 맞는 적 타입 선택
+    const enemyType = getRandomEnemyType(spawnStore.wave);
 
-    switch (side) {
-      case 0: // Top
-        x = Phaser.Math.Between(0, 1200);
-        y = -50;
-        break;
-      case 1: // Right
-        x = 1250;
-        y = Phaser.Math.Between(0, 800);
-        break;
-      case 2: // Bottom
-        x = Phaser.Math.Between(0, 1200);
-        y = 850;
-        break;
-      default: // Left
-        x = -50;
-        y = Phaser.Math.Between(0, 800);
+    // 랜덤 패턴을 사용하여 단일 적 생성
+    const positions = this.spawnManager.getSpawnPositions(
+      1,
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      this.cameras.main.width,
+      this.cameras.main.height
+    );
+
+    if (positions.length > 0) {
+      const pos = positions[0];
+      const enemy = new Enemy(
+        this, 
+        pos.x, 
+        pos.y, 
+        spawnStore.wave,
+        difficulty.enemyHealthMultiplier,
+        difficulty.enemyDamageMultiplier,
+        difficulty.enemySpeedMultiplier,
+        enemyType
+      );
+      this.enemies.add(enemy);
+      enemy.setTarget(this.player);
+      
+      spawnStore.setEnemiesRemaining(spawnStore.enemiesRemaining - 1);
     }
-
-    const enemyStore = useMinimalLegionStore.getState();
-    const enemy = new Enemy(this, x, y, enemyStore.wave);
-    this.enemies.add(enemy);
-    enemy.setTarget(this.player);
-
-    spawnStore.setEnemiesRemaining(spawnStore.enemiesRemaining - 1);
   }
 
   private findNearestEnemy(x: number, y: number): Enemy | null {
@@ -413,9 +487,13 @@ export class MainScene extends Phaser.Scene {
   private convertEnemyToAlly(enemy: Enemy) {
     const store = useMinimalLegionStore.getState();
     
-    // Add experience
-    store.addExperience(10);
-    store.updateScore(10);
+    // 적 타입에 따른 보상 지급
+    const rewards = enemy.getRewards();
+    store.addExperience(rewards.experience);
+    store.updateScore(rewards.score);
+
+    // 폭발 능력 체크
+    enemy.explode();
 
     // Check if we can add more allies
     if (store.allies < store.maxAllies) {
@@ -690,6 +768,38 @@ export class MainScene extends Phaser.Scene {
     });
   }
   
+  // 웨이브 경고 표시
+  private showWaveWarning(wave: number) {
+    const difficultyDesc = this.difficultyManager.getDifficultyDescription(wave);
+    const warningText = this.add.text(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY - 100,
+      `${difficultyDesc}\nWave ${wave}`,
+      {
+        font: 'bold 48px Arial',
+        color: '#ff0000',
+        stroke: '#ffffff',
+        strokeThickness: 4,
+        align: 'center'
+      }
+    );
+    warningText.setOrigin(0.5);
+    warningText.setDepth(1000);
+    
+    // 애니메이션 효과
+    this.tweens.add({
+      targets: warningText,
+      scale: { from: 0.5, to: 1.2 },
+      alpha: { from: 0, to: 1 },
+      duration: 500,
+      ease: 'Back.easeOut',
+      yoyo: true,
+      hold: 1000,
+      completeDelay: 500,
+      onComplete: () => warningText.destroy()
+    });
+  }
+
   // Custom cleanup method
   cleanupScene() {
     console.log('MainScene cleanup called');

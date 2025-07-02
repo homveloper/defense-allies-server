@@ -222,9 +222,9 @@ export class Player extends Phaser.GameObjects.Container {
     const store = useMinimalLegionStore.getState();
     const mainScene = this.scene as MainScene;
     
-    // Get target position - use center of target instead of body position
-    const targetX = this.target.x;
-    const targetY = this.target.y;
+    // Get target position - use body position for GameObject
+    const targetX = this.target.body!.position.x;
+    const targetY = this.target.body!.position.y;
     
     console.log(`Player firing projectile from (${this.x}, ${this.y}) to target (${targetX}, ${targetY})`);
     

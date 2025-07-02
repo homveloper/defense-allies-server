@@ -47,6 +47,18 @@ export default function ShowcasePage() {
                 </CardDescription>
               </CardHeader>
             </Card>
+            
+            <Card variant="interactive" onClick={() => router.push('/ability-arena')}>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CardTitle>🏟️ Ability Arena</CardTitle>
+                  <Badge variant="success">NEW</Badge>
+                </div>
+                <CardDescription>
+                  GAS 어빌리티 시스템을 테스트할 수 있는 아레나 배틀 게임
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </section>
 

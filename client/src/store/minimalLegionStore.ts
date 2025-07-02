@@ -247,22 +247,23 @@ export const useMinimalLegionStore = create<MinimalLegionStore>((set) => ({
   selectUpgrade: (upgrade) =>
     set((state) => {
       const playerUpdates = upgrade.apply(state.player);
-      let newState = {
+      const newState = {
         player: { ...state.player, ...playerUpdates },
         isLevelUpModalOpen: false,
         availableUpgrades: [],
         isPaused: false,
       };
 
+      console.log(`Upgrade selected: ${upgrade.name}`, playerUpdates);
+      
       // 군단 확장 업그레이드 특별 처리
       if (upgrade.id === 'max_allies') {
-        newState = {
+        return {
           ...newState,
           maxAllies: state.maxAllies + 2,
         };
       }
 
-      console.log(`Upgrade selected: ${upgrade.name}`, playerUpdates);
       return newState;
     }),
 }));

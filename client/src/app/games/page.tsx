@@ -20,6 +20,17 @@ export default function GamesPage() {
       route: '/minimal-legion',
     },
     {
+      id: 'ability-arena',
+      title: '🏟️ Ability Arena',
+      description: 'GAS 어빌리티 시스템을 테스트할 수 있는 아레나 배틀 게임',
+      status: 'available',
+      difficulty: '보통',
+      players: '1인',
+      image: '/images/ability-arena-thumb.png',
+      route: '/ability-arena',
+      tag: 'NEW'
+    },
+    {
       id: 'tower-defense',
       title: '타워 디펜스',
       description: '전략적인 타워 배치로 적의 침입을 막는 디펜스 게임',
@@ -66,9 +77,14 @@ export default function GamesPage() {
                 <div className="space-y-2">
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-white">{game.title}</CardTitle>
-                    {game.status === 'coming-soon' && (
-                      <Badge variant="waiting">준비중</Badge>
-                    )}
+                    <div className="flex gap-1">
+                      {game.tag === 'NEW' && (
+                        <Badge variant="success">NEW</Badge>
+                      )}
+                      {game.status === 'coming-soon' && (
+                        <Badge variant="waiting">준비중</Badge>
+                      )}
+                    </div>
                   </div>
                   
                   <CardDescription className="text-gray-400">
