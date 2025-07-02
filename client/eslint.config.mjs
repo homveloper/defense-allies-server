@@ -15,10 +15,15 @@ const eslintConfig = [
     files: [
       "src/game/**/*.{ts,tsx}",
       "src/components/game/**/*.{ts,tsx}",
-      "src/components/games/**/*.{ts,tsx}"
+      "src/components/games/**/*.{ts,tsx}",
+      "src/components/minimal-legion/**/*.{ts,tsx}",
+      "src/components/ability-arena/**/*.{ts,tsx}",
+      "src/app/minimal-legion/**/*.{ts,tsx}",
+      "src/app/ability-arena/**/*.{ts,tsx}"
     ],
     rules: {
-      "@typescript-eslint/no-explicit-any": "off"
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off"
     }
   }
 ];

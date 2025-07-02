@@ -63,10 +63,10 @@ export class ExamplePlayer {
   }
 
   // Try to attack nearest enemy
-  attackNearestEnemy(enemies: any[]): boolean {
+  async attackNearestEnemy(enemies: any[]): Promise<boolean> {
     const target = AbilitySystemUtils.findNearestEnemy(this, enemies, 150);
     if (target) {
-      const result = this.abilitySystem.tryActivateAbility('basic_attack', { 
+      const result = await this.abilitySystem.tryActivateAbility('basic_attack', { 
         target, 
         scene: this.scene 
       });
@@ -76,8 +76,8 @@ export class ExamplePlayer {
   }
 
   // Cast fireball at target
-  castFireball(target: any): boolean {
-    const result = this.abilitySystem.tryActivateAbility('fireball', { 
+  async castFireball(target: any): Promise<boolean> {
+    const result = await this.abilitySystem.tryActivateAbility('fireball', { 
       target, 
       scene: this.scene 
     });
@@ -85,8 +85,8 @@ export class ExamplePlayer {
   }
 
   // Heal self
-  heal(): boolean {
-    const result = this.abilitySystem.tryActivateAbility('heal', { 
+  async heal(): Promise<boolean> {
+    const result = await this.abilitySystem.tryActivateAbility('heal', { 
       scene: this.scene 
     });
     return result.success;
@@ -154,13 +154,13 @@ export class ExampleEnemy {
   }
 
   // Simple AI: attack player if in range
-  tryAttackPlayer(player: ExamplePlayer): boolean {
+  async tryAttackPlayer(player: ExamplePlayer): Promise<boolean> {
     const distance = Math.sqrt(
       Math.pow(this.x - player.x, 2) + Math.pow(this.y - player.y, 2)
     );
     
     if (distance <= 100) { // Attack range
-      const result = this.abilitySystem.tryActivateAbility('basic_attack', { 
+      const result = await this.abilitySystem.tryActivateAbility('basic_attack', { 
         target: player, 
         scene: this.scene 
       });

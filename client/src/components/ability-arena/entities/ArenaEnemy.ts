@@ -2,7 +2,8 @@ import * as Phaser from 'phaser';
 import { 
   AbilitySystemComponent, 
   AbilitySystemUtils,
-  BasicAttackAbility
+  BasicAttackAbility,
+  GameplayEffect
 } from '@/components/minimal-legion/systems/ability-system';
 
 export class ArenaEnemy extends Phaser.GameObjects.Container {
@@ -15,8 +16,8 @@ export class ArenaEnemy extends Phaser.GameObjects.Container {
   public lastPlayerDamage: number = 0;
 
   // Visual components
-  private sprite: Phaser.GameObjects.Graphics;
-  private healthBar: Phaser.GameObjects.Graphics;
+  private sprite!: Phaser.GameObjects.Graphics;
+  private healthBar!: Phaser.GameObjects.Graphics;
   
   // AI
   private target: any = null;
@@ -370,32 +371,40 @@ export class ArenaEnemy extends Phaser.GameObjects.Container {
 
   public takeDamage(amount: number): void {
     // Damage is handled through the ability system
-    const damageEffect = { // Simplified damage effect
-      id: `damage_${Date.now()}`,
-      name: 'Damage',
-      duration: 0,
-      attributeModifiers: [{
-        id: `damage_${Date.now()}`,
-        attribute: 'health',
-        operation: 'add' as const,
-        magnitude: -amount,
-        source: 'enemy_damage'
-      }]
-    };
-    
-    this.abilitySystem.applyGameplayEffect(damageEffect as any);
+    const damageEffect = GameplayEffect.createInstantDamage(amount);
+    this.abilitySystem.applyGameplayEffect(damageEffect);
 
     // Visual feedback
     this.createDamageEffect();
   }
 
   private createDamageEffect(): void {
-    // Red flash effect
-    this.sprite.tint = 0xff0000;
+    // Red flash effect overlay
+    const flashEffect = this.scene.add.graphics();
+    flashEffect.fillStyle(0xff0000, 0.5);
+    
+    const size = this.getTypeSize();
+    switch (this.enemyType) {
+      case 'grunt':
+        flashEffect.fillCircle(this.x, this.y, size);
+        break;
+      case 'archer':
+        flashEffect.fillTriangle(this.x, this.y - size, this.x - size, this.y + size, this.x + size, this.y + size);
+        break;
+      case 'mage':
+        // Simple circle for star shape
+        flashEffect.fillCircle(this.x, this.y, size);
+        break;
+      case 'tank':
+        flashEffect.fillRect(this.x - size, this.y - size, size * 2, size * 2);
+        break;
+      default:
+        flashEffect.fillCircle(this.x, this.y, size);
+    }
     
     this.scene.time.delayedCall(100, () => {
-      if (this.sprite && this.active) {
-        this.sprite.clearTint();
+      if (flashEffect) {
+        flashEffect.destroy();
       }
     });
   }

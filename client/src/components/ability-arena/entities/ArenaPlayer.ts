@@ -4,7 +4,8 @@ import {
   AbilitySystemUtils,
   BasicAttackAbility,
   FireballAbility,
-  HealAbility
+  HealAbility,
+  GameplayEffect
 } from '@/components/minimal-legion/systems/ability-system';
 import { ArenaMainScene } from '../scenes/ArenaMainScene';
 import { useAbilityArenaStore } from '@/store/abilityArenaStore';
@@ -15,8 +16,8 @@ export class ArenaPlayer extends Phaser.GameObjects.Container {
   public health: number = 100;
   
   // Visual components
-  private sprite: Phaser.GameObjects.Graphics;
-  private healthBar: Phaser.GameObjects.Graphics;
+  private sprite!: Phaser.GameObjects.Graphics;
+  private healthBar!: Phaser.GameObjects.Graphics;
   
   // Movement
   private moveSpeed: number = 200;
@@ -261,8 +262,7 @@ export class ArenaPlayer extends Phaser.GameObjects.Container {
 
   public takeDamage(amount: number): void {
     // Damage is handled through the ability system
-    const damageEffect = this.abilitySystem.constructor.prototype.constructor
-      .createInstantDamage(amount);
+    const damageEffect = GameplayEffect.createInstantDamage(amount);
     this.abilitySystem.applyGameplayEffect(damageEffect);
 
     // Visual feedback
@@ -270,12 +270,14 @@ export class ArenaPlayer extends Phaser.GameObjects.Container {
   }
 
   private createDamageEffect(): void {
-    // Red flash effect
-    this.sprite.tint = 0xff0000;
+    // Red flash effect overlay
+    const flashEffect = this.scene.add.graphics();
+    flashEffect.fillStyle(0xff0000, 0.5);
+    flashEffect.fillCircle(this.x, this.y, 20); // Player size
     
     this.scene.time.delayedCall(100, () => {
-      if (this.sprite && this.active) {
-        this.sprite.clearTint();
+      if (flashEffect) {
+        flashEffect.destroy();
       }
     });
 

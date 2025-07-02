@@ -132,7 +132,7 @@ export class GameplayTagSystem {
   }
 
   // Get number of unique tags
-  getTagCount(): number {
+  getTotalTagCount(): number {
     return this.tags.size;
   }
 

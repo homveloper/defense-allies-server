@@ -484,17 +484,18 @@ export class ArenaMainScene extends Phaser.Scene {
   }
 
   public createProjectile(x: number, y: number, targetX: number, targetY: number, damage: number, isEnemy: boolean = false): void {
-    const projectile = this.physics.add.sprite(x, y, null);
-    
-    // Create simple circle projectile
+    // Create simple circle projectile texture
     const graphics = this.add.graphics();
     graphics.fillStyle(isEnemy ? 0xff4444 : 0x44ff44);
     graphics.fillCircle(0, 0, 3);
     
-    projectile.setTexture(graphics.generateTexture('projectile_' + Date.now()));
+    const textureKey = 'projectile_' + Date.now();
+    graphics.generateTexture(textureKey, 6, 6);
     graphics.destroy();
+    
+    const projectile = this.physics.add.sprite(x, y, textureKey);
 
-    projectile.damage = damage;
+    (projectile as any).damage = damage;
 
     // Calculate velocity
     const angle = Phaser.Math.Angle.Between(x, y, targetX, targetY);

@@ -79,7 +79,7 @@ export default function GamesPage() {
                     <CardTitle className="text-white">{game.title}</CardTitle>
                     <div className="flex gap-1">
                       {game.tag === 'NEW' && (
-                        <Badge variant="success">NEW</Badge>
+                        <Badge variant="online">NEW</Badge>
                       )}
                       {game.status === 'coming-soon' && (
                         <Badge variant="waiting">준비중</Badge>

@@ -4,15 +4,15 @@ import { GameplayEffect } from '@/components/minimal-legion/systems/ability-syst
 export class PowerUp extends Phaser.GameObjects.Container {
   public body!: Phaser.Physics.Arcade.Body;
   
-  private sprite: Phaser.GameObjects.Graphics;
-  private type: string;
+  private sprite!: Phaser.GameObjects.Graphics;
+  private powerUpType: string;
   private lifetime: number = 30000; // 30 seconds
   private creationTime: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, type: string) {
     super(scene, x, y);
 
-    this.type = type;
+    this.powerUpType = type;
     this.creationTime = scene.time.now;
 
     // Create visual representation
@@ -43,7 +43,7 @@ export class PowerUp extends Phaser.GameObjects.Container {
     // Main shape
     this.sprite.fillStyle(color, 1);
     
-    switch (this.type) {
+    switch (this.powerUpType) {
       case 'health':
         // Cross shape
         this.sprite.fillRect(-2, -8, 4, 16);
@@ -95,7 +95,7 @@ export class PowerUp extends Phaser.GameObjects.Container {
   }
 
   private getTypeColor(): number {
-    switch (this.type) {
+    switch (this.powerUpType) {
       case 'health': return 0x27ae60; // Green
       case 'mana': return 0x3498db;   // Blue
       case 'damage': return 0xe74c3c; // Red
@@ -162,7 +162,7 @@ export class PowerUp extends Phaser.GameObjects.Container {
 
     const asc = player.abilitySystem;
 
-    switch (this.type) {
+    switch (this.powerUpType) {
       case 'health':
         // Restore 50 health
         const healEffect = GameplayEffect.createInstantHeal(50);
@@ -272,7 +272,7 @@ export class PowerUp extends Phaser.GameObjects.Container {
   }
 
   private getTypeName(): string {
-    switch (this.type) {
+    switch (this.powerUpType) {
       case 'health': return 'Health +50';
       case 'mana': return 'Mana +30';
       case 'damage': return 'Damage +15';

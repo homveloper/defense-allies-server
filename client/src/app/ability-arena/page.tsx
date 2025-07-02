@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import * as Phaser from 'phaser';
-import { ArenaMainScene } from '@/components/ability-arena/scenes/ArenaMainScene';
 import { ArenaHUD } from '@/components/ability-arena/ui/ArenaHUD';
 import { AbilitySelectionModal } from '@/components/ability-arena/ui/AbilitySelectionModal';
 import { GameOverModal } from '@/components/ability-arena/ui/GameOverModal';
@@ -10,15 +8,44 @@ import { PauseModal } from '@/components/ability-arena/ui/PauseModal';
 import { useAbilityArenaStore } from '@/store/abilityArenaStore';
 
 export default function AbilityArenaPage() {
-  const gameRef = useRef<Phaser.Game | null>(null);
+  const gameRef = useRef<any>(null);
   const [isGameReady, setIsGameReady] = useState(false);
+  const phaserRef = useRef<any>(null);
+  const sceneRef = useRef<any>(null);
   const store = useAbilityArenaStore();
 
   useEffect(() => {
-    if (gameRef.current) return;
+    // Dynamic imports to avoid SSR issues
+    const loadPhaser = async () => {
+      const [PhaserModule, SceneModule] = await Promise.all([
+        import('phaser'),
+        import('@/components/ability-arena/scenes/ArenaMainScene')
+      ]);
+      
+      phaserRef.current = PhaserModule;
+      sceneRef.current = SceneModule.ArenaMainScene;
+      
+      // Initialize game after both modules are loaded
+      initializeGame();
+    };
 
-    const config: Phaser.Types.Core.GameConfig = {
-      type: Phaser.AUTO,
+    loadPhaser();
+
+    // Cleanup function
+    return () => {
+      if (gameRef.current) {
+        gameRef.current.destroy(true);
+        gameRef.current = null;
+        setIsGameReady(false);
+      }
+    };
+  }, []);
+
+  const initializeGame = () => {
+    if (!phaserRef.current || !sceneRef.current || gameRef.current) return;
+
+    const config = {
+      type: phaserRef.current.AUTO,
       width: 1200,
       height: 800,
       parent: 'ability-arena-game',
@@ -30,29 +57,21 @@ export default function AbilityArenaPage() {
           debug: false,
         },
       },
-      scene: [ArenaMainScene],
+      scene: [sceneRef.current],
       scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode: phaserRef.current.Scale.FIT,
+        autoCenter: phaserRef.current.Scale.CENTER_BOTH,
       },
     };
 
-    gameRef.current = new Phaser.Game(config);
+    gameRef.current = new phaserRef.current.Game(config);
     setIsGameReady(true);
-
-    return () => {
-      if (gameRef.current) {
-        gameRef.current.destroy(true);
-        gameRef.current = null;
-        setIsGameReady(false);
-      }
-    };
-  }, []);
+  };
 
   const handleRestart = () => {
     store.resetGame();
     if (gameRef.current) {
-      const scene = gameRef.current.scene.getScene('ArenaMainScene') as ArenaMainScene;
+      const scene = gameRef.current.scene.getScene('ArenaMainScene') as any;
       if (scene) {
         scene.scene.restart();
       }
@@ -62,7 +81,7 @@ export default function AbilityArenaPage() {
   const handlePause = () => {
     store.setPaused(true);
     if (gameRef.current) {
-      const scene = gameRef.current.scene.getScene('ArenaMainScene') as ArenaMainScene;
+      const scene = gameRef.current.scene.getScene('ArenaMainScene') as any;
       if (scene) {
         scene.scene.pause();
       }
@@ -72,7 +91,7 @@ export default function AbilityArenaPage() {
   const handleResume = () => {
     store.setPaused(false);
     if (gameRef.current) {
-      const scene = gameRef.current.scene.getScene('ArenaMainScene') as ArenaMainScene;
+      const scene = gameRef.current.scene.getScene('ArenaMainScene') as any;
       if (scene) {
         scene.scene.resume();
       }
@@ -121,10 +140,13 @@ export default function AbilityArenaPage() {
 
         {/* Game Loading */}
         {!isGameReady && (
-          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center min-h-[800px]">
             <div className="text-center">
               <div className="animate-spin w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-xl">Loading Ability Arena...</p>
+              <p className="text-sm text-gray-400 mt-2">
+                {!phaserRef.current ? 'Loading Phaser engine...' : 'Initializing game world...'}
+              </p>
             </div>
           </div>
         )}
