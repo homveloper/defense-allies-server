@@ -2,7 +2,6 @@ import * as Phaser from 'phaser';
 import { 
   AbilitySystemComponent, 
   AbilitySystemUtils,
-  BasicAttackAbility,
   GameplayEffect
 } from '@/components/minimal-legion/systems/ability-system';
 
@@ -260,8 +259,18 @@ export class ArenaEnemy extends Phaser.GameObjects.Container {
       this.target.x, this.target.y
     );
 
-    const velocityX = Math.cos(angle) * this.moveSpeed;
-    const velocityY = Math.sin(angle) * this.moveSpeed;
+    let speed = this.moveSpeed;
+    
+    // Apply dev settings speed multiplier
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings?.enemySpeedMultiplier) {
+        speed *= devSettings.enemySpeedMultiplier;
+      }
+    }
+
+    const velocityX = Math.cos(angle) * speed;
+    const velocityY = Math.sin(angle) * speed;
 
     this.body.setVelocity(velocityX, velocityY);
 
@@ -370,8 +379,32 @@ export class ArenaEnemy extends Phaser.GameObjects.Container {
   }
 
   public takeDamage(amount: number): void {
+    // Check dev settings for invincibility
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings?.enemyInvincible) {
+        console.log('Enemy damage blocked by dev settings');
+        return;
+      }
+    }
+    
+    // Check ability system tags for invincibility
+    if (this.abilitySystem.hasTag('invincible')) {
+      console.log('Enemy damage blocked by invincible tag');
+      return;
+    }
+    
+    // Apply damage multiplier from dev settings
+    let finalAmount = amount;
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings?.enemyDamageMultiplier) {
+        finalAmount *= devSettings.enemyDamageMultiplier;
+      }
+    }
+    
     // Damage is handled through the ability system
-    const damageEffect = GameplayEffect.createInstantDamage(amount);
+    const damageEffect = GameplayEffect.createInstantDamage(finalAmount);
     this.abilitySystem.applyGameplayEffect(damageEffect);
 
     // Visual feedback

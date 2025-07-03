@@ -6,6 +6,7 @@ import { AbilitySelectionModal } from '@/components/ability-arena/ui/AbilitySele
 import { GameOverModal } from '@/components/ability-arena/ui/GameOverModal';
 import { PauseModal } from '@/components/ability-arena/ui/PauseModal';
 import { AbilityDebugPanel } from '@/components/ability-arena/ui/AbilityDebugPanel';
+import { DevControlPanel } from '@/components/ability-arena/ui/DevControlPanel';
 import { useAbilityArenaStore } from '@/store/abilityArenaStore';
 
 export default function AbilityArenaPage() {
@@ -141,6 +142,9 @@ export default function AbilityArenaPage() {
         
         {/* Debug Panel */}
         {isGameReady && <AbilityDebugPanel />}
+        
+        {/* Dev Control Panel */}
+        {isGameReady && <DevControlPanel />}
 
         {/* Game Loading */}
         {!isGameReady && (

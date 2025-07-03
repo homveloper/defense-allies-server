@@ -46,6 +46,12 @@ export class ArenaMainScene extends Phaser.Scene {
   create() {
     console.log('ArenaMainScene created');
     
+    // Register globally for dev panel access
+    if (typeof window !== 'undefined') {
+      (window as any).currentArenaScene = this;
+      (window as any).phaserGame = this.game;
+    }
+    
     // Set world bounds to arena size
     this.physics.world.setBounds(
       this.ARENA_X, 
@@ -255,8 +261,18 @@ export class ArenaMainScene extends Phaser.Scene {
     this.enemySpawnTimer += delta;
     this.powerUpSpawnTimer += delta;
 
-    // Spawn enemies
-    if (this.enemySpawnTimer >= this.enemySpawnRate) {
+    // Spawn enemies (check dev settings)
+    let spawnEnabled = true;
+    let spawnRateMultiplier = 1.0;
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings) {
+        spawnEnabled = devSettings.enemySpawnEnabled !== false;
+        spawnRateMultiplier = devSettings.enemySpawnRate || 1.0;
+      }
+    }
+    
+    if (spawnEnabled && this.enemySpawnTimer >= (this.enemySpawnRate / spawnRateMultiplier)) {
       this.spawnEnemy();
       this.enemySpawnTimer = 0;
     }
@@ -305,7 +321,16 @@ export class ArenaMainScene extends Phaser.Scene {
   }
 
   private spawnEnemy(): void {
-    if (this.enemies.countActive() >= 20) return; // Limit active enemies
+    // Check dev settings for max enemy count
+    let maxEnemies = 20;
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings?.maxEnemyCount) {
+        maxEnemies = devSettings.maxEnemyCount;
+      }
+    }
+    
+    if (this.enemies.countActive() >= maxEnemies) return; // Limit active enemies
 
     // Random spawn position at arena edges
     const side = Math.floor(Math.random() * 4);
@@ -336,6 +361,39 @@ export class ArenaMainScene extends Phaser.Scene {
     const enemy = new ArenaEnemy(this, x, y, this.getEnemyType());
     this.enemies.add(enemy);
     enemy.setTarget(this.player);
+  }
+
+  // Dev Panel utility methods
+  public spawnWave(): void {
+    const waveSize = Math.min(10, 50 - this.enemies.countActive());
+    for (let i = 0; i < waveSize; i++) {
+      this.time.delayedCall(i * 100, () => {
+        this.spawnEnemy();
+      });
+    }
+  }
+
+  public killAllEnemies(): void {
+    this.enemies.children.entries.forEach((enemy: any) => {
+      if (enemy.active && enemy.takeDamage) {
+        enemy.takeDamage(9999);
+      }
+    });
+  }
+
+  public setSpawnEnabled(enabled: boolean): void {
+    // This is handled by dev settings in update loop
+    console.log(`Enemy spawning ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  public setSpawnRate(rate: number): void {
+    // This is handled by dev settings in update loop
+    console.log(`Enemy spawn rate set to ${rate}x`);
+  }
+
+  public setMaxEnemyCount(count: number): void {
+    // This is handled by dev settings in update loop
+    console.log(`Max enemy count set to ${count}`);
   }
 
   private getEnemyType(): string {

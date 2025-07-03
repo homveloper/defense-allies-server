@@ -156,7 +156,15 @@ export class ArenaPlayer extends Phaser.GameObjects.Container {
   }
 
   private handleNormalMovement(): void {
-    const speed = this.abilitySystem.getAttributeFinalValue('moveSpeed') || this.moveSpeed;
+    let speed = this.abilitySystem.getAttributeFinalValue('moveSpeed') || this.moveSpeed;
+    
+    // Apply dev settings speed multiplier
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings?.playerSpeedMultiplier) {
+        speed *= devSettings.playerSpeedMultiplier;
+      }
+    }
     
     // Normalize diagonal movement
     let velocityX = this.moveX * speed;
@@ -287,6 +295,21 @@ export class ArenaPlayer extends Phaser.GameObjects.Container {
   }
 
   public takeDamage(amount: number): void {
+    // Check dev settings for invincibility
+    if (typeof window !== 'undefined') {
+      const devSettings = (window as any).devSettings;
+      if (devSettings?.playerInvincible) {
+        console.log('Player damage blocked by dev settings');
+        return;
+      }
+    }
+    
+    // Check ability system tags for invincibility
+    if (this.abilitySystem.hasTag('invincible')) {
+      console.log('Player damage blocked by invincible tag');
+      return;
+    }
+    
     // Damage is handled through the ability system
     const damageEffect = GameplayEffect.createInstantDamage(amount);
     this.abilitySystem.applyGameplayEffect(damageEffect);
