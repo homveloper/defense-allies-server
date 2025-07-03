@@ -12,6 +12,7 @@ interface Player {
   experienceToNext: number;
   killCount: number;
   abilities: string[];
+  currentRandomAbility?: string;
 }
 
 interface GameStats {
@@ -60,6 +61,7 @@ interface AbilityArenaState {
   addExperience: (amount: number) => void;
   levelUp: () => void;
   addAbility: (abilityId: string) => void;
+  updateCurrentRandomAbility: (abilityName: string) => void;
   
   // Stats Actions
   incrementWave: () => void;
@@ -88,7 +90,8 @@ const initialPlayer: Player = {
   experience: 0,
   experienceToNext: 100,
   killCount: 0,
-  abilities: ['basic_attack'] // Start with basic attack
+  abilities: ['basic_attack'], // Start with basic attack
+  currentRandomAbility: 'None'
 };
 
 const initialStats: GameStats = {
@@ -207,6 +210,13 @@ export const useAbilityArenaStore = create<AbilityArenaState>((set, get) => ({
     player: {
       ...state.player,
       abilities: [...state.player.abilities, abilityId]
+    }
+  })),
+
+  updateCurrentRandomAbility: (abilityName: string) => set((state) => ({
+    player: {
+      ...state.player,
+      currentRandomAbility: abilityName
     }
   })),
 

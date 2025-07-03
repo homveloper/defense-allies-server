@@ -59,11 +59,28 @@ export function ArenaHUD() {
         </div>
       </div>
 
+      {/* Random Ability Display */}
+      <div className="absolute top-4 right-1/2 transform translate-x-1/2 pointer-events-auto">
+        <div className="bg-purple-600/80 rounded-lg p-3 text-center border-2 border-purple-400">
+          <div className="text-white text-xs font-semibold mb-1">Random Ability</div>
+          <div className="text-yellow-300 text-sm font-bold" id="random-ability-name">
+            {store.player.currentRandomAbility || 'None'}
+          </div>
+          <div className="text-white text-xs mt-1">
+            <span className="bg-purple-500 px-1 rounded">F</span> to swap
+          </div>
+          <div className="text-white text-xs">
+            <span className="bg-purple-500 px-1 rounded">Left Click</span> to use
+          </div>
+        </div>
+      </div>
+
       {/* Controls Help */}
       <div className="absolute bottom-4 right-4 bg-black/70 rounded-lg p-2 text-white text-xs">
         <div>WASD: Move</div>
         <div>Space: Dash</div>
-        <div>Left Click: Attack</div>
+        <div>F: Random Ability</div>
+        <div>Left Click: Use Ability</div>
         <div>Right Click: Fireball</div>
       </div>
     </div>

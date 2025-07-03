@@ -24,6 +24,10 @@ export type {
 export { BasicAttackAbility } from './abilities/BasicAttackAbility';
 export { FireballAbility } from './abilities/FireballAbility';
 export { HealAbility } from './abilities/HealAbility';
+export { LightningBoltAbility } from './abilities/LightningBoltAbility';
+export { IceSpikesAbility } from './abilities/IceSpikesAbility';
+export { TeleportAbility } from './abilities/TeleportAbility';
+export { ShieldBubbleAbility } from './abilities/ShieldBubbleAbility';
 
 // Import required dependencies for utilities
 import { AbilitySystemComponent } from './core/AbilitySystemComponent';

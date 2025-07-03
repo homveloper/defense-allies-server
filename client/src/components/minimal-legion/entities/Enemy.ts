@@ -26,7 +26,6 @@ export class Enemy extends Phaser.GameObjects.Container {
     scene: Phaser.Scene, 
     x: number, 
     y: number, 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _wave: number = 1,
     healthMultiplier: number = 1,
     damageMultiplier: number = 1,

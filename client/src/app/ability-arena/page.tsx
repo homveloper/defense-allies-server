@@ -5,6 +5,7 @@ import { ArenaHUD } from '@/components/ability-arena/ui/ArenaHUD';
 import { AbilitySelectionModal } from '@/components/ability-arena/ui/AbilitySelectionModal';
 import { GameOverModal } from '@/components/ability-arena/ui/GameOverModal';
 import { PauseModal } from '@/components/ability-arena/ui/PauseModal';
+import { AbilityDebugPanel } from '@/components/ability-arena/ui/AbilityDebugPanel';
 import { useAbilityArenaStore } from '@/store/abilityArenaStore';
 
 export default function AbilityArenaPage() {
@@ -137,6 +138,9 @@ export default function AbilityArenaPage() {
 
         {/* Game HUD Overlay */}
         {isGameReady && <ArenaHUD />}
+        
+        {/* Debug Panel */}
+        {isGameReady && <AbilityDebugPanel />}
 
         {/* Game Loading */}
         {!isGameReady && (
@@ -167,7 +171,9 @@ export default function AbilityArenaPage() {
               <ul className="space-y-1 text-sm text-gray-300">
                 <li><kbd className="bg-gray-700 px-1 rounded">WASD</kbd> - Move</li>
                 <li><kbd className="bg-gray-700 px-1 rounded">Mouse</kbd> - Aim</li>
-                <li><kbd className="bg-gray-700 px-1 rounded">Left Click</kbd> - Basic Attack</li>
+                <li><kbd className="bg-gray-700 px-1 rounded">Left Click</kbd> - Use Random Ability</li>
+                <li><kbd className="bg-gray-700 px-1 rounded">Right Click</kbd> - Fireball</li>
+                <li><kbd className="bg-gray-700 px-1 rounded">F</kbd> - Swap Random Ability</li>
                 <li><kbd className="bg-gray-700 px-1 rounded">Q</kbd> - Ability 1</li>
                 <li><kbd className="bg-gray-700 px-1 rounded">E</kbd> - Ability 2</li>
                 <li><kbd className="bg-gray-700 px-1 rounded">R</kbd> - Ultimate</li>
@@ -191,8 +197,9 @@ export default function AbilityArenaPage() {
             <h3 className="font-semibold mb-2">💡 Testing Focus</h3>
             <p className="text-sm text-blue-200">
               This arena is designed to test our Gameplay Ability System (GAS). 
+              Use the <strong>F key</strong> to swap between random abilities and <strong>left-click</strong> to use them.
               Try different ability combinations, observe visual effects, test performance with many active effects, 
-              and help us identify bugs or balance issues!
+              and help us identify bugs or balance issues! Check the debug panel on the left for detailed ability information.
             </p>
           </div>
         </div>
